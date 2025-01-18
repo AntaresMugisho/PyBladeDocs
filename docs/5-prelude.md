@@ -14,7 +14,7 @@ Unlike some templating engines, PyBlade keeps things simple while staying flexib
 
 Each PyBlade template is compiled into HTML code and cached to ensure optimal performance, meaning PyBlade adds virtually no overhead to your application.
 
-PyBlade templates use the `.pyblade` file extension and are typically stored within the `templates` directory of your app.
+PyBlade templates use the `.html` file extension and are typically stored within the `templates` directory of your app.
 
 In Django or Flask applications, PyBlade views can be rendered directly within views or controllers, keeping data handling and template rendering clean and straightforward.
 

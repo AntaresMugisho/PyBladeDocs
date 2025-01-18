@@ -20,7 +20,7 @@ def show_status(request):
 ```
 
 ```html
-<!-- In status.pyblade -->
+<!-- In status.html -->
 @if(status == 'active')
     <p>Your account is active.</p>
 @elif (status == 'pending')
@@ -79,7 +79,7 @@ def check_admin(request):
 ```
 
 ```html
-<!-- In admin_check.pyblade -->
+<!-- In admin_check.html -->
 @unless (is_admin)
     <p>You do not have admin privileges.</p>
 @endunless
@@ -178,7 +178,7 @@ def show_status(request):
 ```
 
 ```html
-<!-- In status.pyblade -->
+<!-- In status.html -->
 @switch(status)
     @case('active')
         <p>Your account is active.</p>
@@ -227,7 +227,7 @@ def show_items(request):
 ```
 
 ```html
-<!-- In items.pyblade -->
+<!-- In items.html -->
 <ul>
     @for (fruit in fruits)
         <li>{{ fruit }}</li>
@@ -257,7 +257,7 @@ def show_fruits(request):
 ```
 
 ```html
-<!-- In fruits.pyblade -->
+<!-- In fruits.html -->
 <ul>
     @for(fruit in fruits)
         <li>{{ fruit }}</li>
@@ -301,7 +301,7 @@ Here is a full list of available properties on the loop variable.
 Let’s enhance the previous example to use the `loop` variable for displaying additional information about each item:
 
 ```html
-<!-- In items.pyblade -->
+<!-- In items.html -->
 <ul>
     @for(fruit in fruits)
         <li>
@@ -353,7 +353,7 @@ def show_fruits(request):
 ```
 
 ```html
-<!-- In fruits.pyblade -->
+<!-- In fruits.html -->
 <ul>
     @for(fruit in fruits)
         @if(fruit == 'Banana')
@@ -434,7 +434,7 @@ def show_fruits(request):
 ```
 
 ```html
-<!-- In fruits.pyblade -->
+<!-- In fruits.html -->
 <ul>
     @for fruit in fruits
         <li @class({"list-item": True, "favorite": fruit.is_favorite})>{{ fruit.name }}</li>
@@ -494,17 +494,17 @@ Partials should be stored within a `partials` directory inside the main project 
 my_project/
 ├── templates/
 │   ├── partials/
-│   │   ├── header.pyblade
-│   |   └── base.pyblade
+│   │   ├── header.html
+│   |   └── base.html
 └── settings.py
 ```
 
 ### Including a partial
 
-Use the `@include` directive to insert a partial within a template. The path to the partial is specified as a string, excluding the `.pyblade` extension and separating direcoties with dots (`.`).
+Use the `@include` directive to insert a partial within a template. The path to the partial is specified as a string, excluding the `.html` extension and separating direcoties with dots (`.`).
 
 ```html
-<!-- In base.pyblade -->
+<!-- In base.html -->
 <!DOCTYPE html>
 <html>
 <head>

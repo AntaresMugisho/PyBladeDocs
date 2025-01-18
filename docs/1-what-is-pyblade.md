@@ -10,7 +10,7 @@ Your feedback is invaluable as we work toward a stable release. Thank you for he
 **PyBlade** is a lightweight, secure template engine for Python, designed to be both powerful and easy to use. Drawing
 inspiration from Laravel's Blade, PyBlade allows developers to build expressive, secure templates using an intuitive `@`-based syntax. While many template engines focus on backend logic, PyBlade extends into component-driven development through LiveBlade, helping you create complex, reusable UI components that reduce reliance on backend rendering and enhance performance.
 
-Developed with flexibility in mind, PyBlade is designed to integrate with various Python web frameworks, though it currently supports Django and Flask. Its flexible `.pyblade` file extension makes it easy to identify and work with PyBlade templates across your project. Whether you're a developer familiar with Blade or simply looking for a streamlined template engine, PyBlade offers a refreshing and secure approach to building dynamic applications.
+Developed with flexibility in mind, PyBlade is designed to integrate with various Python web frameworks, though it currently supports Django and Flask. Its flexible `.html` file extension makes it easy to identify and work with PyBlade templates across your project. Whether you're a developer familiar with Blade or simply looking for a streamlined template engine, PyBlade offers a refreshing and secure approach to building dynamic applications.
 
 
 

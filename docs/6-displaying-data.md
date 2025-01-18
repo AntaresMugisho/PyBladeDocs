@@ -20,7 +20,7 @@ def show_greeting(request):
 ```
 
 ```html
-<!-- In greeting.pyblade -->
+<!-- In greeting.html -->
 <p>Hello, {{ name }} !</p>
 ```
 
@@ -48,7 +48,7 @@ def show_message(request):
 ```
 
 ```html
-<!-- In message.pyblade -->
+<!-- In message.html -->
 <p>{!! message !!}</p>
 ```
 
@@ -101,7 +101,7 @@ def show_greeting(request):
 ```
 
 ```html
-<!-- In greeting.pyblade -->
+<!-- In greeting.html -->
 <p>Hello, {{ name.upper() }} !</p>
 ```
 
