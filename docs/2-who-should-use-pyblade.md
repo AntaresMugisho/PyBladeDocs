@@ -19,14 +19,14 @@ PyBlade is built for developers who want to maximize efficiency and maintainabil
    projects with a modern component-driven model similar to frontend frameworks, allowing you to create modular, self-contained UI pieces that reduce server rendering needs.
 
 4. **Multi-Framework Projects**: Since PyBlade’s design is framework-agnostic, it’s well-suited for applications that
-may span multiple Python web frameworks. Current support includes Django and Flask, with a straightforward setup process and the potential for further compatibility in the future.
+may span multiple Python web frameworks. Current support includes only Django with a straightforward setup process and the potential for further compatibility in the future.
 
 
 ## Simple Demo
 
 To get a quick glimpse of PyBlade’s capabilities, here’s an example template:
 
-**Template File (`example.pyblade`):**
+**Template File (`example.html`):**
 
 
 ```html
