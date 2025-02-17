@@ -1,4 +1,4 @@
-# Displaying Data in PyBlade
+# Displaying data in PyBlade
 
 In PyBlade, displaying data inside templates is straightforward and designed to feel intuitive for developers, especially those familiar with Blade from Laravel. To display variables, PyBlade uses the <span v-pre>`{{ }}`</span> syntax, which is both secure and simple to use.
 
@@ -13,14 +13,16 @@ To display a variable, simply wrap it within double curly braces <span v-pre>`{{
 Assuming you have a variable named `name` passed to the template, you can display it like this:
 
 ```python
-# In your rendiring view function
+# views.py
+from django.shortcuts import render
+
 def show_greeting(request):
     context = {'name': 'John Doe'}
     return render(request, 'greeting', context)
 ```
 
 ```html
-<!-- In greeting.html -->
+<!-- greeting.html -->
 <p>Hello, {{ name }} !</p>
 ```
 
@@ -30,7 +32,7 @@ def show_greeting(request):
 ```
 ---
 
-When you insert data using this syntax, PyBlade will automatically escape the content to protect against XSS (Cross-Site Scripting) attacks. For cases where you need to output unescaped HTML, there is another syntax.
+When you insert data using this syntax, PyBlade will automatically escape the content to protect against common vulnerabilities like Cross-Site Scripting (XSS) attacks. For cases where you need to output unescaped HTML, there is another syntax.
 
 ## Displaying unescaped HTML data
 
@@ -41,14 +43,16 @@ For data that includes HTML, such as `<strong>`, `<em>`, or custom HTML content,
 If a variable `message` contains HTML, such as `"<strong>Welcome back!</strong>"`, you can display it like this:
 
 ```python
-# In your rendiring view function
+# views.py
+from django.shortcuts import render
+
 def show_message(request):
     context = {'message': '<strong>Welcome back!</strong>'}
-    return render(request, 'message', context)
+    return render(request, 'welcome', context)
 ```
 
 ```html
-<!-- In message.html -->
+<!-- welcome.html -->
 <p>{!! message !!}</p>
 ```
 
@@ -94,14 +98,16 @@ For example, if you have a string variable like `name`, you can use Python strin
 If `name` is a string variable, you can call `.upper()` to display it in uppercase:
 
 ```python
-# In your rendiring view function
+# views.py
+from django.shortcuts import render
+
 def show_greeting(request):
     context = {'name': 'Jane'}
     return render(request, 'greeting', context)
 ```
 
 ```html
-<!-- In greeting.html -->
+<!-- greeting.html -->
 <p>Hello, {{ name.upper() }} !</p>
 ```
 
@@ -129,7 +135,7 @@ If you want to capitalize only the first letter of `name`, you can use `.capital
 <p>Welcome, {{ name.capitalize() }}!</p>
 ```
 
-### Getting the length of a ist
+### Getting the length of a list
 ::: info Upcoming feature
 This feature is not yet implemented but should be ready in the next version. This part of documentation is provided for informative purpose only.
 :::
@@ -142,7 +148,7 @@ If you have a list called `items`, you can display its length with `len()`:
 
 #### Accessing Dictionary Keys
 
-If `user` is a dictionary with a key `email`, you can access it like this:
+If a variable `user` is a dictionary with a key `email`, you can access it like this:
 
 ```html
 <p>Your email: {{ user.get('email') }}</p>
