@@ -8,7 +8,7 @@ Here's how you can display data in PyBlade templates:
 
 To display a variable, simply wrap it within double curly braces <span v-pre>`{{ }}`</span>.
 
-### Example
+**Example**
 
 Assuming you have a variable named `name` passed to the template, you can display it like this:
 
@@ -26,7 +26,7 @@ def show_greeting(request):
 <p>Hello, {{ name }} !</p>
 ```
 
-### Output
+**Output**
 ```html
 <p>Hello, John Doe !</p>
 ```
@@ -38,7 +38,7 @@ When you insert data using this syntax, PyBlade will automatically escape the co
 
 For data that includes HTML, such as `<strong>`, `<em>`, or custom HTML content, use `{!! !!}` to output the data without escaping. This is useful for displaying HTML content stored in your variables.
 
-### Example
+**Example**
 
 If a variable `message` contains HTML, such as `"<strong>Welcome back!</strong>"`, you can display it like this:
 
@@ -56,7 +56,7 @@ def show_message(request):
 <p>{!! message !!}</p>
 ```
 
-### Output
+**Output**
 ```html
 <p><strong>Welcome back!</strong></p>
 ```
@@ -73,7 +73,7 @@ This feature is not yet implemented but should be ready in the next version. Thi
 
 In PyBlade, you can also define default values for variables. This is helpful in cases where the variable might not always be defined.
 
-### Example
+**Example**
 
 If you want to display `name`, but fallback to "Guest" if it’s undefined, you can use the following syntax:
 
@@ -93,7 +93,7 @@ In PyBlade, you can not only display variables but also call methods on them dir
 
 For example, if you have a string variable like `name`, you can use Python string methods such as `.upper()` or `.capitalize()` directly within <span v-pre>`{{ }}`</span> to transform the data before displaying it.
 
-### Example
+**Example**
 
 If `name` is a string variable, you can call `.upper()` to display it in uppercase:
 
@@ -111,7 +111,7 @@ def show_greeting(request):
 <p>Hello, {{ name.upper() }} !</p>
 ```
 
-### Output
+**Output**
 ```html
 <p>Hello, JANE !</p>
 ```
@@ -160,13 +160,81 @@ Using methods within curly braces allows for greater flexibility and keeps your 
 For best performance and maintainability, follow the principle of “Logic in the code, templates are for display only.” Perform complex logic and data transformations in your views or controllers, passing only the final, display-ready data to your templates. This keeps templates focused solely on presentation, enhancing readability and performance.
 :::
 
+## PyBlade and JavaScript Frameworks
+Since many JavaScript frameworks also use "curly" braces to indicate a given expression should be displayed in the browser, you may use the `@` symbol to inform the PyBlade rendering engine an expression should remain untouched. For example:
+
+```html
+<div class="container">
+    Hello, @{{ name }}.
+</div>
+```
+
+In this example, the `@` symbol will be removed by PyBlade; however, <span v-pre>`{{ name }}`</span> expression will remain untouched by the PyBlade Template engine, allowing it to be rendered by your JavaScript framework.
+
+If you are displaying JavaScript variables in a large portion of your template, you may wrap the HTML in the `@verbatim` directive so that you do not have to prefix each "curly" braces statement with an `@`symbol.
+
+```html
+@verbatim
+    <div class="container">
+        Hello, {{ name }}.
+    </div>
+@endverbatim
+```
+## The `@verbatim` Directive
+If you are displaying JavaScript variables in a large portion of your template, you may wrap the HTML in the `@verbatim` directive so that you do not have to prefix each "curly" braces statement with an `@` symbol.
+
+```html
+@verbatim
+    <div class="container">
+        Hello, {{ name }}.
+    </div>
+@endverbatim
+```
+
+The `@verbatim` directive in PyBlade prevents the engine from parsing the enclosed content, rendering it exactly as written. This is useful when working with JavaScript frameworks or when displaying raw template syntax.
+
+**Example**
+
+```html
+@verbatim
+    <script>
+        let app = {
+            message: "{{ message }}"
+        }
+    </script>
+
+    @if(True)
+        This won't be processed by PyBlade.
+    @endif
+@endverbatim
+```
+
+**Output**
+
+```html
+<script>
+    let app = {
+        message: "{{ message }}"
+    }
+</script>
+
+@if(True)
+    This won't be processed by PyBlade.
+@endif
+```
+
+**Explaination**
+
+- **Without `@verbatim`**: The template engine would try to parse <span v-pre>`{{ message }}`</span> and the `@if` statement, assuming it's a PyBlade directive.
+- **With `@verbatim`**: The engine ignores the enclosed content and outputs it exactly as written.
+
 ## Comments
 
 In PyBlade, comments allow you to include notes within your templates without rendering them in the final output. This is useful for adding explanations, reminders, or temporary code blocks without affecting the generated HTML.
 
 To add a comment in PyBlade, wrap your comment text inside `{# #}` placeholders. Any content within `{# #}` will be ignored during rendering, so it won’t appear in the HTML output.
 
-#### Example
+**Example**
 
 ```html
 <div class="content">
@@ -179,10 +247,19 @@ To add a comment in PyBlade, wrap your comment text inside `{# #}` placeholders.
 </div>
 ```
 
-#### Output
+**Output**
 
 ```html
 <div class="content">
     <p>Welcome to our website!</p>
 </div>
+```
+
+For convenience, PyBlade also provide a `@comment` directive for adding comments.
+
+Sample usage:
+```html
+@comment
+<p>Commented out text</p>
+@endcomment
 ```
