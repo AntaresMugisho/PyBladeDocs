@@ -17,9 +17,9 @@ export default defineConfig({
       {
         text: 'Introduction',
         items: [
-          { text: 'What is Pyblade ?', link: '/1-what-is-pyblade' },
-          { text: 'Who should use PyBlade ?', link: '/2-who-should-use-pyblade' },
-          { text: 'Getting started', link: '/3-getting-started' }
+          { text: 'Meet PyBlade', link: '/1-meet-pyblade' },
+          { text: 'Getting started', link: '/3-getting-started'},
+          { text: 'Migration guide', link: '/migration-guide'}
         ]
       },
       {
