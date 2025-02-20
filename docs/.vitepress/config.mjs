@@ -28,13 +28,19 @@ export default defineConfig({
           {text: "Prelude", link:'/5-prelude'},
           {text: "Displaying Data", link:'/6-displaying-data'},
           {text: "PyBlade Directives", link:'/7-pyblade-directives'},
-          {text: "Components",},
-          {text: "Building Layouts"},
-          {text: "Forms"},
+          {text: "Components", link: '/components'},
+          {text: "Building Layouts", link: '/layouts'},
+          {text: "Forms", link: '/forms'},
         ]
       },
       {
-        text: 'LiveBlade: Interactive UIs',
+        text: 'Liveblade: Interactive UIs',
+        items: [
+          {}
+        ]
+      },
+      {
+        text: 'PyBlade CLI',
         items: [
           {}
         ]

@@ -420,7 +420,7 @@ If there is strong demand from the community and a clear use case for `@while`, 
 
 ## Conditional Classes
 
-The `@class` directive in PyBlade lets you conditionally apply CSS classes based on specific conditions. It accepts a dictionary where `keys` represent the class names and `values` are booleans or boolean expressions. If an expression evaluates to `True`, the associated class is applied.
+The `@class` directive in PyBlade lets you conditionally apply CSS classes based on specific conditions. It accepts a dictionary where `keys` represent the class or classes you wish to add, while `values` are booleans or boolean expressions. If an expression evaluates to `True`, the associated class is applied.
 
 **Example**
 
