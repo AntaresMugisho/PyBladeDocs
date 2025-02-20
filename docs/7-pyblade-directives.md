@@ -8,19 +8,21 @@ PyBlade provides a set of intuitive and developer-friendly directives for condit
 
 To create conditional statements in PyBlade, use the `@if` directive followed by `@elif` and `@else` as needed. This structure is useful for checking various conditions and displaying content accordingly.
 
-#### Example
+**Example**
 
 Suppose you have a variable `status` that can hold values like `'active'`, `'pending'`, or `'inactive'`. You can display different messages based on the value of `status` using conditional statements:
 
 ```python
-# In your Django view
+# views.py
+from django.shortcuts import render
+
 def show_status(request):
     context = {'status': 'active'}
     return render(request, 'status', context)
 ```
 
 ```html
-<!-- In status.html -->
+<!-- status.html -->
 @if(status == 'active')
     <p>Your account is active.</p>
 @elif (status == 'pending')
@@ -30,7 +32,7 @@ def show_status(request):
 @endif
 ```
 
-### Output
+**Output**
 
 If `status` is `'active'`, the output will be:
 
@@ -51,55 +53,39 @@ And if `status` is anything else, the output will be:
 ```
 
 :::info
-In PyBlade, you can use the `@if` directive alone, pair it with `@else`, or chain one condition with `@elif`, just like in Python. Do not forget to end your conditional statement with the `@endif` directive.
-:::
-
-:::warning Missing feature
-Multiple condition chaining with `@elif` are not supported yet.
+In PyBlade, you can use the `@if` directive alone, pair it with `@else`, or chain multiple conditions with `@elif`, just like in Python. Do not forget to end your conditional statement with the `@endif` directive.
 :::
 
 ### Using `@unless`
 
-::: info Upcoming feature
-This feature is not yet implemented but should be ready in the next version. This part of documentation is provided for informative purpose only.
-:::
-
-
 The `@unless` directive works as a negation of `@if`. It executes the block only if the condition evaluates to `False`. This is useful for cases where you want to check if a variable does **not** meet a specific condition.
 
-#### Example
+**Example**
 
 If you want to display a message when a user does not have admin privileges:
 
-```python
-# In your Django view
-def check_admin(request):
-    context = {'is_admin': False}
-    return render(request, 'admin_check', context)
-```
-
 ```html
-<!-- In admin_check.html -->
-@unless (is_admin)
+<!-- admin_check.html -->
+@unless (user.is_admin)
     <p>You do not have admin privileges.</p>
 @endunless
 ```
 
-#### Output
+**Output**
 
-If `is_admin` is `False`, the output will be:
+If `user.is_admin` is `False`, the output will be:
 
 ```html
 <p>You do not have admin privileges.</p>
 ```
 
-If `is_admin` is `True`, nothing will be displayed.
+If `user.is_admin` is `True`, nothing will be displayed.
 
 ### Nested Conditionals
 
 You can also nest conditionals to create more complex logic. However, be cautious with excessive nesting as it can make the template harder to read and maintain.
 
-#### Example
+**Example**
 
 ```html
 @if (user.is_authenticated)
@@ -113,7 +99,7 @@ You can also nest conditionals to create more complex logic. However, be cautiou
 @endif
 ```
 
-#### Output
+**Output**
 
 If `user.is_authenticated` is `True` and `user.is_admin` is `True`, the output will be:
 
@@ -140,46 +126,43 @@ For performance and readability, avoid complex or time-consuming logic within co
 :::
 
 
-## Switch statements
+## Match (Switch) statements
 
-::: info Upcoming feature
-This feature is not yet implemented but should be ready in the next version. This part of documentation is provided for informative purpose only.
-:::
+PyBlde also provides support for `@match` statements, which are useful for handling multiple conditions based on the value of a single variable. This can help simplify templates by reducing the need for multiple `@if`, `@elif`, and `@else` statements.
 
-
-PyBlade also provides support for `@switch` statements, which are useful for handling multiple conditions based on the value of a single variable. This can help simplify templates by reducing the need for multiple `@if`, `@elif`, and `@else` statements.
-
-With `@switch`, you can check a variable's value and define multiple `@case` conditions. If none of the cases match, an optional `@default` can be specified as a fallback.
+With `@match`, you can check a variable's value and define multiple `@case` conditions. If none of the cases match, an optional `@default` can be specified as a fallback.
 
 ### Basic Syntax
 
-The `@switch` directive takes a variable as its argument. Within the `@switch` block, each condition is checked using `@case`, and the code in the matching `@case` block will execute. If no cases match, the `@default` block will execute (if it is provided).
+The `@match` directive takes a variable as its argument. Within the `@match` block, each condition is checked using `@case`, and the code in the matching `@case` block will execute. If no cases match, the `@default` block will execute (if it is provided).
 
 ```html
-@switch(variable)
+@match(variable)
     @case('value1')
         <!-- Code to display if variable == 'value1' -->
     @case('value2')
         <!-- Code to display if variable == 'value2' -->
     @default
         <!-- Code to display if none of the cases match -->
-@endswitch
+@endmatch
 ```
 
-### Example
+**Example**
 
-Suppose you have a variable `status` with possible values like `'active'`, `'pending'`, `'inactive'`, or others. You can use `@switch` to display different messages based on `status`:
+Suppose you have a variable `status` with possible values like `'active'`, `'pending'`, `'inactive'`, or others. You can use `@match` to display different messages based on `status`:
 
 ```python
-# In your Django view
+# views.py
+from django.shortcuts import render
+
 def show_status(request):
     context = {'status': 'pending'}
     return render(request, 'status', context)
 ```
 
 ```html
-<!-- In status.html -->
-@switch(status)
+<!-- status.html -->
+@match(status)
     @case('active')
         <p>Your account is active.</p>
     @case('pending')
@@ -188,10 +171,10 @@ def show_status(request):
         <p>Your account is inactive.</p>
     @default
         <p>Status unknown.</p>
-@endswitch
+@endmatch
 ```
 
-#### Output
+**Output**
 
 If `status` is `'pending'`, the output will be:
 
@@ -205,9 +188,31 @@ If `status` has a value other than `'active'`, `'pending'`, or `'inactive'`, the
 <p>Status unknown.</p>
 ```
 
-### Nested `@switch` Statements
+### The `@switch` directive
 
-Just like other conditional structures, `@switch` statements can be nested, though it’s best to keep templates as simple as possible to maintain readability.
+If you are accustomed to the *switch statement* in other programming  languages, PyBlade provides the `@switch` directive which is an alias for `@match`.
+Both directives function identically.
+
+So the above example is equivalent to this:
+
+```html
+<!-- status.html -->
+@switch(status)
+    @case('active')
+        <p>Your account is active.</p>
+    @case('pending')
+        <p>Your account is pending approval.</p>
+    @case('inactive')
+        <p>Your account is inactive.</p>
+    @default
+        <p>Status unknown.</p>
+@endswitch
+```
+
+### Nested `@match` Statements
+
+Just like other conditional structures, `@match` statements can be nested, though it’s best to keep templates as simple as possible to maintain readability.
+
 
 
 ## Loops
@@ -220,7 +225,8 @@ PyBlade supports looping through lists, dictionaries, and other iterable data st
 If you have a list of items, you can use `@for` to loop through them:
 
 ```python
-# In your Django view
+# views.py
+from django.shortcuts import render
 def show_items(request):
     context = {'fruits': ['Apple', 'Banana', 'Cherry']}
     return render(request, 'my_app.index', context)
@@ -235,7 +241,7 @@ def show_items(request):
 </ul>
 ```
 
-#### Output
+**Output**
 
 ```html
 <ul>
@@ -250,7 +256,9 @@ def show_items(request):
 Somethimes, you may need to handle cases where a loop has no items to iterate over. That's why PyBlade provides an `@empty` directive that specifies a fallback to display content if the list or iterable is empty.
 
 ```python
-# In your Django view
+# views.py
+from django.shortcuts import render
+
 def show_fruits(request):
     context = {'fruits': []}  # An empty list of fruits
     return render(request, 'fruits', context)
@@ -267,7 +275,7 @@ def show_fruits(request):
 </ul>
 ```
 
-### Output
+**Output**
 
 ```html
 <ul>
@@ -290,18 +298,18 @@ Here is a full list of available properties on the loop variable.
 | `loop.iteration` | The current loop iteration (starts at 1).|
 | `loop.first`     | Whether this is the first iteration through the loop.|
 | `loop.last`      | Whether this is the last iteration through the loop.|
-| `loop.count`     | The total number of items in the iterable being iterated.|
+| `loop.count`     | The total number of iterations.|
 | `loop.remaining` | The iterations remaining in the loop.|
 | `loop.even`      | Whether this is an even iteration through the loop.|
 | `loop.odd`       | Whether this is an odd iteration through the loop.|
 
 
-#### Example with `loop` Variable
+**Example** with `loop` Variable
 
 Let’s enhance the previous example to use the `loop` variable for displaying additional information about each item:
 
 ```html
-<!-- In items.html -->
+<!-- items.html -->
 <ul>
     @for(fruit in fruits)
         <li>
@@ -318,7 +326,7 @@ Let’s enhance the previous example to use the `loop` variable for displaying a
 </ul>
 ```
 
-#### Output
+**Output**
 
 ```html
 <ul>
@@ -335,25 +343,23 @@ Nested loops are not supported yet.
 
 ### Skipping and ending loop iterations
 
-::: info Upcoming feature
-This feature is not yet implemented but should be ready in the next version. This part of documentation is provided for informative purpose only.
-:::
-
 In PyBlade, you can use the `@continue` directive to skip the current iteration and move on to the next one, or the `@break` directive to exit the loop entirely based on a condition.
 
-#### Example with `@continue` and `@break`
+**Example** with `@continue` and `@break`
 
 Suppose you have a list of fruits, and you want to display each fruit's name but want to skip "Banana" and stop the loop entirely once you reach "Date."
 
 ```python
-# In your Django view
+# views.py
+from django.shortcuts import render
+
 def show_fruits(request):
     context = {'fruits': ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry']}
     return render(request, 'fruits', context)
 ```
 
 ```html
-<!-- In fruits.html -->
+<!-- fruits.html -->
 <ul>
     @for(fruit in fruits)
         @if(fruit == 'Banana')
@@ -369,7 +375,7 @@ def show_fruits(request):
 </ul>
 ```
 
-#### Output
+**Output**
 
 ```html
 <ul>
@@ -416,12 +422,14 @@ If there is strong demand from the community and a clear use case for `@while`, 
 
 The `@class` directive in PyBlade lets you conditionally apply CSS classes based on specific conditions. It accepts a dictionary where `keys` represent the class names and `values` are booleans or boolean expressions. If an expression evaluates to `True`, the associated class is applied.
 
-#### Example
+**Example**
 
 In this example, we apply the `list-item` class to each item and `favorite` class to items marked as a favorite:
 
 ```python
-# In your Django view
+# views.py
+from django.shortcuts import render
+
 def show_fruits(request):
     context = {
         'fruits': [
@@ -434,7 +442,7 @@ def show_fruits(request):
 ```
 
 ```html
-<!-- In fruits.html -->
+<!-- fruits.html -->
 <ul>
     @for fruit in fruits
         <li @class({"list-item": True, "favorite": fruit.is_favorite})>{{ fruit.name }}</li>
@@ -442,7 +450,7 @@ def show_fruits(request):
 </ul>
 ```
 
-### Output
+**Output**
 
 ```html
 <ul>
@@ -454,13 +462,9 @@ def show_fruits(request):
 
 ## Inline Styles
 
-::: info Upcoming feature
-This feature is not yet implemented but should be ready in the next version. This part of documentation is provided for informative purpose only.
-:::
+The `@style` directive works similarly to `@class`, but it controls inline CSS styles. It also takes a dictionary where `keys` are CSS properties, and `values` are booleans or expressions. When an expression evaluates to `True`, the associated style is applied to the element.
 
-The `@style` directive works similarly to `@class`, but it controls inline CSS styles. It also takes a dictionary where keys are CSS properties, and values are booleans or expressions. When an expression evaluates to `True`, the associated style is applied to the element.
-
-#### Example
+**Example**
 
 Here, we set a red color for fruits that are not favorites:
 
@@ -472,7 +476,7 @@ Here, we set a red color for fruits that are not favorites:
 </ul>
 ```
 
-#### Output
+**Output**
 
 ```html
 <ul>
@@ -486,25 +490,12 @@ Here, we set a red color for fruits that are not favorites:
 
 In PyBlade, partials allow you to include smaller template sections within a template file. This modular approach is useful for reusing common components (e.g., headers, footers, or menus) across multiple templates, keeping your code organized and reducing redundancy.
 
-### Where to Store Partials
-
-Partials should be stored within a `partials` directory inside the main project `templates` folder.
-
-```
-my_project/
-├── templates/
-│   ├── partials/
-│   │   ├── header.html
-│   |   └── base.html
-└── settings.py
-```
-
-### Including a partial
-
 Use the `@include` directive to insert a partial within a template. The path to the partial is specified as a string, excluding the `.html` extension and separating direcoties with dots (`.`).
 
+**Example**
+
 ```html
-<!-- In base.html -->
+<!-- base.html -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -518,15 +509,6 @@ Use the `@include` directive to insert a partial within a template. The path to 
 </body>
 </html>
 ```
-
-### Customizing partial directory path
-
-::: info Upcoming feature
-This feature is not yet implemented but should be ready in the next version. This part of documentation is provided for informative purpose only.
-:::
-
-
-You can customize the location of partials by setting custom paths in the PyBlade **OPTIONS**. This provides flexibility if your project has a different structure or if you want to organize templates differently. Configuration settings will vary depending on your framework, but they typically involve updating the options in your PyBlade setup.
 
 ## Raw Python code
 
