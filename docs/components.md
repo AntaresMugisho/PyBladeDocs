@@ -33,29 +33,58 @@ This command will create the file:
 ```
 
 ## Rendering components
-To display a component, you may use a PyBlade component tag within one of your PyBlade templates. PyBlade component tags start with the string `b-` followed by the kebab case name of the component class:
+
+The **preferred way** to include a component in your template is by using a **PyBlade component tag**. Component tags start with `b-`, followed by the component file name without extension.  
+
+For example, if you have a component file named `alert.html`, you can include it in your template like this:  
 
 ```html
 <b-alert/>
 ```
+
+Similarly, for a `user-profile.html` component, you would write:  
+
 ```html
 <b-user-profile/>
 ```
 
-Alternatively, you may also use the `@component` directive to include a component in a template.
+
+A PyBlade component tag can be **self-closing** – When the component does not need any inner content,
+```html
+<b-alert/>
+```
+or **paired** – When you need to include content inside the component.
+
+```html
+<b-alert>
+    This is an important message!
+</b-alert>
+```
+
+### The `@component` directive 
+PyBlade also provides an alternative way to render components using the `@component` directive:  
 
 ```html
 @component('alert')
 ```
+
 ```html
 @component('user-profile')
 ```
 
-If the component class is nested deeper within the `templates/components` directory, you may use the `.` character to indicate directory nesting. For example, if we assume a component is located at `templates/components/inputs/button.html`, we may render it like so:
+While this method works, **it is not as intuitive as using component tags**. The tag-based syntax is visually clearer and aligns with modern web development practices.  
 
+### Handling nested components  
+If your components are stored inside subdirectories within `templates/components`, you can indicate this hierarchy using a **dot notation** in both approaches.  
+
+For instance, if you have a component file located at `templates/components/inputs/button.html`, you can render it as follows:  
+  
 ```html
 <b-inputs.button/>
 ```
+
+or, alternatively:
+
 ```html
 @component('inputs.button')
 ```
@@ -133,359 +162,6 @@ For example, assuming we have a variable `status` with a dynamic string value, w
 
 In this example, `:type="status"` passes the **value of `status`** instead of the string `"status"`.  
 
-## Component Attributes
-
-We've already examined how to pass data attributes to a component; however, sometimes you may need to specify additional HTML attributes, such as `class`, that are not part of the data required for a component to function. Typically, you want to pass these additional attributes down to the root element of the component template. For example, imagine we want to render an `alert` component like so:
-
-```html
-<b-alert type="error" :message="message" class="mt-4"/>
-```
-
-All of the attributes will automatically be added to the component's "attribute bag". This attribute bag is automatically made available to the component via the `attributes` variable. All of the attributes may be rendered within the component by echoing this variable:
-
-```html
-<div {{ attributes }}>
-    <!-- Component content -->
-</div>
-```
-<a name="default-merged-attributes"></a>
-
-### Default / Merged Attributes
-
-Sometimes you may need to specify default values for attributes or merge additional values into some of the component's attributes. To accomplish this, you may use the attribute bag's `merge` method. This method is particularly useful for defining a set of default CSS classes that should always be applied to a component:
-
-```html
-<div {{ attributes->merge({'class': 'alert alert-' + type}) }}>
-    {{ message }}
-</div>
-```
-
-If we assume this component is utilized like so:
-
-```html
-<b-alert type="error" :message="message" class="mb-4"/>
-```
-
-The final, rendered HTML of the component will appear like the following:
-
-```html
-<div class="alert alert-error mb-4">
-    <!-- Contents of the message variable -->
-</div>
-```
-
-### Conditionally Merge Classes
-
-Sometimes you may wish to merge classes if a given condition is `true`. You can accomplish this via the `class_` method, which accepts an array of classes where the array key contains the class or classes you wish to add, while the value is a boolean expression. If the array element has a numeric key, it will always be included in the rendered class list:
-
-```blade
-<div {{ $attributes->class(['p-4', 'bg-red' => $hasError]) }}>
-    {{ $message }}
-</div>
-```
-
-If you need to merge other attributes onto your component, you can chain the `merge` method onto the `class` method:
-
-```blade
-<button {{ $attributes->class(['p-4'])->merge(['type' => 'button']) }}>
-    {{ $slot }}
-</button>
-```
-
-> [!NOTE]  
-> If you need to conditionally compile classes on other HTML elements that shouldn't receive merged attributes, you can use the [`@class` directive](#conditional-classes).
-
-<a name="non-class-attribute-merging"></a>
-#### Non-Class Attribute Merging
-
-When merging attributes that are not `class` attributes, the values provided to the `merge` method will be considered the "default" values of the attribute. However, unlike the `class` attribute, these attributes will not be merged with injected attribute values. Instead, they will be overwritten. For example, a `button` component's implementation may look like the following:
-
-```blade
-<button {{ $attributes->merge(['type' => 'button']) }}>
-    {{ $slot }}
-</button>
-```
-
-To render the button component with a custom `type`, it may be specified when consuming the component. If no type is specified, the `button` type will be used:
-
-```blade
-<x-button type="submit">
-    Submit
-</x-button>
-```
-
-The rendered HTML of the `button` component in this example would be:
-
-```blade
-<button type="submit">
-    Submit
-</button>
-```
-
-If you would like an attribute other than `class` to have its default value and injected values joined together, you may use the `prepends` method. In this example, the `data-controller` attribute will always begin with `profile-controller` and any additional injected `data-controller` values will be placed after this default value:
-
-```blade
-<div {{ $attributes->merge(['data-controller' => $attributes->prepends('profile-controller')]) }}>
-    {{ $slot }}
-</div>
-```
-
-<a name="filtering-attributes"></a>
-#### Retrieving and Filtering Attributes
-
-You may filter attributes using the `filter` method. This method accepts a closure which should return `true` if you wish to retain the attribute in the attribute bag:
-
-```blade
-{{ $attributes->filter(fn (string $value, string $key) => $key == 'foo') }}
-```
-
-For convenience, you may use the `whereStartsWith` method to retrieve all attributes whose keys begin with a given string:
-
-```blade
-{{ $attributes->whereStartsWith('wire:model') }}
-```
-
-Conversely, the `whereDoesntStartWith` method may be used to exclude all attributes whose keys begin with a given string:
-
-```blade
-{{ $attributes->whereDoesntStartWith('wire:model') }}
-```
-
-Using the `first` method, you may render the first attribute in a given attribute bag:
-
-```blade
-{{ $attributes->whereStartsWith('wire:model')->first() }}
-```
-
-If you would like to check if an attribute is present on the component, you may use the `has` method. This method accepts the attribute name as its only argument and returns a boolean indicating whether or not the attribute is present:
-
-```blade
-@if ($attributes->has('class'))
-    <div>Class attribute is present</div>
-@endif
-```
-
-If an array is passed to the `has` method, the method will determine if all of the given attributes are present on the component:
-
-```blade
-@if ($attributes->has(['name', 'class']))
-    <div>All of the attributes are present</div>
-@endif
-```
-
-The `hasAny` method may be used to determine if any of the given attributes are present on the component:
-
-```blade
-@if ($attributes->hasAny(['href', ':href', 'v-bind:href']))
-    <div>One of the attributes is present</div>
-@endif
-```
-
-You may retrieve a specific attribute's value using the `get` method:
-
-```blade
-{{ $attributes->get('class') }}
-```
-
-<a name="reserved-keywords"></a>
-### Reserved Keywords
-
-By default, some keywords are reserved for Blade's internal use in order to render components. The following keywords cannot be defined as public properties or method names within your components:
-
-<div class="content-list" markdown="1">
-
-- `data`
-- `render`
-- `resolveView`
-- `shouldRender`
-- `view`
-- `withAttributes`
-- `withName`
-
-</div>
-
-<a name="slots"></a>
-### Slots
-
-You will often need to pass additional content to your component via "slots". Component slots are rendered by echoing the `$slot` variable. To explore this concept, let's imagine that an `alert` component has the following markup:
-
-```blade
-<!-- /resources/views/components/alert.blade.php -->
-
-<div class="alert alert-danger">
-    {{ $slot }}
-</div>
-```
-
-We may pass content to the `slot` by injecting content into the component:
-
-```blade
-<x-alert>
-    <strong>Whoops!</strong> Something went wrong!
-</x-alert>
-```
-
-Sometimes a component may need to render multiple different slots in different locations within the component. Let's modify our alert component to allow for the injection of a "title" slot:
-
-```blade
-<!-- /resources/views/components/alert.blade.php -->
-
-<span class="alert-title">{{ $title }}</span>
-
-<div class="alert alert-danger">
-    {{ $slot }}
-</div>
-```
-
-You may define the content of the named slot using the `x-slot` tag. Any content not within an explicit `x-slot` tag will be passed to the component in the `$slot` variable:
-
-```xml
-<x-alert>
-    <x-slot:title>
-        Server Error
-    </x-slot>
-
-    <strong>Whoops!</strong> Something went wrong!
-</x-alert>
-```
-
-You may invoke a slot's `isEmpty` method to determine if the slot contains content:
-
-```blade
-<span class="alert-title">{{ $title }}</span>
-
-<div class="alert alert-danger">
-    @if ($slot->isEmpty())
-        This is default content if the slot is empty.
-    @else
-        {{ $slot }}
-    @endif
-</div>
-```
-
-Additionally, the `hasActualContent` method may be used to determine if the slot contains any "actual" content that is not an HTML comment:
-
-```blade
-@if ($slot->hasActualContent())
-    The scope has non-comment content.
-@endif
-```
-
-<a name="scoped-slots"></a>
-#### Scoped Slots
-
-If you have used a JavaScript framework such as Vue, you may be familiar with "scoped slots", which allow you to access data or methods from the component within your slot. You may achieve similar behavior in Laravel by defining public methods or properties on your component and accessing the component within your slot via the `$component` variable. In this example, we will assume that the `x-alert` component has a public `formatAlert` method defined on its component class:
-
-```blade
-<x-alert>
-    <x-slot:title>
-        {{ $component->formatAlert('Server Error') }}
-    </x-slot>
-
-    <strong>Whoops!</strong> Something went wrong!
-</x-alert>
-```
-
-<a name="slot-attributes"></a>
-#### Slot Attributes
-
-Like Blade components, you may assign additional [attributes](#component-attributes) to slots such as CSS class names:
-
-```xml
-<x-card class="shadow-sm">
-    <x-slot:heading class="font-bold">
-        Heading
-    </x-slot>
-
-    Content
-
-    <x-slot:footer class="text-sm">
-        Footer
-    </x-slot>
-</x-card>
-```
-
-To interact with slot attributes, you may access the `attributes` property of the slot's variable. For more information on how to interact with attributes, please consult the documentation on [component attributes](#component-attributes):
-
-```blade
-@props([
-    'heading',
-    'footer',
-])
-
-<div {{ $attributes->class(['border']) }}>
-    <h1 {{ $heading->attributes->class(['text-lg']) }}>
-        {{ $heading }}
-    </h1>
-
-    {{ $slot }}
-
-    <footer {{ $footer->attributes->class(['text-gray-700']) }}>
-        {{ $footer }}
-    </footer>
-</div>
-```
-
-<a name="inline-component-views"></a>
-### Inline Component Views
-
-For very small components, it may feel cumbersome to manage both the component class and the component's view template. For this reason, you may return the component's markup directly from the `render` method:
-
-    /**
-     * Get the view / contents that represent the component.
-     */
-    public function render(): string
-    {
-        return <<<'blade'
-            <div class="alert alert-danger">
-                {{ $slot }}
-            </div>
-        blade;
-    }
-
-<a name="generating-inline-view-components"></a>
-
-
-
-## The `slot` variable
-
-When using the PyBlade's component tag, each data, the content inside it will automatically be assigned to the `slot` variable and may be accessed into the component.
-
-
-```html
-<!-- templates/components/card.html -->
-
-<div class="card">
-    <h3>{{ title }}</h3>
-    <div class="card-body">
-        {{ slot }}
-    </div>
-</div>
-```
-
-
-```html
-<!-- templates/home.html -->
-
-<b-card title="Welcome">
-    <p>This is the card content.</p>
-</b-card>
-```
-
-**Output**  
-
-```html
-<!-- templates/home.html -->
-
-<div class="card">
-    <h3>Welcome</h3>
-    <div class="card-body">
-        <p>This is the card content.</p>
-    </div>
-</div>
-```
-
----
 
 ## The `@props` directive 
 
@@ -517,6 +193,260 @@ If no `type` is provided, it defaults to `"info"`. If no `message` is provided, 
 </div>
 ```
 
+## Component attributes  
+
+We have already discussed about passing data attributes to a component. However, sometimes you may need to include additional HTML attributes — such as `class` — that are not directly related to the component’s logic but are useful for styling or behavior. These extra attributes should be applied to the root element of the component template.  
+
+For example, let's say we want to render an alert component:  
+
+```html
+<b-alert type="error" :message="message" class="mt-4"/>
+```  
+
+All additional attributes are automatically available through the `attributes` variable inside the component. You can apply them to the component’s root element by simply outputting `attributes`:  
+
+```html
+<div {{ attributes }}>
+    <!-- Component content -->
+</div>
+```  
+
+This ensures that any extra attributes passed to the component are seamlessly integrated without requiring manual handling.
+
+### Default and Merged attributes
+
+In some cases, you might want to define default values for attributes or merge additional values into certain attributes of your component. For instance, this is useful when setting default CSS classes that should always be applied to a component, while also allowing flexibility to add or override them during component usage.
+
+To do this, you can use the `merge` method available on the `attributes` variable. Here's an example of how to set a default class and merge it with an additional class passed to the component:
+
+```html
+<div {{ attributes.merge({'class': 'alert alert-' + type}) }}>
+    {{ message }}
+</div>
+```
+
+If you use the component like this:
+
+```html
+<b-alert type="error" :message="message" class="mb-4"/>
+```
+
+The final HTML rendered will be:
+
+```html
+<div class="alert alert-error mb-4">
+    <!-- Contents of the message variable -->
+</div>
+```
+
+This approach allows you to seamlessly merge default attributes with those passed to the component.
+
+### Conditionally merging classes
+
+Sometimes, you may want to merge classes only under certain conditions. The `class_` method can help achieve this. It takes a dictionary where the `key` is the class you want to add, and the `value` is a boolean expression. If the expression evaluates to `True`, the class will be included. 
+
+Here's how to conditionally merge classes:
+
+```html
+<div {{ attributes.class_({'p-4': True, 'bg-red': has_error}) }}>
+    {{ message }}
+</div>
+```
+
+In this example, the class `p-4` will always be applied, and the class `bg-red` will only be applied if the `has_error` condition is `True`.
+
+<!-- Must be sure the method chaining is available on the class_ methos of the attributes variable.
+
+If you need to merge non-class attributes along with the `class_` method, you can chain the `merge` method:
+
+```html
+<button {{ attributes.class_({'p-4': true}).merge({'type': 'button'}) }}>
+    {{ slot }}
+</button>
+``` -->
 
 
+### Non-Class attribute merging
 
+When merging attributes other than `class`, the values passed to the `merge` method will be treated as "default" values for the attribute. Unlike the `class` attribute, these values will overwrite any injected values. Here's an example of merging a `type` attribute:
+
+```html
+<button {{ attributes.merge({'type': 'button'}) }}>
+    {{ slot }}
+</button>
+```
+
+If you use the component as follows:
+
+```html
+<b-button type="submit">
+    Submit
+</b-button>
+```
+
+The rendered HTML will be:
+
+```html
+<button type="submit">
+    Submit
+</button>
+```
+
+<!-- If you want a non-class attribute to merge with injected values rather than be overwritten, you can use the `prepends` method. For instance:
+
+```html
+<div {{ attributes.merge({'data-controller': attributes.prepends('profile-controller')}) }}>
+    {{ slot }}
+</div>
+``` -->
+
+### Retrieving and filtering attributes
+You may need to retrieve a specific attribute’s value, or filter attributes based on their keys. To retrieve a specific attribute’s value, you can use the `get` method:
+
+```html
+{{ attributes.get('class') }}
+```
+
+You may pass a default value to the `get` method. The default value will be returned if the attribute is not found:
+
+```html
+{{ attributes.get('class', 'default-class') }}
+```
+
+To retrieve all attributes whose keys start with a certain string, you can use the `where_starts_with` method:
+
+```html
+{{ attributes.where_starts_with('data-') }}
+```
+
+On the other hand, if you want to exclude attributes starting with a particular string, use the `where_does_not_start_with` method:
+
+```html
+{{ attributes.where_does_not_start_with('data-') }}
+```
+
+
+### Checking if attributes exist
+
+You may check if an attribute is present using the `has` method. It returns `True` if the attribute exists:
+
+```html
+@if (attributes.has('class'))
+    <div>Class attribute is present</div>
+@endif
+```
+
+You can also check for multiple attributes by separating them with a comma:
+
+```html
+@if (attributes.has('name', 'class'))
+    <div>Both 'name' and 'class' attributes are present</div>
+@endif
+```
+
+To check if at least one of the some specific attributes exists, you can use the `has_any` method:
+
+```html
+@if (attributes.has_any('href', ':href'))
+    <div>One of the attributes is present</div>
+@endif
+```
+
+## Slots in PyBlade
+
+You will often need to pass additional content to your component via **slots**. Component slots are rendered by echoing the `slot` variable. To explore this concept, let's imagine that an `alert` component has the following markup:
+
+```html
+<div class="alert alert-danger">
+    {{ slot }}
+</div>
+```
+
+You may pass content to the `slot` by injecting content inside the component tag:
+
+```html
+<b-alert>
+    <strong>Whoops!</strong> Something went wrong!
+</b-alert>
+```
+
+### Named slots
+
+Sometimes, a component may need to render multiple different slots in different locations within the component. Let's modify our alert component to allow for the injection of a `title` slot:
+
+```html
+<span class="alert-title">{{ title }}</span>
+
+<div class="alert alert-danger">
+    {{ slot }}
+</div>
+```
+
+You may define the content of the named slot using the `<b-slot>` tag. Any content not within an explicit `<b-slot>` tag will be passed to the component in the `slot` variable:
+
+```html
+<b-alert>
+    <b-slot name="title">
+        Server Error
+    </b-slot>
+
+    <strong>Whoops!</strong> Something went wrong !
+</b-alert>
+```
+
+This will render:
+
+```html
+<span class="alert-title">Server Error</span>
+
+<div class="alert alert-danger">
+    <strong>Whoops!</strong> Something went wrong!
+</div>
+```
+
+### Checking if a slot is empty
+
+You can check if a slot contains content by using an `@if` statement with the `is_empty` method available on any slot object:
+
+```html
+<span class="alert-title">{{ title }}</span>
+
+<div class="alert alert-danger">
+    @if(slot.is_empty())
+        This is default content if the slot is empty.
+    @else
+        {{ slot }}
+    @endif
+</div>
+```
+
+### Checking if slot has actual content
+
+Additionally, you can use the `has_actual_content` method to determine if the slot contains any "actual" content that is not an HTML comment:
+
+```html
+@if(slot.has_actual_content())
+    The scope has non-comment content.
+@endif
+```
+
+
+### Slot attributes
+
+Like Blade components, you can assign additional attributes to slots, such as CSS class names:
+
+```html
+<b-card class="shadow-sm">
+    <b-slot name="heading" class="font-bold">
+        Heading
+    </b-slot>
+
+    Content
+
+    <b-slot name="footer" class="text-sm">
+        Footer
+    </b-slot>
+</b-card>
+```
+
+To interact with slot attributes, you can access the `attributes` property of the slot's variable:
