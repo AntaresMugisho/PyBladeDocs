@@ -32,6 +32,11 @@ This command will create the file:
 /templates/components/alert.html
 ```
 
+
+>[!WARNING] 
+>It is important to avoid naming your component `slot`, as this could lead to conflicts with PyBlade’s built-in `b-slot` tag used for creating new [slots](#slots-in-pyblade). Rendering a component named `slot` will interfere with the `slot` system, causing potential issues.
+
+
 ## Rendering components
 
 The **preferred way** to include a component in your template is by using a **PyBlade component tag**. Component tags start with `b-`, followed by the component file name without extension.  
@@ -403,6 +408,9 @@ This will render:
     <strong>Whoops!</strong> Something went wrong!
 </div>
 ```
+
+>[!TIP] Pro tip
+>When creating a named slot, you may pass the name using the colon notation, like this : `<b-slot:title>` instead of using the attribute format `<b-slot name="title">`.
 
 ### Checking if a slot is empty
 
