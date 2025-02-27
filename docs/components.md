@@ -117,7 +117,7 @@ As you can see, the component is waiting for two variables: `type` and `message`
 ```html
 <!-- templates/home.html -->
 
-<x-alert type="success" message="Operation completed successfully."/>
+<b-alert type="success" message="Operation completed successfully."/>
 ```
 or:
 
@@ -167,36 +167,40 @@ For example, assuming we have a variable `status` with a dynamic string value, w
 
 In this example, `:type="status"` passes the **value of `status`** instead of the string `"status"`.  
 
+## The `@props` Directive  
 
-## The `@props` directive 
+The `@props` directive in PyBlade allows you to define default values for properties (variables) within a component. This is particularly useful when creating reusable components where some properties might be optional. If a value is not provided when the component is used, it will automatically fallback to the default value specified in the `@props` directive.  
 
-The `@props` directive allows you to define default values for properties (variables) inside a component. If a value is not passed when using the component, it will fallback to the default. The `@props` directive accept a dictionary.
+The `@props` directive accepts a dictionary where he `keys` represent the names of the properties (variables) that the component expects, while the `values` represent the default values that will be used if no explicit value is provided when using the component.  
+
+
+For example, consider the following **alert** component:
 
 ```html
-<!-- templates/components/alert.html -->
-
 @props({'type':'info', 'message':'Default message'}) 
 
 <div class="alert alert-{{ type }}">
     {{ message }}
 </div>
-```
+```  
 
-If no `type` is provided, it defaults to `"info"`. If no `message` is provided, it defaults to `"Default message"`:  
-
-**Example**
+When using this `alert` component, you can either pass a custom `type` and `message` attributes, or let the component fall back to its default values.
 
 ```html
 <b-alert type="warning" />
 ```
+Here, only the `type` property is provided as an attribute with the value `"warning"`, but the `message` is omitted. Because of this, the default value of `message`, (`"Default message"`) will be used.
 
-**Output**
+The final rendered HTML will look like this:
 
 ```html
 <div class="alert alert-warning">
     Default message
 </div>
 ```
+
+Since only `type` was specified, the `alert-warning` class is applied, but the message remains the default `"Default message"`.  
+
 
 ## Component attributes  
 
