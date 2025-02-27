@@ -64,3 +64,112 @@ def task_list(request):
 With this approach, PyBlade allows you to create reusable layouts, making your views cleaner and easier to maintain.
 
 ## Layouts using Template Inheritance
+
+In addition to using components for building layouts, PyBlade allows you to structure your application using template inheritance.
+
+Template inheritance allows you to define a **base layout** that multiple pages can extend. This keeps your templates clean and maintains a consistent structure across your application. 
+
+### Defining a Layout  
+
+A layout is a reusable template that other templates can inherit from. Below is an example of a **base layout**:
+
+```html
+<!-- templates/layouts/base.html -->
+
+<html>
+    <head>
+        <title>My App - {{ title }}</title>
+    </head>
+    <body>
+        <header>
+            <h1>Welcome to My App</h1>
+        </header>
+
+        <aside>
+            @yield('sidebar', '<p>This is the default sidebar.</p>')
+        </aside>
+
+        <main>
+            @yield('content')
+        </main>
+
+        <footer>
+            @yield('footer')
+        </footer>
+    </body>
+</html>
+```
+
+As you can see, this file contains typical HTML markup. However, take note of the `@yield` directive. The `@yield` directive is used in the layout to display the contents of a given section. Additionally, `@yield` can accept a default value, ensuring that if a section is not overridden, a fallback content is provided.
+
+You should also notice the presence of the `title` variable inside the `<title>` tag in the document's `<head>` section. Rather than using `@yield` for this, we will create a **named slot** to allow child templates to provide a custom page title dynamically.
+
+Now that we have defined a layout for our application, let's create a child page that inherit the layout.
+
+### Extending a Layout
+
+In PyBlade, to extend a layout in a child template, you can use the `@extends` directive. This tells PyBlade which parent layout to inherit, allowing the child template to inject content into specific sections of the layout using the `@section` directive. The sections defined in the child template will then replace the corresponding `@yield` directives in the layout.
+
+For example, let’s say we have the following child view:
+
+```html
+<!-- templates/child.html -->
+ 
+@extends('layouts.base')
+
+<b-slot:title>Page Title</b-slot>
+
+@section('sidebar')
+    @parent
+    <p>This is appended to the master sidebar.</p>
+@endsection
+
+@section('content')
+    <p>This is my body content.</p>
+@endsection
+
+@section('footer')
+    <p>This is my footer.</p>
+@endsection
+```
+
+Here, the `@extends('layouts.app')` means that this child template is inheriting from `layouts.base`.
+
+>[!info] Note
+>It’s important to note that in PyBlade, we use **dot notation** to refer to template files, which helps represent nested directories or files.
+>By using `@extends('layouts.base')`, you're telling PyBlade that this child template should inherit from the `base.html` layout, which resides in the `templates/layouts/` folder.
+
+
+Instead of using `@section` for the title, we use a **named slot**. In the child template, we define the title with `<b-slot:title>Page Title</b-slot>`. In the layout, we access this slot as a variable.
+
+For the `sidebar` section, we use the `@parent` directive. This means we’re appending new content to the layout’s original sidebar rather than replacing it completely. The `@parent` directive outputs whatever is defined in the parent layout's sidebar section (`@yield('sidebar')`), then adds the new content specified in the child template.
+
+The `@section` and `@endsection` directives are used to define content for each section, and PyBlade will automatically replace the `@yield` directive in the layout with the content from the child.
+
+
+### The `@block` directive  
+
+For convenience, PyBlade provides a `@block` directive that is **an alias for `@section`**.
+
+Example:
+
+```html
+@extends('layouts.base')
+
+@block('content')
+    <p>This is the main content.</p>
+@endblock
+```
+
+This behaves exactly like:
+
+```html
+@section('content')
+    <p>This is the main content.</p>
+@endsection
+```
+
+
+>[!warning] Important
+> Unlike Django's Default Template engine, where the `block tag` is used in both the layout and child templates, PyBlade uses the `@section` or `@block` directives to define content in child templates, while `@yield` is used in the layout to display these sections.
+
