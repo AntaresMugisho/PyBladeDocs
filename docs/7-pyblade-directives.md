@@ -551,6 +551,7 @@ You can also define multiple variables at once:
 @endwith
 ```  
 
+---
 ### The `@ratio` directive  
 
 The `@ratio` directive is useful for generating proportional values based on a given scale. This is commonly seen in progress indicators, performance metrics, or any scenario where values need to be mapped to a percentage or a fixed range.
@@ -580,39 +581,193 @@ If `this_value` is 175, `max_value` is 200, and `max_width` is 100, the resultin
 
 So, the `@ratio` directive calculates the proportion of a given value relative to a maximum value and scales it according to a fixed constant.  
 
->[!info] Tip
+>[!Tip] Tip
 >For those accustomed to Django's syntax, PyBlade provides the `@widthratio` directive which can be used as a convenient alias for the `@ratio` directive, performing the same function.
 
-
+---
 ### **The `@cycle` directive**  
 
-When displaying elements in a repeating structure like loops, alternating between values can improve readability and usability. The `@cycle` directive helps cycle through a set of values in sequential order, automatically resetting after reaching the last one.
+When displaying elements in a repeating structure, alternating between values can improve readability and usability.
+
+The `@cycle` directive allows you to alternate between a set of values each time it is encountered. It cycles through the given arguments one by one, and when it reaches the end, it starts over from the first argument.  
+
+This is particularly useful inside loops.
 
 A common use case is in a table, where each row should have alternating background colors to enhance readability.
 
 ```html
 <table>
-    @for(lang in programming_languages)
+    @for(book in books)
         <tr class="@cycle('bg-gray-100', 'bg-white')">
-            <td>{{ lang.name }}</td>
-            <td>{{ lang.year_released }}</td>
+            <td>{{ book.title }}</td>
+            <td>{{ book.author }}</td>
         </tr>
     @endfor
 </table>
 ```
 
-Each row will alternate between `bg-gray-100` and `bg-white`, making it easier to differentiate between rows in the rendered table.
+In this example, each row will alternate between `bg-gray-100` and `bg-white`, so, the first row gets the class `bg-gray-100`, the second gets `bg-white`, the third gets `bg-gray-100` again, and so on.  
 
+#### Using variables in `@cycle`  
 ---
 
-### **The `@firstof()` Directive**  
+You can also cycle through variables instead of fixed values. Suppose you have two CSS classes stored in variables:  
 
-Data often comes from different sources, and sometimes, multiple fields might store the same type of information with different levels of availability. The `@firstof()` directive is useful in such cases by selecting the first non-empty value from a list.
+```html
+@with(row1='highlight', row2='normal')
+    @for(product in products)
+        <tr class="@cycle(row1, row2)">
+            <td>{{ product.name }}</td>
+            <td>{{ product.price }}</td>
+        </tr>
+    @endfor
+@endwith
+```  
 
-In a code repository system, developers may have multiple contact options, such as an email, a GitHub username, or a fallback support email. Instead of checking each condition manually, `@firstof()` simplifies the process:
+The values in the cycle will be automatically escaped for safety. However, if you need to disable auto-escaping, you can wrap it in an [`@autoescape`](#) block. 
 
-```pyblade
-<p>Contact: {{ @firstof(user.email, user.github, 'support@example.com') }}</p>
+```html
+@for(product in products)
+    <tr class="@autoescape(False) @cycle(row1, row2) @endautoescape">
+        <td>{{ product.name }}</td>
+        <td>{{ product.price }}</td>
+    </tr>
+@endfor
+```  
+
+You’re not limited to just variables or just strings — you can mix them as well:  
+
+```html
+@for(product in products)
+    <tr class="@cycle('first', row1, 'last')">
+        <td>{{ product.name }}</td>
+        <td>{{ product.price }}</td>
+    </tr>
+@endfor
+```  
+
+This will alternate between `"first"`, the value of `row2`, and `"last"`.  
+
+#### Storing and reusing a Cycle  
+---
+
+If you need to reference the current value of a cycle without advancing it, you can assign it a name using the `as` keyword:  
+
+```html
+@cycle('red', 'blue' as color)
+<p style="color: {{ color }}">This text alternates between red and blue.</p>
+```  
+
+Later in the template, you can use `@cycle(color)` to advance to the next value:  
+
+```html
+<p style="color: @cycle(color)">This text will continue cycling through the same colors.</p>
+```  
+
+#### Using `silent` to define a Cycle without output  
+---
+
+When using the `@cycle` directive with the `as` keyword, the cycle automatically produces the first value from the list of provided values. However, this behavior might not always be desirable, especially if you want to store the cycle's value for later use but don’t want it to be output immediately. That's where the `silent` keywork comes into play.
+
+This keyword prevents the cycle from displaying its value **at the point where it's declared**, but still allows you to use the cycle in subsequent code.  
+
+
+For example, if you're using the cycle within a loop and want to store the current value in a variable without outputting the first value right away, you can add the `silent` keyword. 
+
+```html
+@for(item in products)
+    @cycle('row1', 'row2' as rowcolors silent)
+    <tr class="{{ rowcolors }}">
+        <td>{{ item.name }}</td>
+        <td>{{ item.price }}</td>
+    </tr>
+
+    @include('subtemplate')
+@endfor
+```
+
+In this example, the first cycle value (`'row1'`) is not output immediately up to the `<tr>` tag. Instead, it is stored in the `rowcolors` variable, which is then used in the `<tr>` tag. The included subtemplate will also have access to the `rowcolors` variable in its context and the value will match the current cycle value.
+
+For the above code, the output would look something like this:
+
+```html
+<tr class="row1">
+    <td>Product 1</td>
+    <td>$10</td>
+</tr>
+<tr class="row2">
+    <td>Product 2</td>
+    <td>$20</td>
+</tr>
+<tr class="row1">
+    <td>Product 3</td>
+    <td>$30</td>
+</tr>
+```
+
+But without the `silent` keyword, **row1** and **row2** would be output right away as normal text, outside the `<tr>` elements resulting in something like this:
+
+```html
+row1
+<tr class="row1">
+    <td>Product 1</td>
+    <td>$10</td>
+</tr>
+row2
+<tr class="row2">
+    <td>Product 2</td>
+    <td>$20</td>
+</tr>
+row1
+<tr class="row1">
+    <td>Product 3</td>
+    <td>$30</td>
+</tr>
+```
+---
+
+Once the `silent` keyword is used, it will apply to all subsequent uses of the same cycle until the end of the block or template. This means that you don't need to specify `silent` in every cycle call within that scope; it's automatically implied.
+  
+
+```html
+@cycle('row1', 'row2' as rowcolors silent)
+<tr class="{{ rowcolors }}">
+    <td>{{ item.name }}</td>
+    <td>{{ item.price }}</td>
+</tr>
+
+@cycle(rowcolors)  <!-- This will not output anything because silent is active -->
+```
+
+In this example, the cycle for `rowcolors` won't output anything, even when called again later.
+
+### Restarting a Cycle with `@resetcycle`  
+
+If needed, you can reset a cycle so that it starts from the first value again the next time it is used:  
+
+```html
+@for(section in sections)
+    @cycle('section-a', 'section-b' as section_class)
+    <div class="{{ section_class }}">
+        <h2>{{ section.title }}</h2>
+        <p>{{ section.content }}</p>
+    </div>
+    
+    @if(loop.last)
+        @resetcycle(section_class)  <!-- Reset cycle to start from the first value -->
+    @endif
+@endfor
+```
+
+---
+### **The `@firstof` directive**  
+
+Data often comes from different sources, and sometimes, multiple fields might store the same type of information with different levels of availability. The `@firstof` directive is useful in such cases by selecting the first non-empty value from a list.
+
+For example, in a code repository system, developers may have multiple contact options, such as an email, a GitHub username, or a fallback support email. Instead of checking each condition manually, `@firstof` simplifies the process:
+
+```html
+<p>Contact: @firstof(user.email, user.github, 'support@example.com')</p>
 ```
 
 If `user.email` exists, it will be displayed. If not, it will fall back to `user.github`, and if both are empty, `'support@example.com'` will be used. This ensures that a valid contact option is always shown.
