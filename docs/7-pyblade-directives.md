@@ -460,7 +460,7 @@ def show_fruits(request):
 </ul>
 ```
 
-## Inline Styles
+## Conditional inline Styles
 
 The `@style` directive works similarly to `@class`, but it controls inline CSS styles. It also takes a dictionary where `keys` are CSS properties, and `values` are booleans or expressions. When an expression evaluates to `True`, the associated style is applied to the element.
 
@@ -490,7 +490,7 @@ Here, we set a red color for fruits that are not favorites:
 
 In PyBlade, partials allow you to include smaller template sections within a template file. This modular approach is useful for reusing common components (e.g., headers, footers, or menus) across multiple templates, keeping your code organized and reducing redundancy.
 
-Use the `@include` directive to insert a partial within a template. The path to the partial is specified as a string, excluding the `.html` extension and separating direcoties with dots (`.`).
+Use the `@include` directive to insert a partial within a template. The path to the partial is specified as a string, excluding the `.html` extension and separating direcoties using **dot notation**.
 
 **Example**
 
@@ -509,6 +509,140 @@ Use the `@include` directive to insert a partial within a template. The path to 
 </body>
 </html>
 ```
+
+## Variable manipulation  
+
+PyBlade provides some useful directives for handling variables dynamically within templates. These directives allow efficient data manipulation without writing additional logic in the backend. Let’s go through them one by one.
+
+### The `@with` directive
+
+The `@with` directive allows you to assign a temporary variable within a block. This is useful when a value needs to be referenced multiple times within a small section of the template.  
+
+For example, in a web application where users have profiles, the display name might depend on whether they have a full name set. Instead of checking this multiple times, `@with` can be used to assign a `display_name` variable and use it throughout the block.  
+
+```html
+@with(display_name=user.full_name or user.username)
+    <h1>Welcome, {{ display_name }} !</h1>
+    <p>Your are logged in as {{ display_name }}</p>
+@endwith
+```
+
+Here, the `display_name` variable stores either `user.full_name` if available or falls back to `user.username`. This ensures that both the `<h1>` and `<p>` tags reference the same calculated value without repeating the logic.
+
+Another use-case way of the `@with` directive is to store the result of a complex expression in a simpler variable. This is particularly helpful when dealing with operations that require significant processing, such as querying the database multiple times.  
+
+For example:  
+
+```html
+@with(total=business.employees.count)
+    {{ total }} employee{{ "s" if total > 1 else "" }}
+@endwith
+```
+
+>[!info] Note
+>The assigned variables (like `total` in the example) are only accessible within the `@with` block and will not be available outside of it.
+
+
+You can also define multiple variables at once:  
+
+```html
+@with(alpha=1, beta=2)
+    ...
+@endwith
+```  
+
+### The `@ratio` directive  
+
+The `@ratio` directive is useful for generating proportional values based on a given scale. This is commonly seen in progress indicators, performance metrics, or any scenario where values need to be mapped to a percentage or a fixed range.
+
+Consider a dashboard that displays the progress of a software project based on completed tasks. If there are `40` completed tasks out of `120` total, and we want to scale this to `100` for a percentage value, `@ratio` makes it easy:  
+
+```html
+<p>Project Completion: @ratio(40, 120, 100) %</p>
+```
+
+PyBlade will calculate `(40 ÷ 120) × 100`, which results in `33 %`, dynamically adjusting the percentage based on the provided values.
+
+
+Sometimes, you may need to store the calculated value in a variable for later use. This can be helpful in translated text or other contexts where you need to reference the value multiple times:  
+
+
+```html
+@ratio(this_value, max_value, max_width as width)
+    <img src="bar.png" alt="Bar" height="10" width="{{ width }}">
+@endratio
+```
+
+In this example, `@ratio` is used to calculate the width of a progress bar based on the provided values. It stores the calculated value in the `width` variable for later use.  
+
+If `this_value` is 175, `max_value` is 200, and `max_width` is 100, the resulting width will be 88 pixels. This is because `175 ÷ 200 = 0.875` and `0.875 × 100` gives `87.5`, which rounds up to `88`.  
+
+
+So, the `@ratio` directive calculates the proportion of a given value relative to a maximum value and scales it according to a fixed constant.  
+
+>[!info] Tip
+>For those accustomed to Django's syntax, PyBlade provides the `@widthratio` directive which can be used as a convenient alias for the `@ratio` directive, performing the same function.
+
+
+### **The `@cycle` directive**  
+
+When displaying elements in a repeating structure like loops, alternating between values can improve readability and usability. The `@cycle` directive helps cycle through a set of values in sequential order, automatically resetting after reaching the last one.
+
+A common use case is in a table, where each row should have alternating background colors to enhance readability.
+
+```html
+<table>
+    @for(lang in programming_languages)
+        <tr class="@cycle('bg-gray-100', 'bg-white')">
+            <td>{{ lang.name }}</td>
+            <td>{{ lang.year_released }}</td>
+        </tr>
+    @endfor
+</table>
+```
+
+Each row will alternate between `bg-gray-100` and `bg-white`, making it easier to differentiate between rows in the rendered table.
+
+---
+
+### **The `@firstof()` Directive**  
+
+Data often comes from different sources, and sometimes, multiple fields might store the same type of information with different levels of availability. The `@firstof()` directive is useful in such cases by selecting the first non-empty value from a list.
+
+In a code repository system, developers may have multiple contact options, such as an email, a GitHub username, or a fallback support email. Instead of checking each condition manually, `@firstof()` simplifies the process:
+
+```pyblade
+<p>Contact: {{ @firstof(user.email, user.github, 'support@example.com') }}</p>
+```
+
+If `user.email` exists, it will be displayed. If not, it will fall back to `user.github`, and if both are empty, `'support@example.com'` will be used. This ensures that a valid contact option is always shown.
+
+---
+
+### **The `@group()` Directive**  
+
+When dealing with categorized data, grouping is often necessary for clarity and organization. The `@group()` directive automatically arranges data based on a given attribute, making it easier to display structured content.
+
+Imagine an API documentation page listing available endpoints grouped by HTTP method. Instead of manually organizing them, `@group()` simplifies the process:
+
+```pyblade
+@group(endpoints, 'method') as groupedEndpoints
+    @for(group in groupedEndpoints)
+        <h2>{{ group.key }}</h2>
+        <ul>
+            @for(endpoint in group.list)
+                <li>{{ endpoint.name }} - {{ endpoint.path }}</li>
+            @endfor
+        </ul>
+    @endfor
+@endgroup
+```
+
+If `endpoints` contains multiple API routes with different HTTP methods (`GET`, `POST`, `DELETE`), this directive groups them accordingly, displaying each category separately with its respective endpoints.
+
+---
+
+Each of these directives serves a distinct purpose, streamlining data manipulation within PyBlade templates without requiring additional backend logic. By leveraging them, developers can create more efficient and readable templates while maintaining flexibility in data presentation.
 
 ## Raw Python code
 

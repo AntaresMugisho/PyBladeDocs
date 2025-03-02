@@ -94,7 +94,7 @@ A layout is a reusable template that other templates can inherit from. Below is 
         </main>
 
         <footer>
-            @yield('footer')
+            © 2025 - My App
         </footer>
     </body>
 </html>
@@ -126,10 +126,6 @@ For example, let’s say we have the following child view:
 
 @section('content')
     <p>This is my body content.</p>
-@endsection
-
-@section('footer')
-    <p>This is my footer.</p>
 @endsection
 ```
 
