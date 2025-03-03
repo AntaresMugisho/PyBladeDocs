@@ -585,7 +585,7 @@ So, the `@ratio` directive calculates the proportion of a given value relative t
 >For those accustomed to Django's syntax, PyBlade provides the `@widthratio` directive which can be used as a convenient alias for the `@ratio` directive, performing the same function.
 
 ---
-### **The `@cycle` directive**  
+### The `@cycle` directive 
 
 When displaying elements in a repeating structure, alternating between values can improve readability and usability.
 
@@ -644,7 +644,7 @@ You’re not limited to just variables or just strings — you can mix them as w
         <td>{{ product.price }}</td>
     </tr>
 @endfor
-```  
+```
 
 This will alternate between `"first"`, the value of `row2`, and `"last"`.  
 
@@ -741,7 +741,7 @@ Once the `silent` keyword is used, it will apply to all subsequent uses of the s
 
 In this example, the cycle for `rowcolors` won't output anything, even when called again later.
 
-### Restarting a Cycle with `@resetcycle`  
+#### Restarting a Cycle with `@resetcycle`  
 
 If needed, you can reset a cycle so that it starts from the first value again the next time it is used:  
 
@@ -762,17 +762,63 @@ If needed, you can reset a cycle so that it starts from the first value again th
 ---
 ### **The `@firstof` directive**  
 
-Data often comes from different sources, and sometimes, multiple fields might store the same type of information with different levels of availability. The `@firstof` directive is useful in such cases by selecting the first non-empty value from a list.
+Data often comes from different sources, and sometimes, multiple fields might store the same type of information with different levels of availability.
 
-For example, in a code repository system, developers may have multiple contact options, such as an email, a GitHub username, or a fallback support email. Instead of checking each condition manually, `@firstof` simplifies the process:
+In PyBlade, the `@firstof` directive helps you select and display the first variable that holds a **meaningful** value. This means it will output the first argument that exists and is not empty, is not a `False` boolean value, is not `None` and is not a `0` numeric value. 
+
+If all the provided variables are "falsy" (empty, `None`, `False`, or `0`), nothing is shown.
+
+For example, consider this usage:  
 
 ```html
-<p>Contact: @firstof(user.email, user.github, 'support@example.com')</p>
-```
+@firstof(var1, var2, var3)
+```  
 
-If `user.email` exists, it will be displayed. If not, it will fall back to `user.github`, and if both are empty, `'support@example.com'` will be used. This ensures that a valid contact option is always shown.
+This is equivalent to writing:  
 
----
+```html
+@if(var1)
+    {{ var1 }}
+@elif(var2)
+    {{ var2 }}
+@elif(var3)
+    {{ var3 }}
+@endif
+```  
+
+You may also provide a fallback value that will be displayed if none of the variables hold a valid value.
+
+For example, let's say you're building an online job portal. Job seekers may provide multiple ways for employers to contact them, such as a phone number, LinkedIn profile, or a general support email. Instead of manually checking each option, `@firstof` helps streamline the process:  
+
+```html
+<p>Contact: @firstof(user.phone, user.linkedin, 'support@jobportal.com')</p>
+```  
+
+If `user.phone` is available, it will be displayed. If not, it falls back to `user.linkedin`, and if both are missing, `'support@jobportal.com'` ensures there's always a valid contact option shown.
+
+>[!info] Note
+>By default, PyBlade automatically escapes output to prevent security risks. If you want to disable escaping for certain reasons, you can wrap the `@firstof` block in an [`@autoescape`](#) one.  
+>```html
+>@autoescape(False)
+>    @firstof(var1, var2, var3, "<strong>Fallback Value</strong>")
+>@endautoescape
+>```  
+
+<!--
+Or if only some variables should be escaped, you can use the `|safe` filter:  
+
+```html
+@firstof(var1, var2|safe, var3, "<strong>Fallback Value</strong>"|safe)
+```   -->
+
+Sometimes, you may need to store the selected value in a variable for later use. You can assign it a name using the `as` keyword:
+
+```html
+@firstof(var1, var2, var3 as chosen_value)
+<p>The selected value is: {{ chosen_value }}</p>
+```  
+
+This will make the `chosen_value` variable available in the context and you may use it later in the template.
 
 ### **The `@group()` Directive**  
 
