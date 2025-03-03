@@ -820,30 +820,133 @@ Sometimes, you may need to store the selected value in a variable for later use.
 
 This will make the `chosen_value` variable available in the context and you may use it later in the template.
 
-### **The `@group()` Directive**  
+---
+### The `@regroup` directive  
 
-When dealing with categorized data, grouping is often necessary for clarity and organization. The `@group()` directive automatically arranges data based on a given attribute, making it easier to display structured content.
+When dealing with categorized data, grouping is often necessary for clarity and organization. The `@regroup` directive is used to categorize a list of similar objects based on a shared attribute. Instead of manually organizing the data, this directive automatically groups related items together for easier presentation.
 
-Imagine an API documentation page listing available endpoints grouped by HTTP method. Instead of manually organizing them, `@group()` simplifies the process:
+This complex directive is best illustrated by way of an example. Let's say that `cities` is a list of cities represented by dictionaries containing `"name"`, `"population"`, and `"country"` keys:  
 
-```pyblade
-@group(endpoints, 'method') as groupedEndpoints
-    @for(group in groupedEndpoints)
-        <h2>{{ group.key }}</h2>
-        <ul>
-            @for(endpoint in group.list)
-                <li>{{ endpoint.name }} - {{ endpoint.path }}</li>
-            @endfor
-        </ul>
-    @endfor
-@endgroup
+```python
+cities = [
+    {"name": "Mumbai", "population": "19,000,000", "country": "India"},
+    {"name": "Calcutta", "population": "15,000,000", "country": "India"},
+    {"name": "New York", "population": "20,000,000", "country": "USA"},
+    {"name": "Chicago", "population": "7,000,000", "country": "USA"},
+    {"name": "Tokyo", "population": "33,000,000", "country": "Japan"},
+]
 ```
 
-If `endpoints` contains multiple API routes with different HTTP methods (`GET`, `POST`, `DELETE`), this directive groups them accordingly, displaying each category separately with its respective endpoints.
+… and you’d like to display a hierarchical list that is ordered by country, like this:  
 
+- India
+    - Mumbai: 19,000,000
+    - Calcutta: 15,000,000
+- USA
+    - New York: 20,000,000
+    - Chicago: 7,000,000
+- Japan
+    - Tokyo: 33,000,000
+
+
+You can use the `@regroup` directive to group the list of cities by country. The following snippet of template code would accomplish this:  
+
+```html
+@regroup(cities by country as country_list)
+
+<ul>
+@for(country in country_list)
+    <li>{{ country.grouper }}
+    <ul>
+        @for(city in country.list)
+          <li>{{ city.name }}: {{ city.population }}</li>
+        @endfor
+    </ul>
+    </li>
+@endfor
+</ul>
+```
+
+Let’s walk through this example. `@regroup` takes three arguments: the list you want to regroup, the attribute to group by, and the name of the resulting list. Here, we’re regrouping the `cities` list by the `country` attribute and calling the result `country_list`.  
+
+`@regroup` produces a list (in this case, `country_list`) of group objects. Group objects are instances of `namedtuple()` with two fields:  
+
+- `grouper` – the item that was grouped by (e.g., the string `"India"` or `"Japan"`).  
+- `list` – a list of all items in this group (e.g., a list of all cities with `country='India'`).  
+
+Because `@regroup` produces `namedtuple()` objects, you can also write the previous example as:  
+
+
+```html
+@regroup(cities by country as country_list)
+
+<ul>
+@for(country, local_cities in country_list)
+    <li>{{ country }}
+    <ul>
+        @for(city in local_cities)
+          <li>{{ city.name }}: {{ city.population }}</li>
+        @endfor
+    </ul>
+    </li>
+@endfor
+</ul>
+```
+>[!info] 💡 Note
+> The `@regroup` directive does not order its input! Our example relies on the fact that the `cities` list was ordered by `country` in the first place. If the `cities` list did not order its members by `country`, the regrouping would naively display more than one group for a single country.  
+
+
+
+For example, say the `cities` list was set to this (note that the countries are not grouped together):  
+
+```python
+cities = [
+    {"name": "Mumbai", "population": "19,000,000", "country": "India"},
+    {"name": "New York", "population": "20,000,000", "country": "USA"},
+    {"name": "Calcutta", "population": "15,000,000", "country": "India"},
+    {"name": "Chicago", "population": "7,000,000", "country": "USA"},
+    {"name": "Tokyo", "population": "33,000,000", "country": "Japan"},
+]
+```
+
+
+With this input for `cities`, the example `@regroup` template code above would result in the following output:  
+
+
+- India
+  - Mumbai: 19,000,000
+- USA
+  - New York: 20,000,000
+- India
+  - Calcutta: 15,000,000
+- USA
+  - Chicago: 7,000,000
+- Japan
+  - Tokyo: 33,000,000
+
+
+The easiest solution to this gotcha is to make sure in your view code that the data is ordered according to how you want to display it.  
+
+#### Grouping on Other Properties
 ---
 
-Each of these directives serves a distinct purpose, streamlining data manipulation within PyBlade templates without requiring additional backend logic. By leveraging them, developers can create more efficient and readable templates while maintaining flexibility in data presentation.
+If you use PyBlade in a Django application, it's important to note that any valid template lookup is a legal grouping attribute for the `@regroup` directive, including methods, attributes, dictionary keys, and list items.  
+
+For example, if the `country` field is a foreign key to a class with an attribute `description`, you could use:  
+
+```html
+@regroup(cities by country.description as country_list)
+```
+
+
+
+Or, if `country` is a field with choices, it will have a `get_FOO_display()` method available as an attribute, allowing you to group on the display string rather than the choices key:  
+
+```html
+@regroup(cities by get_country_display as country_list)
+```
+
+<span v-pre>`{{ country.grouper }}`</span> will now display the value fields from the choices set rather than the keys.
 
 ## Raw Python code
 
