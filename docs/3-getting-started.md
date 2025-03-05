@@ -273,7 +273,7 @@ The templates system will not work if this folder structure is not exactly as de
 
 Here are some best practices and tips to maximize efficiency and maintain clean code when using PyBlade:
 
-- **Keep Logic in the Backend**: Like Django’s templating philosophy, avoid adding business logic in templates. Use PyBlade directives to simplify rendering, but keep calculations, data processing, and complex logic in your views or controllers.
+- **Keep Logic in the Backend**: Our philosophy is to avoid adding business logic in templates. Use PyBlade directives to simplify rendering, but keep calculations, data processing, and complex logic in your views or controllers.
 - **Organize Templates by Feature**: Create subdirectories within `templates` for different sections of your app. This structure keeps templates maintainable, especially in large applications.
 - **Use PyBlade’s Components for Modular Code**: Components let you create reusable template sections, improving maintainability and reducing repetition across your templates.
 - **Editor Extensions**: To speed up development, you can install **PyBlade Intellisense** extensions from your editor’s marketplace, enabling you to work seamlessly with PyBlade templates.

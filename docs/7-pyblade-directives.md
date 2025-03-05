@@ -126,7 +126,7 @@ For performance and readability, avoid complex or time-consuming logic within co
 :::
 
 
-## Match (Switch) statements
+## Match statements
 
 PyBlde also provides support for `@match` statements, which are useful for handling multiple conditions based on the value of a single variable. This can help simplify templates by reducing the need for multiple `@if`, `@elif`, and `@else` statements.
 
@@ -624,7 +624,7 @@ You can also cycle through variables instead of fixed values. Suppose you have t
 @endwith
 ```  
 
-The values in the cycle will be automatically escaped for safety. However, if you need to disable auto-escaping, you can wrap it in an [`@autoescape`](#) block. 
+The values in the cycle will be automatically escaped for safety. However, if you need to disable auto-escaping, you can wrap it in an [`@autoescape`](6-displaying-data.html#the-autoescape-directive) block. 
 
 ```html
 @for(product in products)
@@ -760,7 +760,7 @@ If needed, you can reset a cycle so that it starts from the first value again th
 ```
 
 ---
-### **The `@firstof` directive**  
+### The `@firstof` directive
 
 Data often comes from different sources, and sometimes, multiple fields might store the same type of information with different levels of availability.
 
@@ -797,7 +797,7 @@ For example, let's say you're building an online job portal. Job seekers may pro
 If `user.phone` is available, it will be displayed. If not, it falls back to `user.linkedin`, and if both are missing, `'support@jobportal.com'` ensures there's always a valid contact option shown.
 
 >[!info] Note
->By default, PyBlade automatically escapes output to prevent security risks. If you want to disable escaping for certain reasons, you can wrap the `@firstof` block in an [`@autoescape`](#) one.  
+>By default, PyBlade automatically escapes output to prevent security risks. If you want to disable escaping for certain reasons, you can wrap the `@firstof` block in an [`@autoescape`](6-displaying-data.html#the-autoescape-directive) one.  
 >```html
 >@autoescape(False)
 >    @firstof(var1, var2, var3, "<strong>Fallback Value</strong>")
@@ -927,7 +927,7 @@ With this input for `cities`, the example `@regroup` template code above would r
 
 The easiest solution to this gotcha is to make sure in your view code that the data is ordered according to how you want to display it.  
 
-#### Grouping on Other Properties
+#### Grouping on other properties
 ---
 
 If you use PyBlade in a Django application, it's important to note that any valid template lookup is a legal grouping attribute for the `@regroup` directive, including methods, attributes, dictionary keys, and list items.  
@@ -938,8 +938,6 @@ For example, if the `country` field is a foreign key to a class with an attribut
 @regroup(cities by country.description as country_list)
 ```
 
-
-
 Or, if `country` is a field with choices, it will have a `get_FOO_display()` method available as an attribute, allowing you to group on the display string rather than the choices key:  
 
 ```html
@@ -947,6 +945,49 @@ Or, if `country` is a field with choices, it will have a `get_FOO_display()` met
 ```
 
 <span v-pre>`{{ country.grouper }}`</span> will now display the value fields from the choices set rather than the keys.
+
+
+---
+### The `@ifchanged` directive
+
+The `@ifchanged` directive is a useful feature that allows you to conditionally display content only when the value of a variable changes.  
+
+For example, consider this usage:  
+
+```html
+@for(item in items)
+    @ifchanged(item.category)
+        <h2>{{ item.category }}</h2>
+    @endif
+    <li>{{ item.name }}</li>    
+@endfor
+```
+
+---
+### Capturing the present with `@now`
+
+
+## URL Handling and links
+
+- @url
+    - @urlis
+- @static
+    - @get_static_prefix
+    - @get_media_prefix
+- @querystring
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## Raw Python code
 

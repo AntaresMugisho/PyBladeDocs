@@ -65,6 +65,11 @@ def show_message(request):
 Use `{!! !!}` with caution. Always ensure that the content is safe to display to avoid security risks.
 :::
 
+### The `@autoescape` directive
+---
+
+If you need to disable auto-escaping for certain reasons, you can wrap the content in an `@autoescape` block:
+
 ## Displaying data with default values
 
 ::: info Upcoming feature
@@ -171,7 +176,7 @@ Since many JavaScript frameworks also use "curly" braces to indicate a given exp
 
 In this example, the `@` symbol will be removed by PyBlade; however, <span v-pre>`{{ name }}`</span> expression will remain untouched by the PyBlade Template engine, allowing it to be rendered by your JavaScript framework.
 
-If you are displaying JavaScript variables in a large portion of your template, you may wrap the HTML in the `@verbatim` directive so that you do not have to prefix each "curly" braces statement with an `@`symbol.
+If you are displaying JavaScript variables in a large portion of your template, you may wrap the HTML in the [`@verbatim`](#the-verbatim-directive) directive so that you do not have to prefix each "curly" braces statement with an `@`symbol.
 
 ```html
 @verbatim
@@ -180,16 +185,7 @@ If you are displaying JavaScript variables in a large portion of your template, 
     </div>
 @endverbatim
 ```
-## The `@verbatim` Directive
-If you are displaying JavaScript variables in a large portion of your template, you may wrap the HTML in the `@verbatim` directive so that you do not have to prefix each "curly" braces statement with an `@` symbol.
-
-```html
-@verbatim
-    <div class="container">
-        Hello, {{ name }}.
-    </div>
-@endverbatim
-```
+## The `@verbatim` directive
 
 The `@verbatim` directive in PyBlade prevents the engine from parsing the enclosed content, rendering it exactly as written. This is useful when working with JavaScript frameworks or when displaying raw template syntax.
 
@@ -228,6 +224,9 @@ The `@verbatim` directive in PyBlade prevents the engine from parsing the enclos
 - **Without `@verbatim`**: The template engine would try to parse <span v-pre>`{{ message }}`</span> and the `@if` statement, assuming it's a PyBlade directive.
 - **With `@verbatim`**: The engine ignores the enclosed content and outputs it exactly as written.
 
+## The `@spaceless` directive
+
+
 ## Comments
 
 In PyBlade, comments allow you to include notes within your templates without rendering them in the final output. This is useful for adding explanations, reminders, or temporary code blocks without affecting the generated HTML.
@@ -263,3 +262,10 @@ Sample usage:
 <p>Commented out text</p>
 @endcomment
 ```
+
+## Debugging
+
+PyBlade provides a debugging feature that allows you to display variables and other information in your templates. This is useful for debugging and development purposes.
+
+- @debug
+- @lorem
