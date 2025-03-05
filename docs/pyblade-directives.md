@@ -125,6 +125,40 @@ In PyBlade, you can also use logical expressions such as `and`, `or`, and `not` 
 For performance and readability, avoid complex or time-consuming logic within conditional statements. Templates should primarily focus on displaying pre-processed data, not performing heavy logic. Keep calculations and condition checks within views or controllers wherever possible to adhere to the principle of "Logic in the code, templates are for display only."
 :::
 
+### Authentication directives
+
+When working with authentication, you often need to conditionally display content based on whether a user is logged in. Instead of manually checking `@if(user.is_authenticated)`, PyBlade provides `@auth` and `@guest` directives for a cleaner, more readable approach.  
+
+
+The `@auth` directive ensures that the enclosed content is visible only to lauthenticated users. It’s useful for dashboards, account settings, or other user-specific content.  
+
+```html
+@auth
+    <p>Welcome back, {{ user.name }}!</p>
+    <a href="/dashboard">Go to Dashboard</a>
+@else
+    <p>You must log in to access this section.</p>
+    <a href="/login">Log in here</a>
+@endauth
+```
+
+Here, if the user is authenticated, they see their name and a dashboard link. Otherwise, they see a message prompting them to log in.  
+
+On the other hand, the `@guest` directive is the opposite of `@auth`. It ensures the content is displayed only to "guests" (users who are not authenticated). 
+
+```html
+@guest
+    <p>Welcome! Please <a href="/login">log in</a> or <a href="/register">sign up</a>.</p>
+@else
+    <p>Hello {{ user.name }}, you are already logged in.</p>
+@endguest
+```
+
+If the user is not logged in, they see login and signup links. Otherwise, they are reminded that they are already authenticated.  
+
+>[!tip]
+> The `@anonymous` directive is an alias for `@guest`, so you can use either one interchangeably.  
+
 
 ## Match statements
 
@@ -975,6 +1009,9 @@ For example, consider this usage:
     - @get_static_prefix
     - @get_media_prefix
 - @querystring
+
+
+## The `@lorem` directive
 
 
 

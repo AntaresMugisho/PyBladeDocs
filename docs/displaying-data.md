@@ -196,7 +196,7 @@ If a variable `user` is a dictionary with a key `email`, you can access it like 
 Using methods within curly braces allows for greater flexibility and keeps your template expressions clear and readable.
 
 :::tip
-For best performance and maintainability, follow the principle of “Logic in the code, templates are for display only.” Perform complex logic and data transformations in your views or controllers, passing only the final, display-ready data to your templates. This keeps templates focused solely on presentation, enhancing readability and performance.
+For best performance and maintainability, follow the principle of “Logic in the backend”, templates are for display only. Perform complex logic and data transformations in your views or controllers, passing only the final, display-ready data to your templates. This keeps templates focused solely on presentation, enhancing readability and performance.
 :::
 
 ## PyBlade and JavaScript Frameworks
@@ -260,6 +260,50 @@ The `@verbatim` directive in PyBlade prevents the engine from parsing the enclos
 
 ## The `@spaceless` directive
 
+Normally, when you write HTML, you might format it for readability, introducing extra spaces and line breaks:  
+
+```html
+<p>
+    <a href="foo/">Foo</a>
+</p>
+```
+
+While this makes the template more readable, it also adds unnecessary whitespace to the rendered HTML. Using `@spaceless`, you can remove these spaces between tags without affecting the actual content:  
+
+```html
+@spaceless
+    <p>
+        <a href="foo/">Foo</a>
+    </p>
+@endspaceless
+```
+
+This will render as:  
+
+```html
+<p><a href="foo/">Foo</a></p>
+```
+
+As you can see, all unnecessary spaces between the HTML tags have been removed, making the output cleaner and more efficient.  
+
+The `@spaceless` directive in PyBlade removes whitespace between HTML tags. This includes tab characters and newlines.
+
+
+The directive only removes space between HTML tags — it does not strip spaces inside text content. Consider the following example:  
+
+```html
+@spaceless
+    <strong>
+        Hello
+    </strong>
+@endspaceless
+```
+
+The output will still include the space around "Hello":  
+
+```html
+<strong> Hello </strong>
+```
 
 ## Comments
 
@@ -293,13 +337,25 @@ For convenience, PyBlade also provide a `@comment` directive for adding comments
 Sample usage:
 ```html
 @comment
-<p>Commented out text</p>
+    <p>Commented out text</p>
 @endcomment
 ```
 
 ## Debugging
 
-PyBlade provides a debugging feature that allows you to display variables and other information in your templates. This is useful for debugging and development purposes.
+When developing a web application, debugging plays a crucial role in identifying issues and understanding how data flows within your templates. Whether you are troubleshooting missing data, unexpected outputs, or just trying to understand what’s available in your template, PyBlade provides an easy-to-use debugging directive.
 
-- @debug
-- @lorem
+### The `@debug` directive
+
+One of the simplest ways to gain insights into your template execution is by using the `@debug` directive. This directive prints a detailed breakdown of the current template context, imported modules, and other relevant information about your template, helping you analyze the available variables and their values.
+
+Using `@debug` is as simple as adding it inside your template:
+
+```html
+@debug
+```
+
+This outputs a structured overview of the template context, helping you identify missing variables or unexpected values.
+
+>[!info]
+>In Django applications, the `@debug` directive only works when debugging is enabled (`DEBUG=True`). In production (`DEBUG=False`), it outputs nothing, ensuring sensitive data remains hidden.
