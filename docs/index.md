@@ -11,10 +11,10 @@ hero:
   actions:
     - theme: brand
       text: Getting started
-      link: /3-getting-started
+      link: /getting-started
     - theme: alt
       text: What is PyBlade ?
-      link: /1-what-is-pyblade
+      link: /meet-pyblade
     - theme: alt
       text: Github
       link: https://github.com/antaresmugisho/pyblade

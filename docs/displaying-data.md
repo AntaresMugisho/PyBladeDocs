@@ -68,13 +68,84 @@ Use `{!! !!}` with caution. Always ensure that the content is safe to display to
 ### The `@autoescape` directive
 ---
 
-If you need to disable auto-escaping for certain reasons, you can wrap the content in an `@autoescape` block:
+When rendering dynamic content in a web application, security is a top priority. That's why by default, PyBlade escapes all output. This is a good practice, but sometimes, you may want to disable auto-escaping for specific cases.
+
+### **Controlling Auto-Escaping with `@autoescape()`**  
+
+The `@autoescape()` directive in PyBlade controls whether HTML escaping is applied to variables within its block. By default, PyBlade automatically escapes all variable output to prevent security risks like Cross-Site Scripting (XSS). However, in some cases, you might want to disable this behavior to allow safe HTML content to be rendered as intended.  
+
+The directive takes either `on` or `off` as an argument (or alternatively, `True` and `False` for the same effect). It must be closed with `@endautoescape`.  
+
+#### **Basic Usage**  
+
+When auto-escaping is enabled, all variables are automatically escaped, meaning that any HTML tags inside them are treated as plain text.  
+
+```pyblade
+@autoescape(on)
+    <p>{{ user.bio }}</p>
+@endautoescape
+```
+
+If `user.bio` contains `<strong>Developer</strong>`, the output will be:  
+
+```
+<strong>Developer</strong>
+```
+
+This prevents HTML from being rendered, ensuring that user-generated content does not break the page structure or introduce security vulnerabilities.  
+
+On the other hand, if you want to allow HTML content to be displayed as intended, you can disable auto-escaping:  
+
+```pyblade
+@autoescape(off)
+    <p>{{ user.bio }}</p>
+@endautoescape
+```
+
+Now, the output will be properly rendered as:  
+
+**Developer**  
+
+#### **Handling Pre-Escaped Content**  
+
+Some variables might already be marked as "safe," meaning they do not require additional escaping. This can happen when the variable is pre-processed or when certain filters are applied to it.  
+
+For example, if `user.bio` is explicitly set as safe in your backend logic, disabling auto-escaping will allow it to be displayed as HTML.  
+
+```pyblade
+@autoescape(off)
+    <p>{{ user.bio }}</p>
+@endautoescape
+```
+
+However, if you want to ensure that any user-provided content is always escaped, you can manually apply the `@autoescape(on)` directive or use an escape filter when needed.  
+
+#### **Effects on Filters**  
+
+When auto-escaping is disabled, filters applied to variables may behave differently. Consider the following example where we join a list of values into a string and then apply the `escape` filter:  
+
+```pyblade
+@autoescape(off)
+    {{ my_list|join(", ")|escape }}
+@endautoescape
+```
+
+Since auto-escaping is turned off, `join(", ")` executes first, creating a string that is marked as "safe." The `escape` filter then applies to the already safe string, which may not have the intended effect of escaping individual items.  
+
+To ensure each element in a sequence is properly escaped, use an appropriate escaping filter before joining:  
+
+```pyblade
+@autoescape(off)
+    {{ my_list|escapeseq|join(", ") }}
+@endautoescape
+```
+
+This ensures that every item in `my_list` is safely escaped before joining them into a single string.  
+
+>![!warning] 
+>Always be cautious when turning off auto-escaping, especially with user-generated content, to maintain security best practices.
 
 ## Displaying data with default values
-
-::: info Upcoming feature
-This feature is not yet implemented but should be ready in the next version. This part of documentation is provided for informative purpose only.
-:::
 
 In PyBlade, you can also define default values for variables. This is helpful in cases where the variable might not always be defined.
 

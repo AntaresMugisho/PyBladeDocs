@@ -8,24 +8,24 @@ export default defineConfig({
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Documentation', link: '/1-meet-pyblade' }
+      { text: 'Documentation', link: '/meet-pyblade' }
     ],
 
     sidebar: [
       {
         text: 'Introduction',
         items: [
-          { text: 'Meet PyBlade', link: '/1-meet-pyblade' },
-          { text: 'Getting started', link: '/3-getting-started'},
+          { text: 'Meet PyBlade', link: '/meet-pyblade' },
+          { text: 'Getting started', link: '/getting-started'},
           { text: 'Migration guide', link: '/migration-guide'}
         ]
       },
       {
         text: 'PyBlade : Template engine',
         items: [
-          {text: "Prelude", link:'/5-prelude'},
-          {text: "Displaying Data", link:'/6-displaying-data'},
-          {text: "PyBlade Directives", link:'/7-pyblade-directives'},
+          {text: "Prelude", link:'/pyblade-prelude'},
+          {text: "Displaying Data", link:'/displaying-data'},
+          {text: "PyBlade Directives", link:'/pyblade-directives'},
           {text: "Components", link: '/components'},
           {text: "Building Layouts", link: '/layouts'},
           {text: "Forms", link: '/forms'},
