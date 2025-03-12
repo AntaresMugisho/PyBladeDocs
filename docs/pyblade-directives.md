@@ -1032,6 +1032,53 @@ You can use an `@else` clause inside `@ifchanged` to define an alternative outpu
 ---
 ### Capturing the present with `@now`
 
+The `@now` directive is used to display the current date and time in a template. It takes a string format time based on Python’s standard [datetime module syntax](https://docs.python.org/3/library/datetime.html#strftime-strptime-behavior).  
+
+For example, if you want to show the full date and time, you can write:  
+
+```html
+It is @now("%Y-%m-%d %H:%M:%S")
+```
+
+If the current date and time is March 12, 2025, at 14:30:45, the output will be:  
+
+```
+It is 2025-03-12 14:30:45
+```
+
+Sometimes, you may need to store the output of `@now` in a variable to reuse it in different parts of the template. This can be done using the `as` keyword.  
+
+```html
+@now("%B" as current_month)
+
+@if(current_month == "December")
+    <p>Happy holidays! It's {{ current_month }}, the festive season.</p>
+@else
+    <p>Welcome to {{ current_month }}! Hope you have a great month.</p>
+@endif
+```
+
+>[!Note]
+> When the `as` keyword is used within the `@now` directive to store the current date and time in a variable, the directive does not produce any output on that line.
+
+
+The table below outlines some of the most commonly used  datetime format specifiers from Python’s `datetime` module:  
+
+| Format  | Description               | Example Output (March 12, 2025, 14:30:45) |
+|---------|---------------------------|------------------------------------------|
+| `%Y`    | Full year                  | `2025`                                   |
+| `%y`    | Short year (last two digits) | `25`                                  |
+| `%m`    | Month (zero-padded)         | `03`                                   |
+| `%B`    | Full month name             | `March`                                |
+| `%b`    | Short month name            | `Mar`                                  |
+| `%d`    | Day (zero-padded)           | `12`                                   |
+| `%A`    | Full weekday name           | `Wednesday`                            |
+| `%a`    | Short weekday name          | `Wed`                                  |
+| `%H`    | Hour (24-hour format)       | `14`                                   |
+| `%I`    | Hour (12-hour format)       | `02`                                   |
+| `%M`    | Minutes                     | `30`                                   |
+| `%S`    | Seconds                     | `45`                                   |
+| `%p`    | AM/PM                       | `PM`                                   |
 
 ## URL Handling and links
 
@@ -1044,6 +1091,11 @@ You can use an `@else` clause inside `@ifchanged` to define an alternative outpu
 
 
 ## The `@lorem` directive
+## Localisation
+
+- @translate
+- @blocktranslate
+- @plural
 
 
 
