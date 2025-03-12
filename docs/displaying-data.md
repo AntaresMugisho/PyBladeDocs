@@ -359,3 +359,71 @@ This outputs a structured overview of the template context, helping you identify
 
 >[!info]
 >In Django applications, the `@debug` directive only works when debugging is enabled (`DEBUG=True`). In production (`DEBUG=False`), it outputs nothing, ensuring sensitive data remains hidden.
+
+## The `@lorem` directive
+
+The `@lorem` directive generates random "lorem ipsum" text, which is commonly used as placeholder content in templates. This can be particularly useful when designing a template or layout, as it helps visualize how text will appear without needing to write out actual content. The generated text can either be a standard "lorem ipsum" or, when specified, random Latin words or paragraphs.
+
+#### Usage
+
+The `@lorem` directive can be used with up to three optional arguments:
+
+```blade
+@lorem [count] [method] [random]
+```
+
+Here's a breakdown of each argument:
+
+- **`count`**:  
+  The number of items (paragraphs or words) you want to generate. This can either be a fixed number or a context variable that holds the number. By default, it will generate one paragraph/word.
+
+- **`method`**:  
+  Specifies the type of content to generate. It can be one of the following:
+  - `w` for **words**: Will generate random Latin words.
+  - `p` for **HTML paragraphs**: Will generate full paragraphs wrapped in `<p>` tags.
+  - `b` for **plain-text paragraph blocks**: Will generate plain-text paragraphs without any HTML tags. This is the default option.
+
+- **`random`**:  
+  If the word `random` is provided, it will ensure that the generated content is random Latin text, instead of the usual standard "Lorem ipsum dolor sit amet..." paragraph. This adds variability in the generated text.
+
+#### Examples
+
+1. **Default Usage**
+
+   If you want to generate a single, default "lorem ipsum" paragraph, you can simply use:
+
+   ```blade
+   @lorem
+   ```
+
+   This will output the common placeholder paragraph starting with “Lorem ipsum dolor sit amet…”.
+
+2. **Generate Multiple Paragraphs (HTML format)**
+
+   If you'd like to generate three paragraphs in HTML format, you can use the following syntax:
+
+   ```blade
+   @lorem 3 p
+   ```
+
+   This will output three paragraphs, each wrapped in `<p>` tags, containing the standard "lorem ipsum" text.
+
+3. **Generate Random Latin Words**
+
+   To generate two random Latin words, you can use:
+
+   ```blade
+   @lorem 2 w random
+   ```
+
+   This will output two random Latin words, such as "consectetur adipiscing" or "dolor sit".
+
+4. **Generate Random Paragraphs (Plain-text format)**
+
+   If you prefer random paragraphs without HTML tags, you can generate two random plain-text paragraphs by using:
+
+   ```blade
+   @lorem 2 b random
+   ```
+
+   This will output two blocks of random Latin text, each in plain text format.

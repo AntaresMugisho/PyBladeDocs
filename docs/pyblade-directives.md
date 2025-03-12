@@ -1082,42 +1082,244 @@ The table below outlines some of the most commonly used  datetime format specifi
 
 ## URL Handling and links
 
-- @url
-    - @urlis
-- @static
-    - @get_static_prefix
-    - @get_media_prefix
+### `@url` Directive in PyBlade  
+
+The `@url` directive generates an absolute path (a URL without the domain name) based on a named route and optional parameters. Any special characters in the resulting URL are automatically encoded.  
+
+This directive helps keep templates clean and maintainable by avoiding hardcoded links, ensuring that changes in URL patterns do not require modifications in multiple places.  
+
+#### Generating URLs with `@url`  
+
+To generate a URL, pass the route name as the first argument, followed by any required parameters. The parameters should be separated by spaces.  
+
+```blade
+<a href="@url('some-url-name', v1, v2)">Click here</a>
+```
+
+In this example, the generated URL will dynamically include the values of `v1` and `v2` in the appropriate placeholders defined in the route configuration.  
+
+#### Using Keyword Arguments  
+
+Instead of positional arguments, keyword arguments can be used for better clarity:  
+
+```blade
+<a href="@url('some-url-name', arg1=v1, arg2=v2)">Click here</a>
+```
+
+It is important to note that positional and keyword arguments cannot be mixed within the same `@url` directive. Additionally, all required parameters must be provided to avoid errors.  
+
+#### Example with Dynamic Route  
+
+Consider a view function `client()` inside the `app_views.py` file, which requires a client ID as a parameter. Its corresponding route might look like this:  
+
+```python
+path("client/<int:id>/", app_views.client, name="app-views-client")
+```
+
+If this route is included under `"clients/"` in the main project’s URLs, the correct way to generate a link in a template would be:  
+
+```blade
+<a href="@url('app-views-client', client.id)">View Client</a>
+```
+
+If `client.id` is `123`, the generated URL would be:  
+
+```
+/clients/client/123/
+```
+
+#### Handling Missing Routes  
+
+If the named route does not exist, PyBlade raises a `NoReverseMatch` exception, which could result in an error page. To avoid this, you can use the `as` keyword to store the URL in a variable before using it:  
+
+```blade
+@url('some-url-name', arg, arg2, as_="the_url")
+
+<a href="{{ the_url }}">I'm linking to {{ the_url }}</a>
+```
+
+The variable `the_url` will only be available within the block where it is defined.  
+
+If the route is optional, it can be conditionally checked before rendering a link:  
+
+```blade
+@url('some-url-name', as_="the_url")
+
+@if the_url:
+    <a href="{{ the_url }}">Link to optional content</a>
+@endif
+```
+
+This ensures that broken links do not appear in the rendered page.  
+
+#### Using Namespaced Routes  
+
+For applications using namespaced URLs, specify the fully qualified name:  
+
+```blade
+<a href="@url('myapp:view-name')">Visit MyApp</a>
+```
+
+PyBlade will resolve the namespace according to the context, ensuring that the correct URL is generated.  
+
+#### Important Note  
+
+Always enclose the route name in quotes. If omitted, PyBlade will interpret the value as a context variable, leading to unexpected results.
+
+
+### `@urlis` Directive in PyBlade  
+
+The `@urlis` directive checks whether the current URL matches a given named route and returns `True` if it does, or `False` otherwise. This can be particularly useful for defining active states in navigation menus or conditionally rendering elements based on the active page.  
+
+#### Checking the Current URL  
+
+To use `@urlis`, pass the name of the route as the first argument. It will evaluate to `True` if the current page matches the provided route.  
+
+```blade
+@if @urlis('home')
+    <span>You are on the homepage!</span>
+@endif
+```
+
+If the current URL matches the `home` route, the message will be displayed. Otherwise, it will not render anything.  
+
+#### Using `@urlis` for Navigation Menus  
+
+A common use case is applying an `active` class to navigation links:  
+
+```blade
+<li class="@if @urlis('dashboard') active @endif">
+    <a href="@url('dashboard')">Dashboard</a>
+</li>
+<li class="@if @urlis('profile') active @endif">
+    <a href="@url('profile')">Profile</a>
+</li>
+```
+
+When the user is on the "dashboard" page, the first `<li>` will have the `active` class. When they navigate to "profile," the second `<li>` will become active instead.  
+
+#### Matching URLs with Parameters  
+
+The `@urlis` directive can also be used for routes that include parameters. For example, if the current URL is `/clients/client/123/`, the following check will return `True` for `client.id = 123`:  
+
+```blade
+@if @urlis('app-views-client', client.id)
+    <span>Viewing client {{ client.id }}</span>
+@endif
+```
+
+This ensures that the check remains dynamic, adapting to different URL parameters.  
+
+#### Combining `@urlis` and `@url`  
+
+The `@urlis` directive pairs well with `@url` for improved navigation handling. A more structured navigation bar example:  
+
+```blade
+<ul>
+    <li class="@if @urlis('home') active @endif">
+        <a href="@url('home')">Home</a>
+    </li>
+    <li class="@if @urlis('about') active @endif">
+        <a href="@url('about')">About</a>
+    </li>
+    <li class="@if @urlis('contact') active @endif">
+        <a href="@url('contact')">Contact</a>
+    </li>
+</ul>
+```
+
+This approach ensures that the correct navigation item is highlighted based on the current route, enhancing the user experience.  
+
+#### Important Considerations  
+
+- `@urlis` strictly compares the full route, including parameters if provided.  
+- If no parameters are given, it checks the base route only.  
+- This directive is useful for styling elements dynamically without relying on JavaScript.  
+
+By combining `@urlis` with `@url`, PyBlade makes route handling in templates more flexible and maintainable.
+
+
+### `@static` Directive in PyBlade  
+
+In PyBlade, the `@static` directive is used to link to static files that are saved in a predefined directory. This is similar to Django's static handling, which provides a convenient way to link to images, stylesheets, JavaScript files, and other resources that are served from a static folder.  
+
+To link to a static file, use the `@static` directive with the path to the file. This will generate the appropriate URL for the static resource. The format of the URL is typically determined by the project's static settings.  
+
+#### Basic Example  
+
+If you want to link to an image stored in the `STATIC_ROOT` directory, you would do it like this:
+
+```blade
+<img src="@static('images/hi.jpg')" alt="Hi!">
+```
+
+This will resolve to the appropriate URL for the image, ensuring it is properly linked according to your static file configuration.  
+
+#### Using Context Variables  
+
+You can also pass context variables to the `@static` directive, similar to how Django’s static tag works. For example, if you have a `user_stylesheet` variable passed from the view, you can use it to dynamically link to a user's custom stylesheet:
+
+```blade
+<link rel="stylesheet" href="@static(user_stylesheet)" media="screen">
+```
+
+This way, the value of `user_stylesheet` will be treated as the path to the stylesheet, which can be modified based on the current user’s preferences or other dynamic conditions.  
+
+#### Storing Static URL in a Variable  
+
+If you want to retrieve a static URL without displaying it immediately, you can store the URL in a variable for later use. You can do this by using the `as` keyword, similar to other directives that assign values:
+
+```blade
+@static('images/hi.jpg' as myphoto)
+<img src="{{ myphoto }}" alt="Hi!">
+```
+
+This stores the static URL for the image in the `myphoto` variable, which you can then use anywhere in the template.  
+
+### `@get_static_prefix` Directive  
+
+If you need more control over how the static URL is injected into the template, you can use the `@get_static_prefix` directive. This will give you the static URL prefix, which is typically the base URL for static files.  
+
+```blade
+<img src="@get_static_prefix()images/hi.jpg" alt="Hi!">
+```
+
+This allows you to explicitly append the path to the static resource to the URL prefix.  
+
+Alternatively, you can store the static prefix in a variable to avoid repeated processing of the same value:
+
+```blade
+@get_static_prefix() as STATIC_PREFIX
+<img src="{{ STATIC_PREFIX }}images/hi.jpg" alt="Hi!">
+<img src="{{ STATIC_PREFIX }}images/hi2.jpg" alt="Hello!">
+```
+
+By doing this, the static prefix is stored in the `STATIC_PREFIX` variable, making it easier to use the same prefix multiple times throughout the template.  
+
+### `@get_media_prefix` Directive  
+
+Similar to `@get_static_prefix`, the `@get_media_prefix` directive provides the media URL prefix. This is useful when you need to link to media files, which are typically served separately from static files.  
+
+For example, you can use `@get_media_prefix` to set a data attribute for media URLs:
+
+```blade
+<body data-media-url="@get_media_prefix()">
+```
+
+By storing the media prefix in a data attribute, you ensure it’s appropriately escaped if you need to use it in JavaScript, reducing the risk of issues such as invalid URL formatting or security vulnerabilities.  
+
 - @querystring
 
-
-## The `@lorem` directive
-## Localisation
+## Internationalization
 
 - @translate
 - @blocktranslate
 - @plural
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ## Raw Python code
 
 In PyBlade, the focus is on maintaining a clear separation between logic and presentation, which is why we've opted not to include raw Python code execution within templates. Although technically possible, embedding raw Python can quickly lead to complex, hard-to-maintain templates, reducing readability and performance.
 
 However, we understand that in some cases, direct Python code might seem useful. If there is strong demand from the community, we would consider adding a `@python` directive. This directive could allow developers to execute Python code within templates, but we encourage handling complex logic in the view layer or controller instead.
-
-For now, we recommend:
-- **Using the View Layer for Logic** : Prepare all necessary data and pass it to the template from the view or controller. This keeps templates cleaner and focused on displaying information.
-- **Leveraging PyBlade's Existing Directives**: Use PyBlade's conditional statements, loops, and directives like `@class` and `@style` for most template logic.
 
 If you feel strongly about adding raw Python capabilities in PyBlade, please reach out! We are open to suggestions and would love to hear more about how this feature might help your projects.
