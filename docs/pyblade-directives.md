@@ -160,9 +160,9 @@ If the user is not logged in, they see login and signup links. Otherwise, they a
 > The `@anonymous` directive is an alias for `@guest`, so you can use either one interchangeably.  
 
 
-## Match statements
+## Match Case statements
 
-PyBlde also provides support for `@match` statements, which are useful for handling multiple conditions based on the value of a single variable. This can help simplify templates by reducing the need for multiple `@if`, `@elif`, and `@else` statements.
+Similar to Python, PyBlde also provides support for `@match` statements, which are useful for handling multiple conditions based on the value of a single variable. This can help simplify templates by reducing the need for multiple `@if`, `@elif`, and `@else` statements.
 
 With `@match`, you can check a variable's value and define multiple `@case` conditions. If none of the cases match, an optional `@default` can be specified as a fallback.
 
@@ -984,16 +984,48 @@ Or, if `country` is a field with choices, it will have a `get_FOO_display()` met
 ---
 ### The `@ifchanged` directive
 
-The `@ifchanged` directive is a useful feature that allows you to conditionally display content only when the value of a variable changes.  
+The `@ifchanged` directive in PyBlade is used **only inside loops** and helps you detect when a value changes between iterations. You might find it very useful to conditionally render content based on whether a variable has changed compared to its previous state.  
 
-For example, consider this usage:  
+When used without arguments, `@ifchanged` checks its own rendered contents against its previous state and only displays the content if it has changed.  For example, this displays a list of days, only displaying the month if it changes:
 
 ```html
-@for(item in items)
-    @ifchanged(item.category)
-        <h2>{{ item.category }}</h2>
-    @endif
-    <li>{{ item.name }}</li>    
+<h1>Archive for {{ year }}</h1>
+
+@for(date in dates)
+    @ifchanged
+        <h3>{{ date.strftime('%B') }}</h3>
+    @endifchanged
+    <a href="/{{ date.strftime('%m/%d').lower() }}">{{ date.strftime('%d') }}</a>
+@endfor
+```
+
+If given one or more variables as arguments to `@ifchanged` directive, it checks whether any variable has changed. For example, the following shows the date every time it changes, while showing the hour if either the hour or the date has changed:
+
+```html
+@for(date in dates)
+    @ifchanged (date.date)
+        <strong>{{ date.date }}</strong>
+    @endifchanged
+    
+    @ifchanged (date.hour, date.date)
+        <span>{{ date.hour }}</span>
+    @endifchanged
+@endfor
+```
+
+You can use an `@else` clause inside `@ifchanged` to define an alternative output when the value has **not** changed. For example, the following alternates between `red` and `blue` colors when `ballot_id` changes, otherwise uses `gray`:  
+
+```html
+@for(match in matches)
+    <div style="background-color:
+        @ifchanged(match.ballot_id)
+            @cycle('red', 'blue')
+        @else
+            gray
+        @endifchanged
+    ">
+        {{ match }}
+    </div>
 @endfor
 ```
 
