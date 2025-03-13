@@ -1231,78 +1231,67 @@ Then use it multiple times in your template:
 <a href="/products/{{ next_page }}">Next Page</a>
 ```
 
-
-### `@static` Directive in PyBlade  
+### The `@static` directive
 ---
 
-In PyBlade, the `@static` directive is used to link to static files that are saved in a predefined directory. This is similar to Django's static handling, which provides a convenient way to link to images, stylesheets, JavaScript files, and other resources that are served from a static folder.  
+In PyBlade, the `@static` directive provides a convenient way to link to static files such as images, stylesheets, JavaScript files, and other resources that are served from a **static** folder.  
 
 To link to a static file, use the `@static` directive with the path to the file. This will generate the appropriate URL for the static resource. The format of the URL is typically determined by the project's static settings.  
 
-#### Basic Example  
 
-If you want to link to an image stored in the `STATIC_ROOT` directory, you would do it like this:
-
-```blade
+```html
 <img src="@static('images/hi.jpg')" alt="Hi!">
 ```
 
 This will resolve to the appropriate URL for the image, ensuring it is properly linked according to your static file configuration.  
 
-#### Using Context Variables  
 
-You can also pass context variables to the `@static` directive, similar to how Django’s static tag works. For example, if you have a `user_stylesheet` variable passed from the view, you can use it to dynamically link to a user's custom stylesheet:
+You can also pass context variables to the `@static` directive. For example, if you have a `user_stylesheet` variable passed from the view, you can use it to dynamically link to a user's custom stylesheet:
 
-```blade
+```html
 <link rel="stylesheet" href="@static(user_stylesheet)" media="screen">
 ```
 
 This way, the value of `user_stylesheet` will be treated as the path to the stylesheet, which can be modified based on the current user’s preferences or other dynamic conditions.  
 
-#### Storing Static URL in a Variable  
+Sometimes, you may want to retrieve a static URL without displaying it immediately. You may store the URL in a variable for later use. You can do this by using the `as` keyword, similar to other directives that assign values:
 
-If you want to retrieve a static URL without displaying it immediately, you can store the URL in a variable for later use. You can do this by using the `as` keyword, similar to other directives that assign values:
-
-```blade
-@static('images/hi.jpg' as myphoto)
-<img src="{{ myphoto }}" alt="Hi!">
+```html
+@static('images/hi.jpg' as my_photo)
+<img src="{{ my_photo }}">
 ```
 
-This stores the static URL for the image in the `myphoto` variable, which you can then use anywhere in the template.  
+This stores the static URL for the image in the `my_photo` variable, which you can then use anywhere in the template.  
 
-### `@get_static_prefix` Directive  
+#### The `@get_static_prefix` directive
 
 If you need more control over how the static URL is injected into the template, you can use the `@get_static_prefix` directive. This will give you the static URL prefix, which is typically the base URL for static files.  
 
-```blade
-<img src="@get_static_prefix()images/hi.jpg" alt="Hi!">
+```html
+<img src="@get_static_prefix images/hi.jpg" alt="Hi!">
 ```
 
 This allows you to explicitly append the path to the static resource to the URL prefix.  
 
 Alternatively, you can store the static prefix in a variable to avoid repeated processing of the same value:
 
-```blade
-@get_static_prefix() as STATIC_PREFIX
+```html
+@get_static_prefix(as STATIC_PREFIX)
 <img src="{{ STATIC_PREFIX }}images/hi.jpg" alt="Hi!">
 <img src="{{ STATIC_PREFIX }}images/hi2.jpg" alt="Hello!">
 ```
 
 By doing this, the static prefix is stored in the `STATIC_PREFIX` variable, making it easier to use the same prefix multiple times throughout the template.  
 
-### `@get_media_prefix` Directive  
+####  The `@get_media_prefix` directive
 
 Similar to `@get_static_prefix`, the `@get_media_prefix` directive provides the media URL prefix. This is useful when you need to link to media files, which are typically served separately from static files.  
 
 For example, you can use `@get_media_prefix` to set a data attribute for media URLs:
 
-```blade
-<body data-media-url="@get_media_prefix()">
+```html
+<body data-media-url="@get_media_prefix">
 ```
-
-By storing the media prefix in a data attribute, you ensure it’s appropriately escaped if you need to use it in JavaScript, reducing the risk of issues such as invalid URL formatting or security vulnerabilities.  
-
-- @querystring
 
 ## Internationalization
 
