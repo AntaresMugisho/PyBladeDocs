@@ -658,7 +658,7 @@ You can also cycle through variables instead of fixed values. Suppose you have t
 @endwith
 ```  
 
-The values in the cycle will be automatically escaped for safety. However, if you need to disable auto-escaping, you can wrap it in an [`@autoescape`](6-displaying-data.html#the-autoescape-directive) block. 
+The values in the cycle will be automatically escaped for safety. However, if you need to disable auto-escaping, you can wrap it in an [`@autoescape`](displaying-data.html#the-autoescape-directive) block. 
 
 ```html
 @for(product in products)
@@ -831,7 +831,7 @@ For example, let's say you're building an online job portal. Job seekers may pro
 If `user.phone` is available, it will be displayed. If not, it falls back to `user.linkedin`, and if both are missing, `'support@jobportal.com'` ensures there's always a valid contact option shown.
 
 >[!info] Note
->By default, PyBlade automatically escapes output to prevent security risks. If you want to disable escaping for certain reasons, you can wrap the `@firstof` block in an [`@autoescape`](6-displaying-data.html#the-autoescape-directive) one.  
+>By default, PyBlade automatically escapes output to prevent security risks. If you want to disable escaping for certain reasons, you can wrap the `@firstof` block in an [`@autoescape`](displaying-data.html#the-autoescape-directive) one.  
 >```html
 >@autoescape(False)
 >    @firstof(var1, var2, var3, "<strong>Fallback Value</strong>")

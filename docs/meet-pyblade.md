@@ -107,5 +107,4 @@ In this example:
 
 PyBlade’s flexibility, secure defaults, and intuitive syntax make it a powerful addition to your Python development toolkit, helping you create dynamic, responsive, and secure applications effortlessly.
 
-Check out the documentation for the [full list of PyBlade features](/3-getting-started).
-
+[Start now](/getting-started) to explore the full list of PyBlade features.

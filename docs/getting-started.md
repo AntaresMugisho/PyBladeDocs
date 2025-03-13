@@ -293,8 +293,8 @@ Here’s what you can explore next to unlock the full potential of PyBlade:
 
 PyBlade provides a rich set of directives that can help you add logic and interactivity to your HTML templates, all while keeping the code simple and readable. These directives will allow you to control the flow of your templates in a way that’s both powerful and easy to follow.
 
-- Learn how to [display data](6-displaying-data) in your templates.
-- Learn how to use [pyblade directives](7-pyblade-directives) like `@if`, `@for` and `@include` in your templates.
+- Learn how to [display data](displaying-data) in your templates.
+- Learn how to use [pyblade directives](pyblade-directives) like `@if`, `@for` and `@include` in your templates.
 - Use [PyBlade components](#) to create reusable UI blocks with data encapsulation.
 - Understand [template inheritance and layouts](#) for creating modular templates.
 
