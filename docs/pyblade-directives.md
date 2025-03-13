@@ -1082,164 +1082,98 @@ The table below outlines some of the most commonly used  datetime format specifi
 
 ## URL Handling and links
 
-### `@url` Directive in PyBlade  
-
 The `@url` directive generates an absolute path (a URL without the domain name) based on a named route and optional parameters. Any special characters in the resulting URL are automatically encoded.  
 
-This directive helps keep templates clean and maintainable by avoiding hardcoded links, ensuring that changes in URL patterns do not require modifications in multiple places.  
+To generate a URL, pass the route name as the first argument, followed by any required parameters. The parameters should be comma-separated.  
 
-#### Generating URLs with `@url`  
-
-To generate a URL, pass the route name as the first argument, followed by any required parameters. The parameters should be separated by spaces.  
-
-```blade
-<a href="@url('some-url-name', v1, v2)">Click here</a>
+```html
+<a href="@url('some-url-name', post.id, post.slug)">Read the post</a>
 ```
 
-In this example, the generated URL will dynamically include the values of `v1` and `v2` in the appropriate placeholders defined in the route configuration.  
-
-#### Using Keyword Arguments  
+In this example, the generated URL will dynamically include the values of `post.id` and `post.slug` in the appropriate placeholders defined in the url pattern configuration.  
 
 Instead of positional arguments, keyword arguments can be used for better clarity:  
 
-```blade
-<a href="@url('some-url-name', arg1=v1, arg2=v2)">Click here</a>
+```html
+<a href="@url('some-url-name', pk=product.id)">Show product</a>
 ```
 
-It is important to note that positional and keyword arguments cannot be mixed within the same `@url` directive. Additionally, all required parameters must be provided to avoid errors.  
+>[!Warning] Warning
+>It is important to note that positional and keyword arguments cannot be mixed within the same `@url` directive. Additionally, all required parameters must be provided to avoid errors.  
 
-#### Example with Dynamic Route  
+**Example with dynamic route in Django**
 
-Consider a view function `client()` inside the `app_views.py` file, which requires a client ID as a parameter. Its corresponding route might look like this:  
+Consider a view function `client()` inside the `views.py` file, which requires a client ID as a parameter. Its corresponding route might look like this:  
 
 ```python
-path("client/<int:id>/", app_views.client, name="app-views-client")
-```
+# urls.py
+path("client/<int:id>/", views.client, name="client-detail")
+``` 
 
-If this route is included under `"clients/"` in the main project’s URLs, the correct way to generate a link in a template would be:  
+The correct way to generate a link in a template would be:  
 
-```blade
-<a href="@url('app-views-client', client.id)">View Client</a>
+```html
+<a href="@url('client-detail', client.id)">View Client</a>
 ```
 
 If `client.id` is `123`, the generated URL would be:  
 
 ```
-/clients/client/123/
+/client/123/
 ```
 
-#### Handling Missing Routes  
+>[!warning]Warning
+>If the **URL** you’re reversing doesn’t exist, you’ll get an `NoReverseMatch` exception raised, which will cause your site to display an error page.
+ 
 
-If the named route does not exist, PyBlade raises a `NoReverseMatch` exception, which could result in an error page. To avoid this, you can use the `as` keyword to store the URL in a variable before using it:  
+When workiing with Django, if you’d like to retrieve a namespaced URL, specify the fully qualified name:
 
-```blade
-@url('some-url-name', arg, arg2, as_="the_url")
-
-<a href="{{ the_url }}">I'm linking to {{ the_url }}</a>
-```
-
-The variable `the_url` will only be available within the block where it is defined.  
-
-If the route is optional, it can be conditionally checked before rendering a link:  
-
-```blade
-@url('some-url-name', as_="the_url")
-
-@if the_url:
-    <a href="{{ the_url }}">Link to optional content</a>
-@endif
-```
-
-This ensures that broken links do not appear in the rendered page.  
-
-#### Using Namespaced Routes  
-
-For applications using namespaced URLs, specify the fully qualified name:  
-
-```blade
+```html
 <a href="@url('myapp:view-name')">Visit MyApp</a>
 ```
-
-PyBlade will resolve the namespace according to the context, ensuring that the correct URL is generated.  
-
-#### Important Note  
-
-Always enclose the route name in quotes. If omitted, PyBlade will interpret the value as a context variable, leading to unexpected results.
+This will follow the normal namespaced URL resolution strategy, including using any hints provided by the context as to the current application. 
 
 
-### `@urlis` Directive in PyBlade  
+#### The `@urlis` directive  
+--- 
 
 The `@urlis` directive checks whether the current URL matches a given named route and returns `True` if it does, or `False` otherwise. This can be particularly useful for defining active states in navigation menus or conditionally rendering elements based on the active page.  
 
-#### Checking the Current URL  
+To use `@urlis`, pass the name of the route as the first argument.  
 
-To use `@urlis`, pass the name of the route as the first argument. It will evaluate to `True` if the current page matches the provided route.  
-
-```blade
-@if @urlis('home')
+```html
+@if (@urlis('home'))
     <span>You are on the homepage!</span>
+@endif
+```
+The abve code is equivalent to :
+
+```html
+@if(request.resolver_match.url_name == 'home')
+    <!-- Display content for the home page -->
 @endif
 ```
 
 If the current URL matches the `home` route, the message will be displayed. Otherwise, it will not render anything.  
 
-#### Using `@urlis` for Navigation Menus  
 
-A common use case is applying an `active` class to navigation links:  
+A common use case is applying an `active` class to navigation links. You can achieve this by adding a second string parameter to the `@urlis` directive. When a second parameter is passed, the provided value is returned instead of `True` if the current page matches the given route name, otherwise, nothing is returned instead of `False`.
 
-```blade
-<li class="@if @urlis('dashboard') active @endif">
+```html
+<li class="@urlis('dashboard', 'active')">
     <a href="@url('dashboard')">Dashboard</a>
 </li>
-<li class="@if @urlis('profile') active @endif">
+<li class="@urlis('profile', 'active')">
     <a href="@url('profile')">Profile</a>
 </li>
 ```
 
-When the user is on the "dashboard" page, the first `<li>` will have the `active` class. When they navigate to "profile," the second `<li>` will become active instead.  
+If the current page is dashboard, `@urlis('dashboard', 'active')` returns "active", making the `<li>` element have the class `active`. Else, nothing is returned, meaning no additional class is applied.
 
-#### Matching URLs with Parameters  
-
-The `@urlis` directive can also be used for routes that include parameters. For example, if the current URL is `/clients/client/123/`, the following check will return `True` for `client.id = 123`:  
-
-```blade
-@if @urlis('app-views-client', client.id)
-    <span>Viewing client {{ client.id }}</span>
-@endif
-```
-
-This ensures that the check remains dynamic, adapting to different URL parameters.  
-
-#### Combining `@urlis` and `@url`  
-
-The `@urlis` directive pairs well with `@url` for improved navigation handling. A more structured navigation bar example:  
-
-```blade
-<ul>
-    <li class="@if @urlis('home') active @endif">
-        <a href="@url('home')">Home</a>
-    </li>
-    <li class="@if @urlis('about') active @endif">
-        <a href="@url('about')">About</a>
-    </li>
-    <li class="@if @urlis('contact') active @endif">
-        <a href="@url('contact')">Contact</a>
-    </li>
-</ul>
-```
-
-This approach ensures that the correct navigation item is highlighted based on the current route, enhancing the user experience.  
-
-#### Important Considerations  
-
-- `@urlis` strictly compares the full route, including parameters if provided.  
-- If no parameters are given, it checks the base route only.  
-- This directive is useful for styling elements dynamically without relying on JavaScript.  
-
-By combining `@urlis` with `@url`, PyBlade makes route handling in templates more flexible and maintainable.
 
 
 ### `@static` Directive in PyBlade  
+---
 
 In PyBlade, the `@static` directive is used to link to static files that are saved in a predefined directory. This is similar to Django's static handling, which provides a convenient way to link to images, stylesheets, JavaScript files, and other resources that are served from a static folder.  
 
