@@ -1118,7 +1118,7 @@ The correct way to generate a link in a template would be:
 
 If `client.id` is `123`, the generated URL would be:  
 
-```
+```text
 /client/123/
 ```
 
@@ -1170,6 +1170,66 @@ A common use case is applying an `active` class to navigation links. You can ach
 
 If the current page is dashboard, `@urlis('dashboard', 'active')` returns "active", making the `<li>` element have the class `active`. Else, nothing is returned, meaning no additional class is applied.
 
+### The `@querystring` directive 
+---
+
+PyBlade provides an intuitive way to generate and manipulate query strings dynamically. 
+
+The `@querystring` directive constructs a URL-encoded query string by adding or modifying parameters in the current query string.
+
+```html
+@querystring(color="green", size="M")
+```
+
+Each keyword argument will be added to the current query string, replacing any existing value for that key. For instance, if the currrent query string is `?color=red`, The above code would output :
+
+```text
+?color=green&size=M
+```
+
+
+Setting a query parameter to `None` will remove it from the query string.  
+
+
+If a parameter is a list, `@querystring` will generate multiple key-value pairs, maintaining the structure.  
+
+```html
+@querystring(color=my_list)
+```
+
+If `my_list = ["red", "blue"]`, the output will be:  
+
+```text
+?color=red&color=blue
+```
+
+>[!info] Note
+>If no parameters are provided, the `querystring` directive outputs the current query string verbatim exactly as it appears in the request, or a leading `?` if the query string is empty.
+
+
+A common example of using this directive is to preserve the current query string when displaying a page of paginated results, while adding a link to the next and previous pages of results. For example, if the paginator is currently on page `3`, and the current query string is `?color=blue&size=M&page=3`, the following code :
+
+```html
+@querystring(page=page.next_page_number)
+```
+
+... would output:
+
+```text
+?color=blue&size=M&page=4
+```
+
+For efficiency, you may also store the generated query string in a variable for reuse:  
+
+```html
+@querystring(page=page.next_page_number as next_page)
+```
+
+Then use it multiple times in your template:  
+
+```html
+<a href="/products/{{ next_page }}">Next Page</a>
+```
 
 
 ### `@static` Directive in PyBlade  
