@@ -1364,7 +1364,7 @@ The `@translate` directive also supports contextual markers using the `context` 
 
 Unlike `@translate`, the `@blocktranslate` directive allows marking complex sentences that include both literals and variable content by using placeholders:
 
-```blade
+```html
 @blocktranslate
     This string will have {{ value }} inside.
 @endblocktranslate
@@ -1372,7 +1372,7 @@ Unlike `@translate`, the `@blocktranslate` directive allows marking complex sent
 
 To translate a template expression, such as accessing object attributes or calling object methods, bind the expression to a local variable within the translation block:
 
-```blade
+```html
 @blocktranslate(amount=article.price)
     That will cost $ {{ amount }}.
 @endblocktranslate
@@ -1380,7 +1380,7 @@ To translate a template expression, such as accessing object attributes or calli
 
 You can use multiple expressions inside a single `@blocktranslate`:
 
-```blade
+```html
 @blocktranslate(book_t=book.title, author_t=author.title() )
     This is {{ book_t }} by {{ author_t }}.
 @endblocktranslate
@@ -1401,7 +1401,7 @@ To use pluralization:
 
 Example:
 
-```blade
+```html
 @blocktranslate(counter=list.length)
     There is only one {{ name }} object.
 @plural
@@ -1411,7 +1411,7 @@ Example:
 
 A more complex example:
 
-```blade
+```html
 @blocktranslate(amount=article.price, counter=i.length)
     That will cost $ {{ amount }} per year.
 @plural
@@ -1427,7 +1427,7 @@ If the `counter` variable stores a number greater than `1`, the singular form wi
 
 You can retrieve a translated string without displaying it:
 
-```blade
+```html
 @blocktranslate(as the_title)
     The title is {{ the_title }}.
 @endblocktranslate
@@ -1437,7 +1437,7 @@ You can retrieve a translated string without displaying it:
 ```
 The `@blocktranslate` directive also supports contextual markers using the `context` keyword argument:
 
-```blade
+```html
 @blocktranslate(name=user.username, context="greeting")
     Hi {{ name }}
 @endblocktranslate
@@ -1445,7 +1445,7 @@ The `@blocktranslate` directive also supports contextual markers using the `cont
 
 The `trimmed` argument can be used to remove unnecessary whitespace and newlines:
 
-```blade
+```html
 @blocktranslate(trimmed=True)
     First sentence.
     Second paragraph.
@@ -1470,7 +1470,7 @@ In `.po` files, this results in
 Retrieves a list of available languages. Each entry is a tuple:  
 `(language_code, translated_language_name)`
 
-```blade
+```html
 @get_available_languages(as LANGUAGES)
 
 @for(lang in LANGUAGES)
@@ -1481,7 +1481,7 @@ Retrieves a list of available languages. Each entry is a tuple:
 #### **2. `@get_current_language`**
 Retrieves the **current user’s preferred language** as a string (e.g., `en-us`).
 
-```blade
+```html
 @get_current_language(as LANGUAGE_CODE)
 
 <p>Current Language: {{ LANGUAGE_CODE }}</p>
@@ -1489,13 +1489,13 @@ Retrieves the **current user’s preferred language** as a string (e.g., `en-us`
 
 ---
 
-### **3. `@get_current_language_bidi`**
+#### **3. `@get_current_language_bidi`**
 Checks if the **current language** is a **right-to-left (RTL) language** (e.g., Arabic, Hebrew).  
 
 - Returns `True` for RTL languages.
 - Returns `False` for LTR languages.
 
-```blade
+```html
 @get_current_language_bidi(as LANGUAGE_BIDI)
 
 @if(LANGUAGE_BIDI)
@@ -1504,8 +1504,6 @@ Checks if the **current language** is a **right-to-left (RTL) language** (e.g., 
     <p>The current language is left-to-right (LTR).</p>
 @endif
 ```
-
----
 
 >[!note] Note
 >For Django projects, if `django.template.context_processors.i18n` is enabled, these variables are automatically available in the template:
@@ -1516,19 +1514,18 @@ Checks if the **current language** is a **right-to-left (RTL) language** (e.g., 
 >
 >You can access them directly:
 >
->```blade
+>```html
 ><p>Current language code: {{ LANGUAGE_CODE }}</p>
 >@if(LANGUAGE_BIDI)
 >    <p>The language is bidirectional (RTL).</p>
 >@endif
 >```
 
----
 
-### **5. `@get_language_info`**
+#### **5. `@get_language_info`**
 Retrieves detailed **language metadata** for a given language code.
 
-```blade
+```html
 @get_language_info(LANGUAGE_CODE  as lang)
 
 @get_language_info("pl" as lang)
@@ -1536,8 +1533,7 @@ Retrieves detailed **language metadata** for a given language code.
 
 You can the access information
 
-```blade
-
+```html
 <p>Language Code: {{ lang.code }}</p>
 <p>Name (Local): {{ lang.name_local }}</p>
 <p>Name (English): {{ lang.name }}</p>
@@ -1545,22 +1541,18 @@ You can the access information
 <p>Name in Active Language: {{ lang.name_translated }}</p>
 ```
 
----
-
-### **6. `@get_language_info_list`**
+#### **6. `@get_language_info_list`**
 Retrieves **language information** for a list of languages.
     
 Example: Assume your view passes `available_languages = ["en", "es", "fr"]` to the template.
 
-```blade
+```html
 @get_language_info_list(available_languages as langs)
 
 @for(lang in langs)
     <p>{{ lang.name }} ({{ lang.code }})</p>
 @endfor
 ```
-
----
 
 ## Raw Python code
 
