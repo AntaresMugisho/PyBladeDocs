@@ -42,6 +42,7 @@ export default defineConfig({
         items: [
           {text: "Overview", link: "pyblade-cli-overview"},
           {text: "Available commands", link: "pyblade-cli-commands"},
+          // {text: "Extending PyBlade CLI", link: "extend-pyblade-cli"}
         ]
       },
       {
