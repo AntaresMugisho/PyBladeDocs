@@ -1294,10 +1294,328 @@ For example, you can use `@get_media_prefix` to set a data attribute for media U
 ```
 
 ## Internationalization
+Here’s the adjusted version with PyBlade's directives:
 
-- @translate
-- @blocktranslate
-- @plural
+---
+
+### Internationalization: in template code
+
+Translations in PyBlade templates use two template tags and a slightly different syntax than in Python code. To give your template access to these tags, put `@load("i18n")` toward the top of your template. As with all template tags, this tag needs to be loaded in all templates that use translations, even those templates that extend from other templates that have already loaded the `i18n` tag.
+
+#### ⚠ Warning
+
+Translated strings will not be escaped when rendered in a template. This allows you to include HTML in translations, for example for emphasis, but potentially dangerous characters (e.g., `"` ) will also be rendered unchanged.
+
+---
+
+### `@translate` template tag
+
+The `@translate` template tag translates either a constant string (enclosed in single or double quotes) or variable content:
+
+```blade
+<title>@translate("This is the title.")</title>
+<title>@translate(myvar)</title>
+```
+
+If the `noop` option is present, variable lookup still takes place but the translation is skipped. This is useful when "stubbing out" content that will require translation in the future:
+
+```blade
+<title>@translate("myvar", noop=True)</title>
+```
+
+Internally, inline translations use a `gettext()` call.
+
+If a template variable (`myvar` above) is passed to the tag, the tag will first resolve such a variable to a string at runtime and then look up that string in the message catalogs.
+
+It’s not possible to mix a template variable inside a string within `@translate`. If your translations require strings with variables (placeholders), use `@blocktranslate` instead.
+
+---
+
+If you’d like to retrieve a translated string without displaying it, you can use the following syntax:
+
+```blade
+@translate("This is the title", as_="the_title")
+
+<title>{{ the_title }}</title>
+<meta name="description" content="{{ the_title }}">
+```
+
+In practice, you’ll use this to get a string you can use in multiple places in a template or so you can use the output as an argument for other template tags or filters:
+
+```blade
+@translate("starting point", as_="start")
+@translate("end point", as_="end")
+@translate("La Grande Boucle", as_="race")
+
+<h1>
+  <a href="/" title="@blocktranslate() Back to '{{ race }}' homepage @endblocktranslate()">{{ race }}</a>
+</h1>
+<p>
+@for(stage in tour_stages)
+    @cycle(start, end): {{ stage }}@if(loop.index % 2 == 0)<br>@else, @endif
+@endfor
+</p>
+```
+
+`@translate` also supports contextual markers using the `context` keyword:
+
+```blade
+@translate("May", context="month name")
+```
+
+---
+
+This keeps the structure identical while converting all directives to PyBlade's syntax.
+
+
+
+Here's the `@blocktranslate` directive in PyBlade syntax:
+
+---
+
+### `@blocktranslate` Template Tag
+
+Unlike `@translate`, the `@blocktranslate` directive allows marking complex sentences that include both literals and variable content by using placeholders:
+
+```blade
+@blocktranslate()
+    This string will have {{ value }} inside.
+@endblocktranslate()
+```
+
+To translate a template expression, such as accessing object attributes or using filters, bind the expression to a local variable within the translation block:
+
+```blade
+@blocktranslate(with={"amount": article.price})
+    That will cost $ {{ amount }}.
+@endblocktranslate()
+```
+
+```blade
+@blocktranslate(with={"myvar": value|filter})
+    This will have {{ myvar }} inside.
+@endblocktranslate()
+```
+
+You can use multiple expressions inside a single `@blocktranslate`:
+
+```blade
+@blocktranslate(with={"book_t": book|title, "author_t": author|title})
+    This is {{ book_t }} by {{ author_t }}.
+@endblocktranslate()
+```
+
+#### ⚠ Note:
+The older verbose format using `as` and `and` is still supported:
+
+```blade
+@blocktranslate(with={"book|title as book_t and author|title as author_t"})
+@endblocktranslate()
+```
+
+Other block tags like `@for` or `@if` are **not** allowed inside `@blocktranslate`.
+
+If resolving a block argument fails, `@blocktranslate` falls back to the default language by temporarily deactivating the current language.
+
+---
+
+### Pluralization in `@blocktranslate`
+
+To use pluralization:
+
+1. Bind a counter variable as `count`.
+2. Specify both singular and plural forms using the `@plural` directive.
+
+Example:
+
+```blade
+@blocktranslate(count="counter=list|length")
+    There is only one {{ name }} object.
+    @plural()
+    There are {{ counter }} {{ name }} objects.
+@endblocktranslate()
+```
+
+A more complex example:
+
+```blade
+@blocktranslate(with={"amount": article.price}, count="years=i.length")
+    That will cost $ {{ amount }} per year.
+    @plural()
+    That will cost $ {{ amount }} per {{ years }} years.
+@endblocktranslate()
+```
+
+Since `@blocktranslate` internally converts to `ngettext`, the same variable rules apply.
+
+---
+
+### Reverse URL Lookups in `@blocktranslate`
+
+Reverse URL lookups **cannot** be performed inside `@blocktranslate`. You must retrieve them beforehand:
+
+```blade
+@url("path.to.view", args=[arg, arg2], as_="the_url")
+
+@blocktranslate()
+    This is a URL: {{ the_url }}
+@endblocktranslate()
+```
+
+---
+
+### Storing a Translated String in a Variable
+
+You can retrieve a translated string without displaying it:
+
+```blade
+@blocktranslate(as_="the_title")
+    The title is {{ title }}.
+@endblocktranslate()
+
+<title>{{ the_title }}</title>
+<meta name="description" content="{{ the_title }}">
+```
+
+---
+
+### Contextual Markers in `@blocktranslate`
+
+`@blocktranslate` supports contextual markers using the `context` keyword:
+
+```blade
+@blocktranslate(with={"name": user.username}, context="greeting")
+    Hi {{ name }}
+@endblocktranslate()
+```
+
+---
+
+### Using `trimmed` in `@blocktranslate`
+
+The `trimmed` option removes unnecessary whitespace and newlines:
+
+```blade
+@blocktranslate(trimmed=True)
+    First sentence.
+    Second paragraph.
+@endblocktranslate()
+```
+
+This results in `"First sentence. Second paragraph."` in `.po` files, rather than:
+
+```
+"\n  First sentence.\n  Second paragraph.\n"
+```
+
+---
+
+Here’s how these i18n-related directives will look in PyBlade:
+
+---
+
+## **Other i18n Directives in PyBlade**
+
+These directives require `@load("i18n")` to be included.
+
+---
+
+### **1. `@get_available_languages`**
+Retrieves a list of available languages. Each entry is a tuple:  
+`(language_code, translated_language_name)`
+
+```blade
+@get_available_languages(as_="LANGUAGES")
+
+@foreach(LANGUAGES as lang)
+    <option value="{{ lang.0 }}">{{ lang.1 }}</option>
+@endforeach
+```
+
+---
+
+### **2. `@get_current_language`**
+Retrieves the **current user’s preferred language** as a string (e.g., `en-us`).
+
+```blade
+@get_current_language(as_="LANGUAGE_CODE")
+
+<p>Current Language: {{ LANGUAGE_CODE }}</p>
+```
+
+---
+
+### **3. `@get_current_language_bidi`**
+Checks if the **current language** is a **right-to-left (RTL) language** (e.g., Arabic, Hebrew).  
+
+- Returns `True` for RTL languages.
+- Returns `False` for LTR languages.
+
+```blade
+@get_current_language_bidi(as_="LANGUAGE_BIDI")
+
+@if(LANGUAGE_BIDI)
+    <p>The current language is right-to-left (RTL).</p>
+@else
+    <p>The current language is left-to-right (LTR).</p>
+@endif
+```
+
+---
+
+### **4. i18n Context Processor**
+If `django.template.context_processors.i18n` is enabled, these variables are automatically available in the template:
+
+- `LANGUAGES`
+- `LANGUAGE_CODE`
+- `LANGUAGE_BIDI`
+
+You can access them directly:
+
+```blade
+<p>Current language code: {{ LANGUAGE_CODE }}</p>
+@if(LANGUAGE_BIDI)
+    <p>The language is bidirectional (RTL).</p>
+@endif
+```
+
+---
+
+### **5. `@get_language_info`**
+Retrieves detailed **language metadata** for a given language code.
+
+```blade
+@get_language_info(for_="LANGUAGE_CODE", as_="lang")
+```
+
+Example usage:
+
+```blade
+@get_language_info(for_="pl", as_="lang")
+
+<p>Language Code: {{ lang.code }}</p>
+<p>Name (Local): {{ lang.name_local }}</p>
+<p>Name (English): {{ lang.name }}</p>
+<p>Bidirectional: {{ lang.bidi }}</p>
+<p>Name in Active Language: {{ lang.name_translated }}</p>
+```
+
+---
+
+### **6. `@get_language_info_list`**
+Retrieves **language information** for a list of languages.
+    
+Example: Assume your view passes `available_languages = ["en", "es", "fr"]` to the template.
+
+```blade
+@get_language_info_list(for_="available_languages", as_="langs")
+
+@foreach(langs as lang)
+    <p>{{ lang.name }} ({{ lang.code }})</p>
+@endforeach
+```
+
+---
 
 ## Raw Python code
 

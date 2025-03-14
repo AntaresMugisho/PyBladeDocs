@@ -40,7 +40,8 @@ export default defineConfig({
       {
         text: 'PyBlade CLI',
         items: [
-          {}
+          {text: "Overview", link: "pyblade-cli-overview"},
+          {text: "Available commands", link: "pyblade-cli-commands"},
         ]
       },
       {
