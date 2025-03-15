@@ -5,7 +5,7 @@ Learn how to use the PyBlade command-line interface (CLI) to manage and configur
 The PyBlade CLI allows you to streamline your development workflow, making it easy to manage components, databases, templates, and settings, whether you're working locally on a project or automating tasks. By leveraging the CLI, you can simplify many common tasks involved in web development, from generating new components to running migrations, all within a terminal environment.
 
 
-
+    
 ## Installing PyBlade CLI
 
 To get started with PyBlade and its CLI, you first need to install the PyBlade package. When you install PyBlade, it includes the PyBlade CLI by default, so you won’t need to install it separately. To install PyBlade globally on your system, run the following command:

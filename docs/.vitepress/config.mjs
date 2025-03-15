@@ -34,17 +34,34 @@ export default defineConfig({
       {
         text: 'Liveblade: Interactive UIs',
         items: [
-          {}
+          {text: "Quick start", link:"/liveblade/quickstart"},
+          {text: "Installation", link:"/liveblade/installation"},
+          // {text: "ESSENTIALS"},
+          {text: "Components", link:"/liveblade/components"},
+          {text: "Properties", link:"/liveblade/properties"},
+          {text: "Actions", link:"/liveblade/actions"},
+          {text: "Lifecycle Hooks", link:"/liveblade/lifecycle-hooks"},
+          {text: "Forms", link:"/liveblade/forms"},
+          {text: "Events", link:"/liveblade/events"},
+          {text: "HTML Directives", link:"/liveblade/html-directives"},
+          // {text: "FEATURES"},
+          {text: "Navigation", link:"/liveblade/features/navigation"},
+          {text: "Lazy Loading", link:"/liveblade/features/lazy-loading"},
+          {text: "Validation", link:"/liveblade/features/validation"},
+          {text: "Pagination", link:"/liveblade/features/pagination"},
+          {text: "File Uploads", link:"/liveblade/features/file-uploads"},
+          {text: "Security", link:"/liveblade/security"},
         ]
       },
+
       {
-        text: 'PyBlade CLI',
-        items: [
-          {text: "Overview", link: "pyblade-cli-overview"},
-          {text: "Available commands", link: "pyblade-cli-commands"},
-          // {text: "Extending PyBlade CLI", link: "extend-pyblade-cli"}
+        text: "PyBlade CLI",
+        items:[
+          {text: "Overview", link: "/cli/overview"},
+          {text: "Available commands", link: "/cli/commands"}
         ]
       },
+ 
       {
         text: 'Outro',
         items: [
