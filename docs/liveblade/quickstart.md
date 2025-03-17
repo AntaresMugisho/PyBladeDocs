@@ -1,171 +1,156 @@
-# LiveBlade Documentation
+# Quick Start
 
-LiveBlade is an extension of the PyBlade template engine, bringing real-time interactivity to Python web applications. Inspired by Laravel Livewire, LiveBlade allows developers to create dynamic components using Python classes, eliminating the need for complex frontend JavaScript frameworks.
+To begin your Liveblade journey, we will create a simple "counter" component and render it in the browser. This example is a great way to experience Liveblade for the first time as it demonstrates PyBlade's _liveness_ in the simplest way possible.
 
-## Installation
+## Install Liveblade
 
-To install LiveBlade, ensure you have PyBlade installed:
+Since **Liveblade** is a part of **PyBlade**, you first need to install PyBlade inside a virtual environment. To do this, run:  
 
 ```bash
 pip install pyblade
-```
+```  
 
-Then, install LiveBlade:
+Once installed, initialize a new project for your preferred Python framework:  
 
 ```bash
-pip install liveblade
+pyblade init
+```  
+
+During the project initialization, PyBlade will ask whether you want to enable Liveblade:  
+
+- If you select **Yes**, Liveblade will be fully configured, and you can start using it right away.  
+- If you select **No**, Liveblade won’t be set up initially, but you can enable it later by running:  
+
+  ```bash
+  pyblade liveblade:install
+  ```  
+
+This command will automatically configure everything for you. If you’d like to understand the setup process in detail, check the [manual configuration](/getting-started#manual-configuration) section.
+
+## Create a Liveblade component
+
+PyBlade provides a convenient command to generate new **Livablade components** quickly. Run the following command to make a new `counter` component:
+
+```bash
+pyblade make:livablade counter
 ```
 
-## Configuration
+This command will generate two new files in your project:
+* `liveblade/counter.py`
+* `templates/liveblade/counter.html`
 
-In your Django or Flask project, configure LiveBlade by updating the settings:
+## Writing the class
 
-### Django Configuration
-
-```python
-# settings.py
-TEMPLATES = [
-    {
-        'BACKEND': 'pyblade.backends.LiveBladeBackend',
-        'DIRS': [BASE_DIR / 'templates'],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.request',
-            ],
-        },
-    },
-]
-```
-
-### Flask Configuration
+Open `liveblade/counter.py` and replace its contents with the following:
 
 ```python
-from flask import Flask
-from pyblade import LiveBlade
+from pyblade import liveblade
 
-app = Flask(__name__)
-LiveBlade.init_app(app)
-```
-
-## Creating Components
-
-LiveBlade components are Python classes that manage state and actions. Each component extends `LiveBladeComponent`.
-
-### Example Component
-
-```python
-from liveblade import LiveBladeComponent
-
-class Counter(LiveBladeComponent):
-    count: int = 0
+class Counter(liveblade.Component):
+    count = 0
 
     def increment(self):
         self.count += 1
+
+    def decrement(self):
+        self.count -= 1
+
+    def render(self):
+        return self.view("liveblade.counter")
 ```
 
-### Component View (Blade Template)
+Here's a brief explanation of the code above:
+- `count = 0` — Declares a class property named `count` with an initial value of `0`.
+- `def increment(self)` — Declares a method named `increment` that increments the `count` property each time it's called. Methods like this can be triggered from the browser in a variety of ways, including when a user clicks a button.
+- `def decrement(self)` — Declares a method named `decrement` that decrements the `count` property each time it's called.
+- `def render(self)` — Declares a `render` method that returns a Liveblade view. This view will contain the HTML template for our component.
 
-Save the component's view as `counter.blade.py`:
+## Writing the template
+
+Open the `templates/liveblade/counter.html` file and replace its content with the following:
 
 ```blade
-<div>
-    <h1>Count: {{ count }}</h1>
-    <button wire:click="increment">Increment</button>
+<div >
+    <h1>{{ count }}</h1>
+
+    <button b-click="decrease">-</button>
+    <button b-click="increase">+</button>
 </div>
 ```
 
-## Rendering Components
+This code will display the value of the `count` property and two buttons that decrement and increment the `count` property, respectively.
 
-To include a component in a PyBlade template:
+> [!warning] Warning
+> In order for Liveblade to work, components must have just **one** single element as its root. If multiple root elements are detected, an exception is thrown.  Comments don't count as separate elements and can be put inside the root element.
 
-```blade
-@liveblade('counter')
+## Create the component wrapper
+
+You just created the liveblade component. But, how to use it ?
+Now we need a HTML template for our component to render inside. Let's create one:
+
+```bash
+pyblade make:template index
 ```
 
-## Live Events
+This command will generate a file called `templates/index.html`. Open it and add the following content :
 
-LiveBlade provides event handling to manage interactions.
+```html
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Title</title>
+    </head>
+    <body>
+        @liveblade("counter") // [!code ++]
+    </body>
+</html>
+```
 
-### Listening for Events
+The _counter_ component will be rendered in place of the `@liveblade("counter")` directive in the template above.
+
+You may have noticed there is no JavaScript or CSS assets provided by Liveblade. That is because Liveblade automatically injects any frontend assets it needs.
+
+Now let's create the view function that will render our `index.html` template. Open the `view.py` file and add the following content:
 
 ```python
-class MessageHandler(LiveBladeComponent):
-    message: str = ""
+from django.shortcuts import render
 
-    def update_message(self, new_message):
-        self.message = new_message
+def index(request):
+    return render(request, "index")
 ```
 
-### Emitting Events
+## Register a route for the component
 
-```blade
-<button wire:click="$emit('update_message', 'Hello LiveBlade!')">Send Message</button>
-```
-
-## Lifecycle Hooks
-
-LiveBlade provides lifecycle hooks similar to Livewire:
-
-- `mount(self)`: Called when the component is initialized.
-- `updated(self, property)`: Triggered when a property is updated.
-- `render(self)`: Used for custom rendering logic.
-
-## Validation
-
-You can add validation to component properties using Python’s validation mechanisms:
+Open the `urls.py` file in your Django application and add the following code:
 
 ```python
-from liveblade import LiveBladeComponent
-from pydantic import BaseModel, Field
+from django.urls import path
+from .views import index
 
-class FormData(BaseModel):
-    name: str = Field(..., min_length=3)
-
-class UserForm(LiveBladeComponent):
-    data: FormData
-
-    def save(self):
-        self.validate()
-        # Save logic here
+urlpatterns = [
+    path('counter/', index)
+]
 ```
 
-## File Uploads
+>[!warning]Warning
+>Make sure the `views.py` and `urls.py` files are in the same folder.
 
-LiveBlade supports file uploads:
+Now, our _counter_ component is assigned to the `counter/` route, so that when a user visits the `counter/` endpoint in your application, PyBlade will load our `index.htm`l template, parse it, and when it will encouter the `@liveblade("counter")` directive, the directive will render our component, finally PyBlade Engine will render the full page.
 
-### Component Handling Uploads
+## Test it out
 
-```python
-class UploadFile(LiveBladeComponent):
-    file: any
+With our component class and templates in place, our component is ready to test!
 
-    def save_file(self):
-        with open(f'uploads/{self.file.filename}', 'wb') as f:
-            f.write(self.file.read())
+Start the development server by running:
+
+```bash
+pyblade serve
 ```
 
-### Blade Template
+Visit whatever the link shown in your terminal plus `counter/` in your browser (most likely `http:127.0.0.1:8000/counter/`), and you should see a number displayed on the screen with two buttons to increment and decrement the number.
 
-```blade
-<input type="file" wire:model="file">
-<button wire:click="save_file">Upload</button>
-```
+After clicking one of the buttons, you will notice that the count updates in **real time**, **without the page reloading**. This is the magic of Liveblade: dynamic frontend applications written entirely in Python.
 
-## Redirecting
-
-To redirect within a component:
-
-```python
-from liveblade import redirect
-
-def go_home(self):
-    return redirect('/')
-```
-
-## Conclusion
-
-LiveBlade simplifies building interactive, real-time web applications using Python and PyBlade. It provides a Livewire-like experience for Python developers, leveraging Python classes instead of JavaScript frameworks.
-
-For more details, visit the official LiveBlade documentation.
-
+We've barely scratched the surface of what Liveblade is capable of. Keep reading the documentation to see everything Liveblade has to offer.
