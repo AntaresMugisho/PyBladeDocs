@@ -202,7 +202,7 @@ Liveblade properties are extremely powerful and are an important concept to unde
 
 Actions are methods within your Liveblade component that handle user interactions or perform specific tasks. They're often useful for responding to button clicks or form submissions on a page.
 
-To learn more about actions, let's add a `save` action to the `CreatePost` component:
+To learn more about actions, let's add a `save` action to the `TodoList` component:
 
 ```python
 from my_app.models import Task
@@ -234,3 +234,152 @@ Next, let's call the `save` action from the component's template by adding the `
 When the "Save" button is clicked, the `save()` method in your Liveblade component will be executed and your component will re-render.
 
 To keep learning about Liveblade actions, visit the [actions documentation](#).
+
+
+
+
+## Rendering components
+
+There are two ways to render a Liveblade component on a page:
+
+1. Include it within an existing template
+2. Assign it directly to a route as a full-page component
+
+Let's cover the first way to render your component, as it's simpler than the second.
+
+The **preferred way** to include a component in your template is by using a **Liveblade component tag**. Liveblade component tags start with `liveblade:`, followed by the component name without extension.  
+
+```blade
+<liveblade:todo-list />
+```
+
+If the component class is nested deeper within the `liveblade` directory, you may use the `.` character to indicate directory nesting. For example, if we assume a component is located at `liveblade/tasks/todo_list.py`, we may render it like so:
+
+```blade
+<liveblade:tasks.todo-list />
+```
+
+> [!warning] Warning
+> Always use _kebab-case_ or _snake\_case_ version of the component name. Using the _PascalCase_ version of the component name (`<liveblade:TodoList />`) is invalid and won't be recognized by Liveblade.
+
+### The `@liveblade` directive 
+PyBlade also provides an alternative way to render Liveblade components using the `@liveblade` directive:  
+
+```html
+@liveblade('task')
+```
+
+```html
+@liveblade('user-profile')
+```
+
+While this method works, **it is not as intuitive as using liveblade component tags**. The tag-based syntax is visually clearer and aligns with modern web development practices.
+
+### Passing data to components
+
+To pass outside data into a Liveblade component, you can use attributes on the liveblade component tag. This is useful when you want to initialize a component with specific data.
+
+To pass an initial value to the `title` property of the `TodoList` component, you can use the following syntax:
+
+```blade
+<liveblade:todo-list title="Initial Title" />
+```
+
+If you need to pass dynamic values or variables to a component, you can write Python expressions in component attributes by prefixing the attribute with a colon:
+
+```blade
+<liveblade:todo-list :title="initial_value" />
+```
+
+>[!tip] Reminder
+>You may already know the difference between  what we call **Normal attributes** and **Bound attributes** when you learned about PyBlade components. The concept is the same with liveblade components.
+>If not you can read [this section](../components#normal-vs-bound-attributes) again.
+
+Data passed into components is received through the `mount()` lifecycle hook as method parameters. In this case, to assign the `title` parameter to a property, you would write a `mount()` method like the following:
+
+```python
+
+from pyblade import liveblade
+
+class TodoList(liveblade.Component):
+
+    def mount(self, title=None):
+        self.title = title
+```
+
+In this example, the `title` property will be initialized with the value "Initial Title".
+
+You can think of the `mount()` method as a class constructor, the equivalent of the `__init__()` method. It runs on the initial load of the component, but not on subsequent requests within a page. 
+
+We will learn more about `mount()` and other helpful lifecycle hooks within the [Lifecycle hooks](lifecycle-hooks) section.
+
+To reduce boilerplate code in your components, you can alternatively omit the `mount()` method and Liveblade will automatically set any properties on your component with names matching the passed in values:
+
+```python
+from pyblade import liveblade
+
+class TodoList(liveblade.Component):
+    ...
+```
+
+This is effectively the same as assigning `title` inside a `mount()` method.
+
+> [!warning] These properties are not reactive by default
+> The `title` property will not update automatically if the outer `:title="initialValue"` changes after the initial page load. This is a common point of confusion when using Liveblade, especially for developers who have used JavaScript frameworks like Vue or React and assume these "parameters" behave like "reactive props" in those frameworks. But, don't worry, Liveblade allows you to opt-in to [making your props reactive](#).
+
+
+## Full-page components
+
+>[!info] Missing feataure
+> This feature is not yet available. This part of documentation is for informative purposes only.
+
+Liveblade allows you to assign components directly to a route in your Django application. These are called "full-page components". You can use them to build standalone pages with logic and templates, fully encapsulated within a Liveblade component.
+
+To create a full-page component, define a route in your `urls.py` file and use the `as_view()` method on the component class. For example, let's imagine you want to render the `TodoList` component at the dedicated route: `tasks/`.
+
+You can accomplish this by adding the following line to your `urls.py` file:
+
+```python
+from django.urls import path
+from liveblade import TodoList
+
+urlpatterns = [
+    path('tasks/', TodoList.as_view()) # [!code highlight]
+]
+```
+
+Now, when you visit the `tasks/` path in your browser, the `TodoList` component will be rendered as a full-page component and all templates inside may be updated without the need of full page relaod. This may be interesting if you're building an SPA.
+
+### Accessing route parameters
+
+When working with full-page components, you may need to access route parameters within your Liveblade component.
+
+To demonstrate, first, define a route with a parameter in your `urls.py` file:
+
+```python
+from django.urls import path
+from liveblade import TodoList
+
+urlpatterns = [
+    path('tasks/<int:id>', TodoList.as_view()) # [!code highlight]
+]
+```
+
+Here, we've defined a route with an `id` parameter which represents a task's ID.
+
+Next, update your Liveblade component to accept the route parameter in the `mount()` method:
+
+```python
+from pyblade import liveblade
+from .models import Task
+
+class TaskDetail(liveblade.Component):
+
+    def mount(self, id: int):
+        self.task = Task.objects.get(id)
+
+    def render(self):
+        return self.view("task-detail")
+```
+
+In this example, because the parameter name `id` matches the route parameter `<int:id>`, if the `/tasks/1` URL is visited, Liveblade will pass the value of `1` as `id`.
