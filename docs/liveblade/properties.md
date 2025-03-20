@@ -1,3 +1,4 @@
+<!-- # Magic properties Cfr Magic actions in Actions -->
 # Properties
 
 Properties store and manage data inside your Liveblade components. They are defined as attributes on component classes and can be accessed and modified on both the server and client-side.
@@ -39,7 +40,7 @@ class TodoComponent(liveblade.Component):
             Task.objects.create(title=self.title)
 ```
 
-```blade
+```html
 <div>
     <input type="text" b-model="title" placeholder="Title..."> # [!code highlight] 
 
@@ -104,7 +105,7 @@ class TodoComponent(liveblade.Component):
 ```
 
 ## Security concerns
-
+<!-- 
 While Liveblade properties are a powerful feature, there are a few security considerations that you should be aware of before using them.
 
 In short, always treat public properties as user input — as if they were request input from a traditional endpoint. In light of this, it's essential to validate and authorize properties before persisting them to a database — just like you would do when working with request input in a controller.
@@ -132,7 +133,7 @@ class UpdatePost(liveblade.Component)
         return self.view('liveblade.update-post')
 ```
 
-```blade
+```html
 <form b-submit="update">
     <input type="text" b-model="title">
     <input type="text" b-model="content">
@@ -147,7 +148,7 @@ Because we are storing the `id` of the post as a public property on the componen
 
 It doesn't matter that we didn't write an input with `b-model="id"`. A malicious user can easily change the template to the following using their browser DevTools:
 
-```blade
+```html
 <form b-submit="update">
     <input type="text" b-model="id"> // [!code highlight] 
     <input type="text" b-model="title">
@@ -191,4 +192,4 @@ By using `@locked`, you can assume this property has not been manipulated anywhe
 For more information on locking properties, [consult the Locked properties documentation](#).
 
 <!-- ### Properties expose system information to the browser -->
-
+ -->

@@ -33,7 +33,7 @@ class TodoList(liveblade.Component):
 
 The second will be the component's HTML template located in the **templates** folder inside the `liveblade` folder: `my_project/templates/liveblade/todo_list.html`
 
-```blade
+```html
 <div>
     {# ... #}
 </div>
@@ -107,7 +107,7 @@ class TodoList(liveblade.Component):
 
 Component properties are automatically made available to the component's context. You can reference it using standard PyBlade syntax. Here we'll display the value of the `title` property:
 
-```blade
+```html
 <div>
     <h1>Title: {{ title }}</h1>
 </div>
@@ -115,7 +115,7 @@ Component properties are automatically made available to the component's context
 
 The rendered output of this component would be:
 
-```blade
+```html
 <div>
     <h1>Title: Learn PyBlade</h1>
 </div>
@@ -138,7 +138,7 @@ class TodoList(liveblade.Component):
 
 Now you may access the `status` property from the component's template:
 
-```blade
+```html
 <div>
     <h1>Title: {{ title }}</h1>
 
@@ -154,7 +154,7 @@ Without a `b-key` attribute present within a PyBlade loop, Liveblade won't be ab
 
 For example, if you are looping through a list of tasks, you may set the `b-key` attribute to the task's ID:
 
-```blade
+```html
 <div>
     @for (task in tasks)
         <div b-key="{{ task.id }}">  // [!code highlight]
@@ -166,7 +166,7 @@ For example, if you are looping through a list of tasks, you may set the `b-key`
 
 <!-- If you are looping through a liqr that is rendering Liveblade components you may set the key as a component attribute `:key` or pass the key as a third argument when using the `@liveblade` directive.
 
-```blade
+```html
 <div>
     @for (task in tasks)
         <liveblade:task-item :task="task" :key="task.id"/>
@@ -182,7 +182,7 @@ One of Liveblade's most powerful features is "data binding": the ability to auto
 
 Let's bind the `title` property from the `TodoList` component to a text input using the `b-model` attribute:
 
-```blade
+```html
 <form>
     <label for="title">Title:</label>
 
@@ -196,7 +196,7 @@ Any changes made to the text input will be automatically synchronized with the `
 > If you tried this in your browser and are confused why the title isn't automatically updating, it's because Liveblade only updates a component when an "action" is submitted—like pressing a submit button—not when a user types into a field. This cuts down on network requests and improves performance. To enable "live" updating as a user types, you can use `b-model.live` instead. [Learn more about data binding](#).
 
 
-Liveblade properties are extremely powerful and are an important concept to understand. For more information, check out the [Liveblade properties documentation](/docs/properties).
+Liveblade properties are extremely powerful and are an important concept to understand. For more information, check out the [Liveblade properties documentation](#).
 
 ## Calling actions
 
@@ -205,7 +205,7 @@ Actions are methods within your Liveblade component that handle user interaction
 To learn more about actions, let's add a `save` action to the `TodoList` component:
 
 ```python
-from my_app.models import Task
+from app.models import Task
 
 class TodoList(liveblade.Component):
     title = "Learn PyBlade"
@@ -221,7 +221,7 @@ class TodoList(liveblade.Component):
 
 Next, let's call the `save` action from the component's template by adding the `b-submit` directive to the `<form>` element:
 
-```blade
+```html
 <form b-submit="save"> // [!code highlight]
     <label for="title">Title:</label>
 
@@ -249,13 +249,13 @@ Let's cover the first way to render your component, as it's simpler than the sec
 
 The **preferred way** to include a component in your template is by using a **Liveblade component tag**. Liveblade component tags start with `liveblade:`, followed by the component name without extension.  
 
-```blade
+```html
 <liveblade:todo-list />
 ```
 
 If the component class is nested deeper within the `liveblade` directory, you may use the `.` character to indicate directory nesting. For example, if we assume a component is located at `liveblade/tasks/todo_list.py`, we may render it like so:
 
-```blade
+```html
 <liveblade:tasks.todo-list />
 ```
 
@@ -281,13 +281,13 @@ To pass outside data into a Liveblade component, you can use attributes on the l
 
 To pass an initial value to the `title` property of the `TodoList` component, you can use the following syntax:
 
-```blade
+```html
 <liveblade:todo-list title="Initial Title" />
 ```
 
 If you need to pass dynamic values or variables to a component, you can write Python expressions in component attributes by prefixing the attribute with a colon:
 
-```blade
+```html
 <liveblade:todo-list :title="initial_value" />
 ```
 

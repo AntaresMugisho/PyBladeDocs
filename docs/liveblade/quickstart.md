@@ -69,7 +69,7 @@ Here's a brief explanation of the code above:
 
 Open the `templates/liveblade/counter.html` file and replace its content with the following:
 
-```blade
+```html
 <div >
     <h1>{{ count }}</h1>
 

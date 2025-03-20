@@ -1,16 +1,16 @@
-# LiveBlade Documentation
+# Liveblade Documentation
 
-LiveBlade is an extension of the PyBlade template engine, bringing real-time interactivity to Python web applications. Inspired by Laravel Livewire, LiveBlade allows developers to create dynamic components using Python classes, eliminating the need for complex frontend JavaScript frameworks.
+Liveblade is an extension of the PyBlade template engine, bringing real-time interactivity to Python web applications. Inspired by Laravel Livewire, Liveblade allows developers to create dynamic components using Python classes, eliminating the need for complex frontend JavaScript frameworks.
 
 ## Installation
 
-To install LiveBlade, ensure you have PyBlade installed:
+To install Liveblade, ensure you have PyBlade installed:
 
 ```bash
 pip install pyblade
 ```
 
-Then, install LiveBlade:
+Then, install Liveblade:
 
 ```bash
 pip install liveblade
@@ -18,7 +18,7 @@ pip install liveblade
 
 ## Configuration
 
-In your Django or Flask project, configure LiveBlade by updating the settings:
+In your Django or Flask project, configure Liveblade by updating the settings:
 
 ### Django Configuration
 
@@ -26,7 +26,7 @@ In your Django or Flask project, configure LiveBlade by updating the settings:
 # settings.py
 TEMPLATES = [
     {
-        'BACKEND': 'pyblade.backends.LiveBladeBackend',
+        'BACKEND': 'pyblade.backends.LivebladeBackend',
         'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -42,22 +42,22 @@ TEMPLATES = [
 
 ```python
 from flask import Flask
-from pyblade import LiveBlade
+from pyblade import Liveblade
 
 app = Flask(__name__)
-LiveBlade.init_app(app)
+Liveblade.init_app(app)
 ```
 
 ## Creating Components
 
-LiveBlade components are Python classes that manage state and actions. Each component extends `LiveBladeComponent`.
+Liveblade components are Python classes that manage state and actions. Each component extends `LivebladeComponent`.
 
 ### Example Component
 
 ```python
-from liveblade import LiveBladeComponent
+from liveblade import LivebladeComponent
 
-class Counter(LiveBladeComponent):
+class Counter(LivebladeComponent):
     count: int = 0
 
     def increment(self):
@@ -68,7 +68,7 @@ class Counter(LiveBladeComponent):
 
 Save the component's view as `counter.blade.py`:
 
-```blade
+```html
 <div>
     <h1>Count: {{ count }}</h1>
     <button wire:click="increment">Increment</button>
@@ -79,18 +79,18 @@ Save the component's view as `counter.blade.py`:
 
 To include a component in a PyBlade template:
 
-```blade
+```html
 @liveblade('counter')
 ```
 
 ## Live Events
 
-LiveBlade provides event handling to manage interactions.
+Liveblade provides event handling to manage interactions.
 
 ### Listening for Events
 
 ```python
-class MessageHandler(LiveBladeComponent):
+class MessageHandler(LivebladeComponent):
     message: str = ""
 
     def update_message(self, new_message):
@@ -99,13 +99,13 @@ class MessageHandler(LiveBladeComponent):
 
 ### Emitting Events
 
-```blade
-<button wire:click="$emit('update_message', 'Hello LiveBlade!')">Send Message</button>
+```html
+<button wire:click="$emit('update_message', 'Hello Liveblade!')">Send Message</button>
 ```
 
 ## Lifecycle Hooks
 
-LiveBlade provides lifecycle hooks similar to Livewire:
+Liveblade provides lifecycle hooks similar to Livewire:
 
 - `mount(self)`: Called when the component is initialized.
 - `updated(self, property)`: Triggered when a property is updated.
@@ -116,13 +116,13 @@ LiveBlade provides lifecycle hooks similar to Livewire:
 You can add validation to component properties using Python’s validation mechanisms:
 
 ```python
-from liveblade import LiveBladeComponent
+from liveblade import LivebladeComponent
 from pydantic import BaseModel, Field
 
 class FormData(BaseModel):
     name: str = Field(..., min_length=3)
 
-class UserForm(LiveBladeComponent):
+class UserForm(LivebladeComponent):
     data: FormData
 
     def save(self):
@@ -132,12 +132,12 @@ class UserForm(LiveBladeComponent):
 
 ## File Uploads
 
-LiveBlade supports file uploads:
+Liveblade supports file uploads:
 
 ### Component Handling Uploads
 
 ```python
-class UploadFile(LiveBladeComponent):
+class UploadFile(LivebladeComponent):
     file: any
 
     def save_file(self):
@@ -147,7 +147,7 @@ class UploadFile(LiveBladeComponent):
 
 ### Blade Template
 
-```blade
+```html
 <input type="file" wire:model="file">
 <button wire:click="save_file">Upload</button>
 ```
@@ -165,7 +165,7 @@ def go_home(self):
 
 ## Conclusion
 
-LiveBlade simplifies building interactive, real-time web applications using Python and PyBlade. It provides a Livewire-like experience for Python developers, leveraging Python classes instead of JavaScript frameworks.
+Liveblade simplifies building interactive, real-time web applications using Python and PyBlade. It provides a Livewire-like experience for Python developers, leveraging Python classes instead of JavaScript frameworks.
 
-For more details, visit the official LiveBlade documentation.
+For more details, visit the official Liveblade documentation.
 
