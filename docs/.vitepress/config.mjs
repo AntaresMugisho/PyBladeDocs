@@ -34,6 +34,7 @@ export default defineConfig({
       {
         text: 'Liveblade: Interactive UIs',
         items: [
+          {text:"Prelude", link:"/liveblade/prelude"},
           {text: "Quick start", link:"/liveblade/quickstart"},
           {text: "Installation", link:"/liveblade/installation"},
           // {text: "ESSENTIALS"},

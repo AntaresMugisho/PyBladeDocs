@@ -21,11 +21,11 @@ During the project initialization, PyBlade will ask whether you want to enable L
 - If you select **Yes**, Liveblade will be fully configured, and you can start using it right away.  
 - If you select **No**, Liveblade won’t be set up initially, but you can enable it later by running:  
 
-  ```bash
-  pyblade liveblade:install
-  ```  
+```bash
+pyblade liveblade:install
+```
 
-This command will automatically configure everything for you. If you’d like to understand the setup process in detail, check the [manual configuration](/getting-started#manual-configuration) section.
+This command will automatically configure everything for Liveblade to work inside your project.
 
 ## Create a Liveblade component
 
