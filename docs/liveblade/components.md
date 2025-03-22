@@ -294,14 +294,7 @@ END ACTIONS -->
 
 ## Rendering components
 
-There are two ways to render a Liveblade component on a page:
-
-1. Include it within an existing template
-2. Assign it directly to a route as a full-page component
-
-Let's cover the first way to render your component, as it's simpler than the second.
-
-The **preferred way** to include a component in your template is by using a **Liveblade component tag**. Liveblade component tags start with `liveblade:`, followed by the component name without extension.  
+The **preferred way** to include a Liveblade component in your PyBlade template is by using a **Liveblade component tag**. Liveblade component tags start with `liveblade:`, followed by the _kebab-cased_ component name without extension.  
 
 ```html
 <liveblade:todo-list />
@@ -320,20 +313,22 @@ If the component class is nested deeper within the `liveblade` directory, you ma
 PyBlade also provides an alternative way to render Liveblade components using the `@liveblade` directive:  
 
 ```html
-@liveblade('task')
+@liveblade("counter")
 ```
 
 ```html
-@liveblade('user-profile')
+@liveblade("todo-list")
 ```
 
-While this method works, **it is not as intuitive as using liveblade component tags**. The tag-based syntax is visually clearer and aligns with modern web development practices.
+While this method works, **it is not as intuitive as using liveblade component tags**. The tag-based syntax is visually clearer and aligns with HTML syntax.
 
-### Passing data to components
+## Passing data to components
+
+Liveblade allows you to pass initial values to component properties directly from the template.
 
 To pass outside data into a Liveblade component, you can use attributes on the liveblade component tag. This is useful when you want to initialize a component with specific data.
 
-To pass an initial value to the `title` property of the `TodoList` component, you can use the following syntax:
+For example, to pass an initial value to the `title` property of the `TodoList` component, you can use the following syntax:
 
 ```html
 <liveblade:todo-list title="Initial Title" />
@@ -346,10 +341,10 @@ If you need to pass dynamic values or variables to a component, you can write Py
 ```
 
 >[!tip] Reminder
->You may already know the difference between  what we call **Normal attributes** and **Bound attributes** when you learned about PyBlade components. The concept is the same with liveblade components.
+>You may already know the difference between  what we call **Normal attributes** and **Bound attributes** when you learned about PyBlade components. The concept is the same with Liveblade components.
 >If not you can read [this section](../components#normal-vs-bound-attributes) again.
 
-Data passed into components is received through the `mount()` lifecycle hook as method parameters. In this case, to assign the `title` parameter to a property, you would write a `mount()` method like the following:
+Data passed to components from templates are received through the `mount()` lifecycle hook as method parameters. In this case, to assign the `title` parameter to a property, you would write a `mount()` method like the following:
 
 ```python
 
@@ -357,8 +352,11 @@ from pyblade import liveblade
 
 class TodoList(liveblade.Component):
 
-    def mount(self, title=None):
+    def mount(self, title: str):
         self.title = title
+
+    def render(self)
+        return self.view("liveblade.todo-list")
 ```
 
 In this example, the `title` property will be initialized with the value "Initial Title".
@@ -367,19 +365,23 @@ You can think of the `mount()` method as a class constructor, the equivalent of 
 
 We will learn more about `mount()` and other helpful lifecycle hooks within the [Lifecycle hooks](lifecycle-hooks) section.
 
-To reduce boilerplate code in your components, you can alternatively omit the `mount()` method and Liveblade will automatically set any properties on your component with names matching the passed in values:
+You can alternatively omit the `mount()` method and Liveblade will automatically set any properties on your component with names matching the passed in values, however, this will be done if and only if you explicitely declared those typed properties in your component.
 
 ```python
 from pyblade import liveblade
 
 class TodoList(liveblade.Component):
-    ...
+
+    title: str # [!code highlight]
+
+    def render(self)
+        return self.view("liveblade.todo-list")
 ```
 
 This is effectively the same as assigning `title` inside a `mount()` method.
 
 > [!warning] These properties are not reactive by default
-> The `title` property will not update automatically if the outer `:title="initialValue"` changes after the initial page load. This is a common point of confusion when using Liveblade, especially for developers who have used JavaScript frameworks like Vue or React and assume these "parameters" behave like "reactive props" in those frameworks. But, don't worry, Liveblade allows you to opt-in to [making your props reactive](#).
+> The `title` property will not update automatically if the outer `:title="initial_value"` changes after the initial component load. This is a common point of confusion when using Liveblade, especially for developers who have used JavaScript frameworks like Vue or React and assume these "parameters" behave like "reactive props" in those frameworks. But, don't worry, Liveblade allows you to opt-in to [making your props reactive](#).
 
 
 ## Full-page components
@@ -402,7 +404,7 @@ urlpatterns = [
 ]
 ```
 
-Now, when you visit the `tasks/` path in your browser, the `TodoList` component will be rendered as a full-page component and all templates inside may be updated without the need of full page relaod. This may be interesting if you're building an SPA.
+Now, when you visit the `tasks/` path in your browser, the `TodoList` component will be rendered as a full-page component and all templates inside may be updated without the need of full page relaod. This may be interesting if you're building an SPA (Single Page Application).
 
 ### Accessing route parameters
 
@@ -425,7 +427,7 @@ Next, update your Liveblade component to accept the route parameter in the `moun
 
 ```python
 from pyblade import liveblade
-from .models import Task
+from app.models import Task
 
 class TaskDetail(liveblade.Component):
 

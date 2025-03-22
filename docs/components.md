@@ -70,14 +70,14 @@ or **paired** – When you need to include content inside the component.
 PyBlade also provides an alternative way to render components using the `@component` directive:  
 
 ```html
-@component('alert')
+@component("alert")
 ```
 
 ```html
-@component('user-profile')
+@component("user-profile")
 ```
 
-While this method works, **it is not as intuitive as using component tags**. The tag-based syntax is visually clearer and aligns with modern web development practices.  
+While this method works, **it is not as intuitive as using component tags**. The tag-based syntax is visually clearer and aligns with HTML syntax.  
 
 ### Handling nested components  
 If your components are stored inside subdirectories within `templates/components`, you can indicate this hierarchy using a **dot notation** in both approaches.  
