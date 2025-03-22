@@ -1,26 +1,33 @@
 # Liveblade Components
 
-Components are the building blocks of your application. Liveblade make them combine state and behavior to create reusable pieces of UI for your front end. Here, we'll cover the basics of creating and rendering components.
+Liveblade components are self-contained, reusable UI elements that encapsulates both **logic** (Python class) with **presentation** (PyBlade templates). They allow you to build dynamic, interactive user interfaces using only Python — without writing JavaScript.  These components handle user interactions, maintain state on the server, and update the UI dynamically.
 
->[!info] PyBlade vs Liveblade Components
->it's important to make the diffence between PyBlade components and Liveblade Components. PyBlade components are simple HTML reusable pieces of UI for your frontend while Liveblade components has also the capabilities of being dynamic. They can be updated without page reloading. 
+>[!tip] PyBlade Components vs Liveblade Components
+>it's important to make the diffence between PyBlade components and Liveblade Components. PyBlade components are simple HTML reusable pieces of UI for your frontend while Liveblade components has also the capabilities of being dynamic. They can be updated without full page reloading. 
 
 ## Creating components
 
-A Liveblade component is simply a Python class that inherits `pyblade.liveblade.Component`. You can create component files by hand or use the following PyBlade command:
+A Liveblade component consists of two parts:
+
+- A **Python class**  that inherits `pyblade.liveblade.Component`. It is responsible of handling logic and state.
+
+- A **PyBlade template** that defines the component’s UI.
+
+To create a new component, use the `pyblade make:liveblade` command:
+
 
 ```shell
 pyblade make:liveblade TodoList
 ```
 
-If you prefer kebab-cased names, you can use them as well:
+If you prefer _kebab-cased_ names, you can use them as well:
 
 ```shell
 pyblade make:liveblade todo-list
 ```
 
 After running this command, PyBlade will create two new files in your application.
-The first will be the component's class located at the root of your project inside the `liveblade` folder : `my_project/liveblade/todo_list.py`
+The first will be the component's class located at `<root>/liveblade/todo_list.py` where `root` is the root folder of your project: 
 
 ```python
 from pyblade import liveblade
@@ -31,7 +38,7 @@ class TodoList(liveblade.Component):
         return self.view("liveblade.todo-list")
 ```
 
-The second will be the component's HTML template located in the **templates** folder inside the `liveblade` folder: `my_project/templates/liveblade/todo_list.html`
+The second will be the component's PyBlade template located at `<root>/templates/liveblade/todo_list.html` where again `root` is the root folder of your project: 
 
 ```html
 <div>
@@ -39,16 +46,47 @@ The second will be the component's HTML template located in the **templates** fo
 </div>
 ```
 
-You may use dot-notation to create your components in sub-directories. For example, the following commands will create a `TodoList` component in the `tasks` sub-directory:
+Alternatively, you can create these files manually.
+
+You may use dot-notation to create your components in sub-directories. For example, given the following folder structure :
+
+```
+my_project/
+├── my_app/
+│   ├── views.py
+│   ├── models.py
+│   └── templates/
+├── templates/
+└── manage.py
+```
+
+The following command will create a `TodoList` component in the `tasks` sub-directory which will be created if it doesn't exist:
 
 ```shell
 pyblade make:liveblade Tasks.TodoList
-pyblade make:liveblade tasks.todo-list
 ```
 
-These commands whould create two files: `my_project/liveblade/tasks/todo_list.py` and `my_project/templates/liveblade/tasks/todo_list.html`. 
+These commands whould create two files: `my_project/liveblade/tasks/todo_list.py` and `my_project/templates/liveblade/tasks/todo_list.html`. Resulting in the following folder structure:
 
-Notice that files and subfolders are always named in snake_case while the component classes are in PascalCase.
+Here is a sample folder structure of `my_project`:
+```text{6-8,10-12}
+my_project/
+├── my_app/
+│   ├── views.py
+│   ├── models.py
+│   └── templates/
+├── liveblade/         
+│   └──tasks/         
+│      └── todo_list.py 
+├── templates/
+│   └── liveblade/     
+│       └──tasks/         
+│           └── todo_list.html   
+└── manage.py
+```
+
+>[!note] Note
+>Generated files and subfolders are always named in _snake_case_ while the component classes are in _PascalCase_.
 
 ### Inline components
 
@@ -87,6 +125,7 @@ class TodoList(liveblade.Component):
 
 If the component above is rendered on a page, Liveblade will automatically determine it should be rendered using the `templates/liveblade/todo_list.html` template.
 
+<!-- START PROPOERTIES
 ## Setting properties
 
 Liveblade components have properties that store data and can be easily accessed within the component's class and template. This section discusses the basics of adding a property to a component and using it in your application.
@@ -144,8 +183,15 @@ Now you may access the `status` property from the component's template:
 
     <span>Status: {{ status }}</span>
 </div>
-```
+``` -->
 
+
+
+
+
+
+
+<!-- 
 ### Adding `b-key` to `@for` loops
 
 When looping through data in a Liveblade component template using `@for`, you must add a unique `b-key` attribute to the root element rendered by the loop.
@@ -162,7 +208,7 @@ For example, if you are looping through a list of tasks, you may set the `b-key`
         </div>
     @endfor
 </div>
-```
+``` -->
 
 <!-- If you are looping through a liqr that is rendering Liveblade components you may set the key as a component attribute `:key` or pass the key as a third argument when using the `@liveblade` directive.
 
@@ -176,6 +222,11 @@ For example, if you are looping through a list of tasks, you may set the `b-key`
 </div>
 ``` -->
 
+
+
+
+
+<!--  SUIT PROPERTIES
 ### Binding inputs to properties
 
 One of Liveblade's most powerful features is "data binding": the ability to automatically keep properties in-sync with form inputs on the page.
@@ -188,7 +239,7 @@ Let's bind the `title` property from the `TodoList` component to a text input us
 
     <input type="text" id="title" b-model="title"/> // [!code highlight]
 </form>
-```
+``` 
 
 Any changes made to the text input will be automatically synchronized with the `title` property in your Liveblade component.
 
@@ -198,7 +249,11 @@ Any changes made to the text input will be automatically synchronized with the `
 
 Liveblade properties are extremely powerful and are an important concept to understand. For more information, check out the [Liveblade properties documentation](#).
 
-## Calling actions
+END PROPERTIES -->
+
+<!-- START ACTIONS
+
+ ## Calling actions
 
 Actions are methods within your Liveblade component that handle user interactions or perform specific tasks. They're often useful for responding to button clicks or form submissions on a page.
 
@@ -233,10 +288,9 @@ Next, let's call the `save` action from the component's template by adding the `
 
 When the "Save" button is clicked, the `save()` method in your Liveblade component will be executed and your component will re-render.
 
-To keep learning about Liveblade actions, visit the [actions documentation](#).
+To keep learning about Liveblade actions, visit the [actions documentation](#). 
 
-
-
+END ACTIONS -->
 
 ## Rendering components
 

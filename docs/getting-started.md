@@ -186,7 +186,7 @@ You can learn more about this functionnality in the [Migration guide](migration-
 ---
 ### Configuring PyBlade for Flask  
 ::: info Coming soon
-You'll now more about Flask specific configuration in the upcoming version of PyBlade.
+You'll know more about Flask specific configuration in the upcoming version of PyBlade.
 :::  
 
 ## Run the development server  
@@ -211,14 +211,13 @@ For example, given the structure:
 ```
 my_project/
 ├── my_app/
-│   ├── views.py                # Django views file
-│   ├── models.py               # Django models file
+│   ├── views.py
+│   ├── models.py
 │   └── templates/
-│       └── my_app/             # App-specific folder for templates
-│           ├── index.html   # Template for a view in `my_app`
-│           └── about.html   # Other template
-└── settings.py
-
+│       └── my_app/
+│           ├── index.html
+│           └── about.html
+└── manage.py
 ```
 To reference `index.html` within `templates/my_app/`, use the path `"my_app.index"` in your Django view, as follows:
 
@@ -261,8 +260,8 @@ my_flask_project/
 |   └── css/
 |       └── style.css
 └── templates/
-    ├── index.html       # PyBlade template file
-    └── about.html       # Optional base layout template
+    ├── index.html
+    └── about.html
 ```
 
 ::: warning Attention
