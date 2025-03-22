@@ -1,13 +1,14 @@
 <!-- # Magic properties Cfr Magic actions in Actions -->
+
 # Properties
 
-Properties store and manage data inside your Liveblade components. They are defined as attributes on component classes and can be accessed and modified on both the server and client-side.
+Liveblade components have properties that store data and can be easily accessed within the component's class and template. Properties are defined as attributes on component classes and can be accessed and modified on both the server and client-side. 
+
+This section discusses the basics of adding a property to a component and using it in your application.
 
 ## Initializing properties
 
-You can set initial values for properties within your component's `mount()` method.
-
-Consider the following example:
+In a standard Python class, to initialize properties or attributes, we use the `__init__()` dunder method. However, in a Liveblade's component class, you can set initial values for properties within your component's `mount()` method.
 
 ```python
 from pyblade import liveblade
@@ -19,9 +20,71 @@ class TodoList(liveblade.Component):
         self.tasks = Task.objects.all()
 ```
 
-In this example, when the component renders for the first time, all the existing tasks in the database are made available through the `tasks` variable into the components template.
+In this example, when the component renders for the first time, all the existing tasks in the database are made available through the `tasks` variable.
+
+
+Alternatively, you may declare properties in your component class, making them what are known as "class attributes". For example, let's create a `title` property in the `TodoList` component:
+
+```python
+from pyblade import liveblade
+
+class TodoList(liveblade.Component):
+
+    title = "Learn PyBlade"
+
+    def render(self):
+        return self.view("liveblade.todo-list")
+```
+
+## Accessing properties in the template
+
+Component properties are automatically made available to the component's context. You can reference them using standard PyBlade syntax. Here we'll display the value of the `title` property:
+
+```html
+<div>
+    <h1>Title: {{ title }}</h1>
+</div>
+```
+
+The rendered output of this component would be:
+
+```html
+<div>
+    <h1>Title: Learn PyBlade</h1>
+</div>
+```
+
+## Sharing additional data with the template
+
+In addition to accessing class properties from the template, you can explicitly pass data to the template from the `render()` method, like you might typically do from a view in Django. This can be useful when you want to pass additional data without first storing it as a property — because properties have [specific security implications](#).
+
+To pass data to the view in the `render()` method, you can add a dictionnary as second parameter to the returned `view()` method. For example, let's say you want to pass the task status to the template.
+
+```python
+class TodoList(liveblade.Component):
+
+    title = "Learn PyBlade"
+
+    def render(self):
+        return self.view("liveblade.todo-list", context={"status": "In progress"}) # [!code highlight]
+
+```
+
+
+Now you may access the `status` property from the component's template like this:
+
+```html
+<div>
+    <h1>Title: {{ title }}</h1>
+
+    <span>Status: {{ status }}</span>
+</div>
+```
+
 
 ## Data binding
+
+One of Liveblade's most powerful features is "data binding": the ability to automatically keep properties in-sync with form inputs on the page.
 
 Liveblade supports two-way data binding through the `b-model` HTML attribute. This allows you to easily synchronize data between component properties and HTML inputs, keeping your user interface and component state in sync.
 
@@ -33,30 +96,27 @@ from app.models import Task
 
 class TodoComponent(liveblade.Component):
 
-    title = ""
+    title: str = ""
 
-    def add(self):
-        if self.title:
-            Task.objects.create(title=self.title)
+    def render(self):
+        return self.view("liveblade.todo-list")
 ```
 
 ```html
 <div>
-    <input type="text" b-model="title" placeholder="Title..."> # [!code highlight] 
-
-    <button b-click="add">Add Task</button>
-
-    <ul>
-        @for (task in tasks)
-            <li>{{ task.title }}</li>
-        @endfor
-    </ul>
+    <h1>{{ title }}</h1>
+    <input type="text" b-model="title" /> // [!code highlight] 
 </div>
 ```
 
-In the above example, the text input's value will synchronize with the `title` property on the server when the **"Add Todo"** button is clicked.
+Any changes made to the text input will be automatically synchronized with the `title` property in your Liveblade component.
 
-This is just scratching the surface of `b-model`. For deeper information on data binding, check out our [documentation on forms](#).
+> [!warning] "Why isn't my component live updating as I type?"
+> If you tried this in your browser and are confused why the title isn't automatically updating, it's because Liveblade only updates a component when an "action" is submitted — like pressing a submit button — not when a user types into a field. This cuts down on network requests and improves performance. To enable "live" updating as a user types, you can use `b-model.live` instead.
+
+
+
+This is just scratching the surface of `b-model`. We will go deeper when we'll talk about [Forms](liveblade/forms) in Liveblade.
 
 ## Resetting properties
 
@@ -72,10 +132,8 @@ class TodoComponent(liveblade.Component):
 
     title = ""
 
-    def add(self):
-        if self.title:
-            Task.objects.create(title=self.title)
-            self.reset("title") # [!code highlight]
+    def render(self):
+        return self.view("liveblade.todo-list")
 
 ```
 
@@ -103,6 +161,10 @@ class TodoComponent(liveblade.Component):
         if self.title:
             Task.objects.create(title=self.pull("title")) # [!code highlight]
 ```
+
+---
+Liveblade properties are extremely powerful and are an important concept to understand. For more information, check out the [Liveblade properties documentation](#).
+
 
 ## Security concerns
 <!-- 

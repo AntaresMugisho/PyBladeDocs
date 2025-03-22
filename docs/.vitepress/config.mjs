@@ -55,7 +55,6 @@ export default defineConfig({
           {text: "Security", link:"/liveblade/security"},
         ]
       },
-
       {
         text: "PyBlade CLI",
         items:[

@@ -125,132 +125,6 @@ class TodoList(liveblade.Component):
 
 If the component above is rendered on a page, Liveblade will automatically determine it should be rendered using the `templates/liveblade/todo_list.html` template.
 
-<!-- START PROPOERTIES
-## Setting properties
-
-Liveblade components have properties that store data and can be easily accessed within the component's class and template. This section discusses the basics of adding a property to a component and using it in your application.
-
-To add a property to a Liveblade component, declare property in your component class. For example, let's create a `title` property in the `TodoList` component:
-
-```python
-from pyblade import liveblade
-
-class TodoList(liveblade.Component):
-    title = "Learn PyBlade"
-
-    def render(self):
-        return self.view("liveblade.todo-list")
-```
-
-### Accessing properties in the template
-
-Component properties are automatically made available to the component's context. You can reference it using standard PyBlade syntax. Here we'll display the value of the `title` property:
-
-```html
-<div>
-    <h1>Title: {{ title }}</h1>
-</div>
-```
-
-The rendered output of this component would be:
-
-```html
-<div>
-    <h1>Title: Learn PyBlade</h1>
-</div>
-```
-
-### Sharing additional data with the template
-
-In addition to accessing class properties from the template, you can explicitly pass data to the template from the `render` method, like you might typically do from a view in Django. This can be useful when you want to pass additional data without first storing it as a property — because properties have [specific security implications](#).
-
-To pass data to the view in the `render` method, you can add a dictionnary as second parameter to the returned `view` method. For example, let's say you want to pass the task status to the template.
-
-```python
-class TodoList(liveblade.Component):
-    title = "Learn PyBlade"
-
-    def render(self):
-        return self.view("liveblade.todo-list", context={"status": "In progress"})
-```
-
-
-Now you may access the `status` property from the component's template:
-
-```html
-<div>
-    <h1>Title: {{ title }}</h1>
-
-    <span>Status: {{ status }}</span>
-</div>
-``` -->
-
-
-
-
-
-
-
-<!-- 
-### Adding `b-key` to `@for` loops
-
-When looping through data in a Liveblade component template using `@for`, you must add a unique `b-key` attribute to the root element rendered by the loop.
-
-Without a `b-key` attribute present within a PyBlade loop, Liveblade won't be able to properly match old elements to their new positions when the loop changes. This can cause many hard to diagnose issues in your application.
-
-For example, if you are looping through a list of tasks, you may set the `b-key` attribute to the task's ID:
-
-```html
-<div>
-    @for (task in tasks)
-        <div b-key="{{ task.id }}">  // [!code highlight]
-            {# ... #}
-        </div>
-    @endfor
-</div>
-``` -->
-
-<!-- If you are looping through a liqr that is rendering Liveblade components you may set the key as a component attribute `:key` or pass the key as a third argument when using the `@liveblade` directive.
-
-```html
-<div>
-    @for (task in tasks)
-        <liveblade:task-item :task="task" :key="task.id"/>
-
-        @liveblade("task-item", {"task": task}, key=task.id)
-    @endforeach
-</div>
-``` -->
-
-
-
-
-
-<!--  SUIT PROPERTIES
-### Binding inputs to properties
-
-One of Liveblade's most powerful features is "data binding": the ability to automatically keep properties in-sync with form inputs on the page.
-
-Let's bind the `title` property from the `TodoList` component to a text input using the `b-model` attribute:
-
-```html
-<form>
-    <label for="title">Title:</label>
-
-    <input type="text" id="title" b-model="title"/> // [!code highlight]
-</form>
-``` 
-
-Any changes made to the text input will be automatically synchronized with the `title` property in your Liveblade component.
-
-> [!warning] "Why isn't my component live updating as I type?"
-> If you tried this in your browser and are confused why the title isn't automatically updating, it's because Liveblade only updates a component when an "action" is submitted—like pressing a submit button—not when a user types into a field. This cuts down on network requests and improves performance. To enable "live" updating as a user types, you can use `b-model.live` instead. [Learn more about data binding](#).
-
-
-Liveblade properties are extremely powerful and are an important concept to understand. For more information, check out the [Liveblade properties documentation](#).
-
-END PROPERTIES -->
-
 <!-- START ACTIONS
 
  ## Calling actions
@@ -321,6 +195,47 @@ PyBlade also provides an alternative way to render Liveblade components using th
 ```
 
 While this method works, **it is not as intuitive as using liveblade component tags**. The tag-based syntax is visually clearer and aligns with HTML syntax.
+
+
+### Add `key` attribute when looping
+
+When looping through data in a Liveblade component's template using `@for`, you must add a **unique** `key` attribute to the root element rendered by the loop.
+
+Without a `key` attribute present within a PyBlade loop, Liveblade won't be able to properly match old elements to their new positions when the loop changes. This can cause many hard to diagnose issues in your application.
+
+For example, if you are looping through a list of tasks, you may set the `key` attribute to the task's ID:
+
+```html
+<div>
+    @for (task in tasks)
+        <div key="{{ task.id }}">  // [!code highlight]
+            {# ... #}
+        </div>
+    @endfor
+</div>
+```
+
+>[!tip] Pro advisory
+> The syntax in the 2 following code snippets may be unfamiliar to you, but don't worry as we will cover it in the [Passing data to components](#passing-data-to-components) section just after !
+
+If you are looping through a list that is rendering Liveblade components you may set the `key` as a tag attribute when using Liveblade component tags:
+
+```html
+<div>
+    @for (task in tasks)
+        <liveblade:task-item :task="task" :key="task.id"/> // [!code highlight]
+    @endfor
+</div>
+```
+Or pass the `key` as a third argument when using the `@liveblade` directive.
+
+```html
+<div>
+    @for (task in tasks)
+        @liveblade("task-item", props={"task": task}, key=task.id) // [!code highlight]
+    @endfor
+</div>
+```
 
 ## Passing data to components
 
