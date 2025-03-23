@@ -1,7 +1,8 @@
-<!-- Pulling and Ressetting properties here (not in properties) -->
 # Actions
 
-Liveblade actions are methods on your component that can be triggered by frontend interactions like clicking a button or submitting a form. They provide the developer experience of being able to call a Python method directly from the browser, allowing you to focus on the logic of your application without getting bogged down writing boilerplate code connecting your application's frontend and backend.
+Liveblade actions are methods on your component that can be triggered by frontend interactions like clicking a button or submitting a form. 
+
+They provide the developer experience of being able to call a Python method directly from the browser, allowing you to focus on the logic of your application without getting bogged down writing boilerplate code connecting your application's frontend and backend.
 
 Let's explore a basic example of calling a `save` action on a `CreatePost` component:
 
@@ -30,33 +31,13 @@ class CreatePost(liveblade.component):
 </form>
 ```
 
-In the above example, when a user submits the form by clicking "Save", `b-submit` intercepts the `submit` event and calls the `save()` action on the server.
+In the above example, when a user submits the form by clicking "Save", `b-submit` intercepts the `submit` event and calls the `save()` method on the server.
 
 In essence, actions are a way to easily map user interactions to server-side functionality without the hassle of submitting and handling AJAX requests manually.
 
-## Refreshing a component
-
-Sometimes you may want to trigger a simple "refresh" of your component. For example, if you have a component checking the status of something in the database, you may want to show a button to your users allowing them to refresh the displayed results.
-
-You can do this using Liveblade's simple `refresh` action anywhere you would normally reference your own component method:
-
-```html
-<button type="button" b-click="refresh">...</button>
-```
-
-When the `refresh` action is triggered, Liveblade will make a server-roundtrip and re-render your component without calling any methods.
-
-It's important to note that any pending data updates in your component (for example `b-model` bindings) will be applied on the server when the component is refreshed.
-
-Internally, Liveblade uses the name "commit" to refer to any time a Liveblade component is updated on the server. If you prefer this terminology, you can use the `commit` helper instead of `refresh`. The two are identical.
-
-```html
-<button type="button" b-click="commit">...</button>
-```
-
 ## Confirming an action
 
-When allowing users to perform dangerous actions—such as deleting a post from the database—you may want to show them a confirmation alert to verify that they wish to perform that action.
+When allowing users to perform dangerous actions — such as deleting a post from the database — you may want to show them a confirmation alert to verify that they wish to perform that action.
 
 Liveblade makes this easy by providing a simple directive called `b-confirm`:
 
@@ -70,144 +51,22 @@ Liveblade makes this easy by providing a simple directive called `b-confirm`:
 </button>
 ```
 
-When `b-confirm` is added to an element containing a Liveblade action, when a user tries to trigger that action, they will be presented with a confirmation dialog containing the provided message. They can either press "OK" to confirm the action, or press "Cancel" or hit the escape key.
-
-For more information, visit the [`b-confirm` documentation page](#).
-
-## Event listeners
-
-Liveblade supports a variety of event listeners, allowing you to respond to various types of user interactions:
-
-| Listener        | Description                               |
-|-----------------|-------------------------------------------|
-| `b-click`    | Triggered when an element is clicked      |
-| `b-submit`   | Triggered when a form is submitted        |
-| `b-keydown`  | Triggered when a key is pressed down      |
-| `b-keyup`  | Triggered when a key is released
-| `b-mouseenter`| Triggered when the mouse enters an element |
-| `b-*`| Whatever text follows `b-` will be used as the event name of the listener |
-
-Because the event name after `b-` can be anything, Liveblade supports any browser event you might need to listen for. For example, to listen for `transitionend`, you can use `b-transitionend`.
-
-### Listening for specific keys
-
-You can use one of Liveblade's convenient aliases to narrow down key press event listeners to a specific key or combination of keys.
-
-For example, to perform a search when a user hits `Enter` after typing into a search box, you can use `b-keydown.enter`:
-
-```html
-<input b-model="query" b-keydown.enter="searchPosts">
-```
-
-You can chain more key aliases after the first to listen for combinations of keys. For example, if you would like to listen for the `Enter` key only while the `Shift` key is pressed, you may write the following:
-
-```html
-<input b-keydown.shift.enter="...">
-```
-
-Below is a list of all the available key modifiers:
-
-| Modifier      | Key                          |
-|---------------|------------------------------|
-| `.shift`      | Shift                        |
-| `.enter`      | Enter                        |
-| `.space`      | Space                        |
-| `.ctrl`       | Ctrl                         |
-| `.cmd`        | Cmd                          |
-| `.meta`       | Cmd on Mac, Windows key on Windows |
-| `.alt`        | Alt                          |
-| `.up`         | Up arrow                     |
-| `.down`       | Down arrow                   |
-| `.left`       | Left arrow                   |
-| `.right`      | Right arrow                  |
-| `.escape`     | Escape                       |
-| `.tab`        | Tab                          |
-| `.caps-lock`  | Caps Lock                    |
-| `.equal`      | Equal, `=`                   |
-| `.period`     | Period, `.`                  |
-| `.slash`      | Forward Slash, `/`           |
-
-### Event handler modifiers
-
-Liveblade also includes helpful modifiers to make common event-handling tasks trivial.
-
-For example, if you need to call `event.preventDefault()` from inside an event listener, you can suffix the event name with `.prevent`:
-
-```html
-<input b-keydown.prevent="...">
-```
-
-Here is a full list of all the available event listener modifiers and their functions:
-
-| Modifier         | Key                                                     |
-|------------------|---------------------------------------------------------|
-| `.prevent`       | Equivalent of calling `.preventDefault()`               |
-| `.stop`          | Equivalent of calling `.stopPropagation()`              |
-| `.window`        | Listens for event on the `window` object                 |
-| `.outside`       | Only listens for clicks "outside" the element            |
-| `.document`      | Listens for events on the `document` object              |
-| `.once`          | Ensures the listener is only called once                 |
-| `.debounce`      | Debounce the handler by 250ms as a default               |
-| `.debounce.100ms`| Debounce the handler for a specific amount of time       |
-| `.throttle`      | Throttle the handler to being called every 250ms at minimum |
-| `.throttle.100ms`| Throttle the handler at a custom duration                |
-| `.self`          | Only call listener if event originated on this element, not children |
-| `.camel`         | Converts event name to camel case (`b-custom-event` -> "customEvent") |
-| `.dot`           | Converts event name to dot notation (`b-custom-event` -> "custom.event") |
-| `.passive`       | `b-touchstart.passive` won't block scroll performance |
-| `.capture`       | Listen for event in the "capturing" phase                 |
-
-
-### Disabling inputs while a form is being submitted
-
-Consider the `CreatePost` example we previously discussed:
-
-```html
-<form b-submit="save">
-    <input b-model="title">
-
-    <textarea b-model="content"></textarea>
-
-    <button type="submit">Save</button>
-</form>
-```
-
-When a user clicks "Save", a network request is sent to the server to call the `save()` action on the Liveblade component.
-
-But, let's imagine that a user is filling out this form on a slow internet connection. The user clicks "Save" and nothing happens initially because the network request takes longer than usual. They might wonder if the submission failed and attempt to click the "Save" button again while the first request is still being handled.
-
-In this case, there would be two requests for the same action being processed at the same time.
-
-To prevent this scenario, Liveblade automatically disables the submit button and all form inputs inside the `<form>` element while a `b-submit` action is being processed. This ensures that a form isn't accidentally submitted twice.
-
-To further lessen the confusion for users on slower connections, it is often helpful to show some loading indicator such as a subtle background color change or SVG animation.
-
-Liveblade provides a `b-loading` directive that makes it trivial to show and hide loading indicators anywhere on a page. Here's a short example of using `b-loading` to show a loading message below the "Save" button:
-
-```html
-<form b-submit="save">
-    <textarea b-model="content"></textarea>
-
-    <button type="submit">Save</button>
-
-    <span b-loading>Saving...</span>  // [!code highlight]
-</form>
-```
-
-`b-loading` is a powerful feature with a variety of more powerful features. [Check out the full loading documentation for more information](#).
+When `b-confirm` is added to an element containing a Liveblade action, when a user tries to trigger that action, they will be presented with a confirmation dialog containing the provided message. They can either press **"Yes"** to confirm the action, or press **"Cancel"** or hit the escape key to cancel the action.
 
 ## Passing parameters
 
 Liveblade allows you to pass parameters from your PyBlade template to the actions in your component, giving you the opportunity to provide an action additional data or state from the frontend when the action is called.
 
-For example, let's imagine you have a `TodoList` component that allows users to delete a post. You can pass the post's ID as a parameter to the `delete()` action in your Liveblade component. Then, the action can fetch the relevant post and delete it from the database:
+For example, let's imagine you have a `TodoList` component that allows users to delete a task. You can pass the task's ID as a parameter to the `delete()` action in your Liveblade component. Then, the action can fetch the relevant task and delete it from the database:
 
 ```python
 rom pyblade import liveblade
 from app.models import Task
 
 class TodoList(liveblade.Component):
-    ...
+    
+    def mount(self):
+        self.tasks = Task.objects.all()
 
     def delete(self, id: int):
         task = Task.objects.get(id=id)
@@ -221,7 +80,7 @@ class TodoList(liveblade.Component):
 ```html
 <div>
     @for (task in tasks)
-        <div b-key="{{ task.id }}">
+        <div key="{{ task.id }}">
             <h1>{{ task.title }}</h1>
             <span>{{ task.content }}</span>
 
@@ -231,7 +90,7 @@ class TodoList(liveblade.Component):
 </div>
 ```
 
-For a task with an ID of 2, the "Delete" button in the Blade template above will render in the browser as:
+For a task with an ID of 2, the "Delete" button in the PyBlade template above will render in the browser as:
 
 ```html
 <button b-click="delete(2)">Delete</button>
@@ -239,11 +98,47 @@ For a task with an ID of 2, the "Delete" button in the Blade template above will
 
 When this button is clicked, the `delete()` method will be called and `id` will be passed in with a value of "2".
 
-> [!warning] Warning
-> **Don't trust action parameters !**
+> [!warning] Don't trust action parameters !
 > Action parameters should be treated just like HTTP request input, meaning action parameter values should not be trusted. You should always authorize ownership of an entity before updating it in the database.
 >
-> For more information, consult our documentation regarding [security concerns and best practices](/docs/actions#security-concerns).
+> For more information, consult our documentation regarding [security concerns](#).
+
+
+## Skipping re-renders
+
+Everytime an action in your component is trigerred, the `render()` method is called to re-render the component.
+
+But, sometimes there might be an action in your component with no side effects that would change the rendered PyBlade template when the action is invoked. If so, you can skip the `render` portion of Liveblade's lifecycle by adding the `@renderless` decorator above the action method.
+
+>[!danger] 404 : Not found
+> Looking for a better example !
+
+```python
+...
+
+```
+
+```html
+```
+
+The example above uses [`b-intersect`](#), a Liveblade utility that calls the expression when the element enters the viewport (typically used to detect when a user scrolls to an element further down the page).
+
+As you can see, when a user scrolls to the bottom of the post, `increment_view_count()` is invoked. Since `@renderless` was added to the action, the view is logged, but the template doesn't re-render and no part of the page is affected.
+
+If you prefer to not utilize method attributes or need to conditionally skip rendering, you may invoke the `skip_render()` method in your component action:
+
+```python
+class PostDetail(liveblade.Component):
+    ...
+
+    def increment_view_count():
+        self.post.increment_views()
+        self.skip_render() # [!code highlight]
+
+    def render():
+        return view('liveblade.show-post');
+
+```
 
 
 ## JavaScript actions
@@ -256,6 +151,10 @@ Liveblade allows you to define JavaScript actions that run entirely on the clien
 To define a JavaScript action, you can use the `js()` function inside a `<script>` tag in your component.
 
 Here's an example of bookmarking a post that uses a JavaScript action to optimistically update the UI before making a server request. The JavaScript action immediately shows the filled bookmark icon, then makes a request to persist the bookmark in the database:
+
+>[!danger] 404 : Not found
+> Looking for a simple example !
+
 
 ```python
 from pyblade import liveblade 
@@ -337,63 +236,71 @@ class CreatePost(liveblade.Component):
 @endscript
 ```
 
-In this example, when the `save()` action is finished, the `postSaved` JavaScript action will be run, triggering the alert dialog.
+In this example, when the `save()` action is finished, the `onPostSaved` JavaScript action will be run, triggering the alert dialog.
 
 ## Magic actions
 
-Liveblade provides a set of "magic" actions that allow you to perform common tasks in your components without defining custom methods. These magic actions can be used within event listeners defined in your Blade templates.
+Liveblade provides a set of "magic" actions that allow you to perform common tasks in your components without defining custom methods. These magic actions can be used within event listeners defined in your PyBlade templates.
 
-### `parent`
+### Refreshing a component
+
+Sometimes you may want to trigger a simple "refresh" of your component. For example, if you have a component checking the status of something in the database, you may want to show a button to your users allowing them to refresh the displayed results.
+
+You can do this using Liveblade's simple `refresh` action anywhere you would normally reference your own component method:
+
+```html
+<button type="button" b-click="refresh">...</button>
+```
+
+When the `refresh` action is triggered, Liveblade will make a server-roundtrip and re-render your component without calling any methods.
+
+It's important to note that any pending data updates in your component (for example `b-model` bindings) will be applied on the server when the component is refreshed.
+
+
+### Calling parent actions
 
 The `parent` magic variable allows you to access parent component properties and call parent component actions from a child component:
 
 ```html
-<button b-click="parent.removePost({{ post->id }})">Remove</button>
+<button b-click="parent.remove_post({{ post.id }})">Remove</button>
 ```
 
-In the above example, if a parent component has a `removePost()` action, a child can call it directly from its Blade template using `parent.removePost()`.
+In the above example, if a parent component has a `remove_post()` action, a child can call it directly from its PyBlade template using `parent.remove_post()`.
 
-### `set`
+### Updating properties
 
-The `set` magic action allows you to update a property in your Liveblade component directly from the Blade template. To use `set`, provide the property you want to update and the new value as arguments:
+The `set` magic action allows you to update a property in your Liveblade component directly from the PyBlade template. To use `set`, provide the property you want to update and the new value as arguments:
 
 ```html
 <button b-click="set('query', '')">Reset Search</button>
 ```
 
-In this example, when the button is clicked, a network request is dispatched that sets the `query` property in the component to `''`.
+In this example, when the button is clicked, a network request is dispatched that sets the `query` property in the component to an empty string `''`.
 
-### `refresh`
-
-The `refresh` action triggers a re-render of your Liveblade component. This can be useful when updating the component's view without changing any property values:
-
-```html
-<button b-click="refresh">Refresh</button>
-```
-
-When the button is clicked, the component will re-render, allowing you to see the latest changes in the view.
-
-### `toggle`
+### Toggling Boolean values
 
 The `toggle` action is used to toggle the value of a boolean property in your Liveblade component:
 
 ```html
-<button b-click="toggle('sortAsc')">
-    Sort {{ sortAsc ? 'Descending' : 'Ascending' }}
+<button b-click="toggle('sort_asc')">
+    Sort {{ "Descending" if sort_asc else "Ascending" }}
 </button>
 ```
 
-In this example, when the button is clicked, the `sortAsc` property in the component will toggle between `true` and `false`.
+In this example, when the button is clicked, the `sort_asc` property in the component will toggle between `True` and `False`.
 
-### `dispatch`
+### Dispatching events
 
-The `dispatch` action allows you to dispatch a Liveblade event directly in the browser. Below is an example of a button that, when clicked, will dispatch the `post-deleted` event:
+The `emit` action allows you to dispatch a Liveblade event directly in the browser. Below is an example of a button that, when clicked, will emit the `post-deleted` event:
 
 ```html
-<button type="submit" b-click="dispatch('post-deleted')">Delete Post</button>
+<button type="submit" b-click="emit('post-deleted')">Delete Post</button>
 ```
 
-### `event`
+>[!tip] Pro tip
+>You can also use the `dispatch` action to dispatch events. It works the same way as `emit`.
+
+### Accessing event objects
 
 The `event` action may be used within event listeners like `b-click`. This action gives you access to the actual JavaScript event that was triggered, allowing you to reference the triggering element and other relevant information:
 
@@ -403,45 +310,130 @@ The `event` action may be used within event listeners like `b-click`. This actio
 
 When the enter key is pressed while a user is typing in the input above, the contents of the input will be passed as a parameter to the `search()` action.
 
-## Skipping re-renders
+## Event listeners
 
-Sometimes there might be an action in your component with no side effects that would change the rendered Blade template when the action is invoked. If so, you can skip the `render` portion of Liveblade's lifecycle by adding the `@renderless` decorator above the action method.
+Liveblade supports a variety of event listeners, allowing you to respond to various types of user interactions:
 
-To demonstrate, in the `ShowPost` component below, the "view count" is logged when the user has scrolled to the bottom of the post:
+| Listener        | Description                               |
+|-----------------|-------------------------------------------|
+| `b-click`    | Triggered when an element is clicked      |
+| `b-submit`   | Triggered when a form is submitted        |
+| `b-change`   | Triggered when an input value changes        |
+| `b-keydown`  | Triggered when a key is pressed down      |
+| `b-keyup`  | Triggered when a key is released
+| `b-mouseenter`| Triggered when the mouse enters an element |
+| `b-*`| Whatever text follows `b-` will be used as the event name of the listener |
 
-```python
-...
+Because the event name after `b-` can be anything, Liveblade supports any browser event you might need to listen for. For example, to listen for `transitionend`, you can use `b-transitionend`.
 
-```
+### Listening for specific keys
+
+You can use one of Liveblade's convenient aliases to narrow down key press event listeners to a specific key or combination of keys.
+
+For example, to perform a search when a user hits `Enter` after typing into a search box, you can use `b-keydown.enter`:
 
 ```html
-<div>
-    <h1>{{ post.title }}</h1>
-    <p>{{ post.content }}</p>
-
-    <div b-intersect="liveblade.incrementViewCount()"></div>
-</div>
+<input b-model="query" b-keydown.enter="searchPosts">
 ```
 
-The example above uses [`x-intersect`](#), a Liveblade utility that calls the expression when the element enters the viewport (typically used to detect when a user scrolls to an element further down the page).
+You can chain more key aliases after the first to listen for combinations of keys. For example, if you would like to listen for the `Enter` key only while the `Shift` key is pressed, you may write the following:
 
-As you can see, when a user scrolls to the bottom of the post, `incrementViewCount()` is invoked. Since `#[Renderless]` was added to the action, the view is logged, but the template doesn't re-render and no part of the page is affected.
-
-If you prefer to not utilize method attributes or need to conditionally skip rendering, you may invoke the `skip_render()` method in your component action:
-
-```python
-class PostDetail(liveblade.Component):
-    ...
-
-    def increment_view_count():
-        self.post.increment_views()
-        self.skip_render() # [!code highlight]
-
-    def render():
-        return view('liveblade.show-post');
-
+```html
+<input b-keydown.shift.enter="...">
 ```
+
+Below is a list of all the available key modifiers:
+
+| Modifier      | Key                          |
+|---------------|------------------------------|
+| `.shift`      | Shift                        |
+| `.enter`      | Enter                        |
+| `.space`      | Space                        |
+| `.ctrl`       | Ctrl                         |
+| `.cmd`        | Cmd                          |
+| `.meta`       | Cmd on Mac, Windows key on Windows |
+| `.alt`        | Alt                          |
+| `.up`         | Up arrow                     |
+| `.down`       | Down arrow                   |
+| `.left`       | Left arrow                   |
+| `.right`      | Right arrow                  |
+| `.esc`     | Escape                       |
+| `.tab`        | Tab                          |
+| `.caps-lock`  | Caps Lock                    |
+| `.equal`      | Equal, `=`                   |
+| `.period`     | Period, `.`                  |
+| `.slash`      | Forward Slash, `/`           |
+
+### Event handler modifiers
+
+Liveblade also includes helpful modifiers to make common event-handling tasks trivial.
+
+For example, if you need to call `event.preventDefault()` from inside an event listener, you can suffix the event name with `.prevent`:
+
+```html
+<input b-keydown.prevent="...">
+```
+
+Here is a full list of all the available event listener modifiers and their functions:
+
+| Modifier         | Key                                                     |
+|------------------|---------------------------------------------------------|
+| `.prevent`       | Equivalent of calling `.preventDefault()`               |
+| `.stop`          | Equivalent of calling `.stopPropagation()`              |
+| `.window`        | Listens for event on the `window` object                 |
+| `.outside`       | Only listens for clicks "outside" the element            |
+| `.document`      | Listens for events on the `document` object              |
+| `.once`          | Ensures the listener is only called once                 |
+| `.debounce`      | Debounce the handler by 250ms as a default               |
+| `.debounce.100ms`| Debounce the handler for a specific amount of time       |
+| `.throttle`      | Throttle the handler to being called every 250ms at minimum |
+| `.throttle.100ms`| Throttle the handler at a custom duration                |
+| `.self`          | Only call listener if event originated on this element, not children |
+| `.camel`         | Converts event name to camel case (`b-custom-event` -> "customEvent") |
+| `.dot`           | Converts event name to dot notation (`b-custom-event` -> "custom.event") |
+| `.passive`       | `b-touchstart.passive` won't block scroll performance |
+| `.capture`       | Listen for event in the "capturing" phase                 |
+
+
+### Disabling inputs while a form is being submitted
+
+Consider the `CreatePost` example we previously discussed:
+
+```html
+<form b-submit="save">
+    <input b-model="title">
+
+    <textarea b-model="content"></textarea>
+
+    <button type="submit">Save</button>
+</form>
+```
+
+When a user clicks **"Save"**, a network request is sent to the server to call the `save()` action on the Liveblade component.
+
+But, let's imagine that a user is filling out this form on a slow internet connection. The user clicks "Save" and nothing happens initially because the network request takes longer than usual. They might wonder if the submission failed and attempt to click the "Save" button again while the first request is still being handled.
+
+In this case, there would be two requests for the same action being processed at the same time.
+
+To prevent this scenario, Liveblade automatically disables the submit button and all form inputs inside the `<form>` element while a `b-submit` action is being processed. This ensures that a form isn't accidentally submitted twice.
+
+To further lessen the confusion for users on slower connections, it is often helpful to show some loading indicator such as a subtle background color change or SVG animation.
+
+Liveblade provides a `b-loading` directive that makes it trivial to show and hide loading indicators anywhere on a page. Here's a short example of using `b-loading` to show a loading message below the "Save" button:
+
+```html
+<form b-submit="save">
+    <textarea b-model="content"></textarea>
+
+    <button type="submit">Save</button>
+
+    <span b-loading>Saving...</span>  // [!code highlight]
+</form>
+```
+
 ## Security concerns
+
+Remember that any method in your Liveblade component can be called from the client-side, even without an associated `b-click` handler that invokes it. In these scenarios, users can still trigger the action from the browser's DevTools. So to make your application secure, read out our [Security concerns](#) before using actions.
 
 <!-- 
 Remember that any public method in your Liveblade component can be called from the client-side, even without an associated `b-click` handler that invokes it. In these scenarios, users can still trigger the action from the browser's DevTools.

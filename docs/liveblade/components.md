@@ -125,47 +125,6 @@ class TodoList(liveblade.Component):
 
 If the component above is rendered on a page, Liveblade will automatically determine it should be rendered using the `templates/liveblade/todo_list.html` template.
 
-<!-- START ACTIONS
-
- ## Calling actions
-
-Actions are methods within your Liveblade component that handle user interactions or perform specific tasks. They're often useful for responding to button clicks or form submissions on a page.
-
-To learn more about actions, let's add a `save` action to the `TodoList` component:
-
-```python
-from app.models import Task
-
-class TodoList(liveblade.Component):
-    title = "Learn PyBlade"
-
-    def save(self):
-         if self.title:
-            Task.objects.create(title=self.title)
-
-    def render(self):
-        return self.view("liveblade.todo-list")
-```
-
-
-Next, let's call the `save` action from the component's template by adding the `b-submit` directive to the `<form>` element:
-
-```html
-<form b-submit="save"> // [!code highlight]
-    <label for="title">Title:</label>
-
-    <input type="text" id="title" b-model="title">
-
-    <button type="submit">Save</button>
-</form>
-```
-
-When the "Save" button is clicked, the `save()` method in your Liveblade component will be executed and your component will re-render.
-
-To keep learning about Liveblade actions, visit the [actions documentation](#). 
-
-END ACTIONS -->
-
 ## Rendering components
 
 The **preferred way** to include a Liveblade component in your PyBlade template is by using a **Liveblade component tag**. Liveblade component tags start with `liveblade:`, followed by the _kebab-cased_ component name without extension.  
@@ -297,6 +256,10 @@ This is effectively the same as assigning `title` inside a `mount()` method.
 
 > [!warning] These properties are not reactive by default
 > The `title` property will not update automatically if the outer `:title="initial_value"` changes after the initial component load. This is a common point of confusion when using Liveblade, especially for developers who have used JavaScript frameworks like Vue or React and assume these "parameters" behave like "reactive props" in those frameworks. But, don't worry, Liveblade allows you to opt-in to [making your props reactive](#).
+
+## Including custom JavaScripts
+>[!danger] 404 : Not found
+>Coming soon ! 
 
 
 ## Full-page components
