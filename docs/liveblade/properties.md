@@ -61,6 +61,8 @@ In addition to accessing class properties from the template, you can explicitly 
 To pass data to the view in the `render()` method, you can add a dictionnary as second parameter to the returned `view()` method. For example, let's say you want to pass the task status to the template.
 
 ```python
+from pyblade import liveblade
+
 class TodoList(liveblade.Component):
 
     title = "Learn PyBlade"
@@ -92,9 +94,8 @@ Let's use the `b-model` directive to bind the `title` property in our `TodoList`
 
 ```python
 from pyblade import liveblade
-from app.models import Task
 
-class TodoComponent(liveblade.Component):
+class TodoList(liveblade.Component):
 
     title: str = ""
 
@@ -104,7 +105,7 @@ class TodoComponent(liveblade.Component):
 
 ```html
 <div>
-    <h1>{{ title }}</h1>
+    <h1>Title : {{ title }}</h1>
     <input type="text" b-model="title" /> // [!code highlight] 
 </div>
 ```
@@ -112,11 +113,42 @@ class TodoComponent(liveblade.Component):
 Any changes made to the text input will be automatically synchronized with the `title` property in your Liveblade component.
 
 > [!warning] "Why isn't my component live updating as I type?"
-> If you tried this in your browser and are confused why the title isn't automatically updating, it's because Liveblade only updates a component when an "action" is submitted — like pressing a submit button — not when a user types into a field. This cuts down on network requests and improves performance. To enable "live" updating as a user types, you can use `b-model.live` instead.
+> If you tried this in your browser and are confused why the title isn't automatically updating, it's because Liveblade only updates a component when an "action" is submitted — like pressing a submit button — not when a user types into a field. This cuts down on network requests and improves performance.
 
+>[!tip] Pro tip
+>To enable "live" updating as a user types, you can use `b-model.live` instead.
+
+Let's add a method in our component's class so that we can trigger an "action" from the browser to test it out.
+
+```python{7-8}
+from pyblade import liveblade
+
+class TodoList(liveblade.Component):
+
+    title: str = ""
+
+    def add(self):
+        pass
+
+    def render(self):
+        return self.view("liveblade.todo-list")
+```
+
+And now we will introduce `b-click` which allows you to call and execute a method defined in a Liveblade component's class right from the browser.
+
+```html
+<div>
+    <h1>Title : {{ title }}</h1>
+    <input type="text" b-model="title" /> 
+    <button b-click="add">Add Task</button> // [!code highlight] 
+</div>
+```
+
+This time, in the above example, the text input's value will synchronize with the `title` property on the server when the **"Add Task"** button is clicked.
 
 
 This is just scratching the surface of `b-model`. We will go deeper when we'll talk about [Forms](liveblade/forms) in Liveblade.
+
 
 ## Resetting properties
 
@@ -126,18 +158,18 @@ In the example below, we can avoid code duplication by using `self.reset()` to r
 
 ```python
 from pyblade import liveblade
-from app.models import Task
 
 class TodoComponent(liveblade.Component):
 
     title = ""
 
-    def render(self):
-        return self.view("liveblade.todo-list")
-
+    def add(self):
+        if self.title:
+            Task.objects.create(title=self.title)
+            self.reset("title") # [!code highlight]
 ```
 
-In the above example, after a user clicks "Add Todo", the input field holding the title that has just been added will clear, allowing the user to write a new title.
+In the above example, after a user clicks "Add Task", the input field holding the title that has just been added will clear, allowing the user to write a new title.
 
 > [!warning] Warning
 > `reset()` won't work on values set in `mount()`.
@@ -162,11 +194,10 @@ class TodoComponent(liveblade.Component):
             Task.objects.create(title=self.pull("title")) # [!code highlight]
 ```
 
----
-Liveblade properties are extremely powerful and are an important concept to understand. For more information, check out the [Liveblade properties documentation](#).
-
-
 ## Security concerns
+
+While Liveblade properties are a powerful feature, there are a few [security considerations](#) that you should be aware of before using them.
+
 <!-- 
 While Liveblade properties are a powerful feature, there are a few security considerations that you should be aware of before using them.
 
@@ -253,5 +284,5 @@ By using `@locked`, you can assume this property has not been manipulated anywhe
 
 For more information on locking properties, [consult the Locked properties documentation](#).
 
-<!-- ### Properties expose system information to the browser -->
- -->
+### Properties expose system information to the browser
+-->
