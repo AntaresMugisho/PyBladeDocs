@@ -88,7 +88,7 @@ To get a quick glimpse of PyBlade’s capabilities, here’s an example template
     @for (post in posts)
         <article>
             <h2>{{ post.title }}</h2>
-            <p>{{ post.content }}</p>
+            <div>{!! post.content !!}</div>
         </article>
     @empty
         <div>No post found !</div>

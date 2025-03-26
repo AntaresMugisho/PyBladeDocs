@@ -6,7 +6,7 @@ hero:
   text: "The lightweight and secure template engine for Python web frameworks !"
   tagline: "Modern, Elegant and Efficient."
   image:
-    src: /assets/images/pyblade.png
+    src: assets/images/pyblade.png
     alt: PyBlade Logo
   actions:
     - theme: brand
