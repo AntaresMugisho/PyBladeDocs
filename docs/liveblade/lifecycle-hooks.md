@@ -1,334 +1,249 @@
 # Lifecycle Hooks
 
-Liveblade provides a variety of lifecycle hooks that allow you to execute code at specific points during a component's lifecycle. These hooks enable you to perform actions before or after particular events, such as initializing the component, updating properties, or rendering the template.
+Liveblade provides various lifecycle hooks that allow you to execute code at specific points during a component's lifecycle. These hooks let you perform actions before or after certain events, such as initializing the component, updating properties, or rendering the template.
 
-Here's a list of all the available component lifecycle hooks:
+Here’s a list of the available lifecycle hooks:
 
-| Hook Method      | Description                                                                     |
-|------------------|---------------------------------------------------------------------------------|
-| `mount()`        | Called when a component is created                                              |
-| `hydrate()`      | Called when a component is re-hydrated at the beginning of a subsequent request |
-| `boot()`         | Called at the beginning of every request. Both initial, and subsequent          |
-| `updating()`     | Called before updating a component property                                     |
-| `updated()`      | Called after updating a property                                                |
-| `rendering()`    | Called before `render()` is called                                              |
-| `rendered()`     | Called after `render()` is called                                               |
-| `dehydrate()`    | Called at the end of every component request                                    |
-| `exception($e, $stopPropagation)` | Called when an exception is thrown                     |                    |
+| Hook Method          | Description                                                                   |
+|----------------------|-------------------------------------------------------------------------------|
+| `mount()`           | Called when a component is initialized the first time                                            |
+| `boot()`            | Called at the beginning of every request, both initial and subsequent         |
+| `update()`        | Called when a component is updated                                   |
+| `serialize()`         | Called when a component is re-hydrated at the beginning of a subsequent request |
+| `deserialize()`       | Called at the end of every component request                                  |
+| `render()`        | Called after `render()` is called                                             |
+| `exception(e, stop_propagation)` | Called when an exception is thrown                     |                    |
 
 ## Mount
 
-In a standard Python class, a constructor (`__construct()`) takes in outside parameters and initializes the object's state. However, in Liveblade, you use the `mount()` method for accepting parameters and initializing the state of your component.
+In a typical Python class, a constructor (`__init__()`) initializes an object’s state. However, in Liveblade components, the `mount()` method is used instead because components are _reconstructed_ on each network request, and we only want to initialize the component once when it is first created.
 
-Liveblade components don't use `__construct()` because Liveblade components are _re-constructed_ on subsequent network requests, and we only want to initialize the component once when it is first created.
+Here's an example of how to use the `mount()` method to initialize `name` and `email` in an `UpdateProfile` component:
 
-Here's an example of using the `mount()` method to initialize the `name` and `email` properties of an `UpdateProfile` component:
+```python
+from pyblade import liveblade
+from pyblade.liveblade import auth
 
-```php
-use Illuminate\Support\Facades\Auth;
-use Liveblade\Component;
+class UpdateProfile(liveblade.Component):
 
-class UpdateProfile extends Component
-{
-    public $name;
-
-    public $email;
-
-    public function mount()
-    {
-        $this->name = Auth::user()->name;
-
-        $this->email = Auth::user()->email;
-    }
-
-    // ...
-}
+    def mount(self):
+        user = auth()
+        self.name = user.name
+        self.email = user.email
 ```
 
-As mentioned earlier, the `mount()` method receives data passed into the component as method parameters:
+The `mount()` method can also receive parameters when the component is initialized:
 
-```php
-use Liveblade\Component;
-use App\Models\Post;
+```python
+from pyblade import Component
+from app.models import Post
 
-class UpdatePost extends Component
-{
-    public $title;
+class UpdatePost(Component):
 
-    public $content;
-
-    public function mount(Post $post)
-    {
-        $this->title = $post->title;
-
-        $this->content = $post->content;
-    }
-
-    // ...
-}
+    def mount(self, post: Post):
+        self.title = post.title
+        self.content = post.content
 ```
 
-> [!tip] You can use dependency injection with all hook methods
-> Liveblade allows you to resolve dependencies out of [Laravel's service container](https://laravel.com/docs/container#automatic-injection) by type-hinting method parameters on lifecycle hooks.
 
-The `mount()` method is a crucial part of using Liveblade. The following documentation provides further examples of using the `mount()` method to accomplish common tasks:
+The `mount()` method plays a crucial role in initializing Liveblade components. Here are some common use cases:
 
-* [Initializing properties](/docs/properties#initializing-properties)
-* [Receiving data from parent components](/docs/nesting#passing-props-to-children)
-* [Accessing route parameters](/docs/components#accessing-route-parameters)
+- Initializing properties  
+- Receiving data from parent components and templates  
+- Accessing route parameters  
+
+---
 
 ## Boot
 
-As helpful as `mount()` is, it only runs once per component lifecycle, and you may want to run logic at the beginning of every single request to the server for a given component.
+While `mount()` is helpful, it only runs **once** when the component is first created. However, sometimes you may need to run logic at the beginning of every single request to the server for a given component
 
-For these cases, Liveblade provides a `boot()` method where you can write component setup code that you intend to run every single time the component class is booted: both on initialization and on subsequent requests.
+For this purpose, Liveblade provides the `boot()` method where you can write component setup code that you intend to run every single time the component class is booted: both on initialization and on subsequent requests.
 
-The `boot()` method can be useful for things like initializing protected properties, which are not persisted between requests. Below is an example of initializing a protected property as an Eloquent model:
+The `boot()` method can be useful for things like initializing private properties, which are not persisted between requests. Below is an example of initializing a private property as a Post model:
 
-```php
-use Liveblade\Attributes\Locked;
-use Liveblade\Component;
-use App\Models\Post;
+```python
+from pyblade import liveblade
+from app.models import Post
 
-class ShowPost extends Component
-{
-    #[Locked]
-    public $postId = 1;
+class ShowPost(liveblade.Component):
+    _post_id = 1  # Private property that users cannot access or change
 
-    protected Post $post;
-
-    public function boot() // [tl! highlight:3]
-    {
-        $this->post = Post::find($this->postId);
-    }
-
-    // ...
-}
+    def boot(self):
+        self._post = Post.objects.get(id=self._post_id)
 ```
 
-You can use this technique to have complete control over initializing a component property in your Liveblade component.
+This approach allows you to have full control over initializing a property in a Liveblade component.
 
-> [!tip] Most of the time, you can use a computed property instead
-> The technique used above is powerful; however, it's often better to use [Liveblade's computed properties](/docs/computed-properties) to solve this use case.
+>[!note] Note 
+> In many cases, using a **computed property** may be a better alternative.
 
-> [!warning] Always lock sensitive public properties
-> As you can see above, we are using the `#[Locked]` attribute on the `$postId` property. In a scenario like the above, where you want to ensure the `$postId` property isn't tampered with by users on the client-side, it's important to authorize the property's value before using it or add `#[Locked]` to the property ensure it is never changed.
->
-> For more information, check out the [documentation on Locked properties](/docs/locked).
+>[!warning] Warning 
+> Always use private properties for sensitive data.
+> Since `_post_id` is used to fetch a post, it should not be modified by users. In Liveblade, public properties should be carefully validated before use.
 
 
 ## Update
 
-Client-side users can update public properties in many different ways, most commonly by modifying an input with `wire:model` on it.
+Client-side users can update public properties in many different ways, most commonly by modifying an input with `b-model` on it.
 
-Liveblade provides convenient hooks to intercept the updating of a public property so that you can validate or authorize a value before it's set, or ensure a property is set in a given format.
+Liveblade provides convenient hooks to intercept the updating of a property so that you can validate or authorize a value before it's set or ensure a property is set in a given format.
 
-Below is an example of using `updating` to prevent the modification of the `$postId` property.
+### The `updating()` method
 
-It's worth noting that for this particular example, in an actual application, you should use the [`#[Locked]` attribute](/docs/locked) instead, like in the above example.
+Below is an example of using `updating()` to prevent the modification of the `post_id` property.
 
-```php
-use Exception;
-use Liveblade\Component;
+It's worth noting that for this particular example, in an actual application, you should use a **private attributes** instead, as demonstrated in the previous sections.
 
-class ShowPost extends Component
-{
-    public $postId = 1;
 
-    public function updating($property, $value)
-    {
-        // $property: The name of the current property being updated
-        // $value: The value about to be set to the property
+```python
+from pyblade import liveblade
 
-        if ($property === 'postId') {
-            throw new Exception;
-        }
-    }
-
-    // ...
-}
+class PostDetail(liveblade.Component):
+    post_id = 1
+    
+    def updating(self, property: str, value):
+        """
+        property: The name of the current property being updated
+        value: The value about to be set to the property
+        """
+       
+        if property == "post_id":
+            raise ValueError("Modifying post_id is not allowed.")
 ```
 
-The above `updating()` method runs before the property is updated, allowing you to catch invalid input and prevent the property from updating. Below is an example of using `updated()` to ensure a property's value stays consistent:
+The `updating()` method runs **before** the property is updated, allowing you to catch invalid input and prevent changes. 
 
-```php
-use Liveblade\Component;
+### The `updated()` method
 
-class CreateUser extends Component
-{
-    public $username = '';
+Below is an example of using `updated()` to ensure a property's value stays consistent:
 
-    public $email = '';
 
-    public function updated($property)
-    {
-        // $property: The name of the current property that was updated
+```python
+from pyblade import Component
 
-        if ($property === 'username') {
-            $this->username = strtolower($this->username);
-        }
-    }
-
-    // ...
-}
+class CreateUser(Component):
+    username = ""
+    email = ""
+    
+    def updated(self, property: str):
+        """
+        property: The name of the current property that was updated
+        """
+        
+        if property == "username":
+            self.username = self.username.lower()
 ```
 
-Now, anytime the `$username` property is updated client-side, we will ensure that the value will always be lowercase.
+Now, anytime the `username` property is updated client-side, Liveblade will ensure that the value remains lowercase.
+
+### Direct Property Hook Naming
 
 Because you are often targeting a specific property when using update hooks, Liveblade allows you to specify the property name directly as part of the method name. Here's the same example from above but rewritten utilizing this technique:
 
-```php
-use Liveblade\Component;
+```python
+from pyblade import Component
 
-class CreateUser extends Component
-{
-    public $username = '';
-
-    public $email = '';
-
-    public function updatedUsername()
-    {
-        $this->username = strtolower($this->username);
-    }
-
-    // ...
-}
+class CreateUser(Component):
+    username = ""
+    email = ""
+    
+    def updated_username(self):
+        self.username = self.username.lower()
 ```
 
 Of course, you can also apply this technique to the `updating` hook.
 
-### Arrays
 
-Array properties have an additional `$key` argument passed to these functions to specify the changing element.
+## Serialize & Deserialize
 
-Note that when the array itself is updated instead of a specific key, the `$key` argument is null.
+Serialize and deserialize are lesser-known and lesser-utilized hooks. However, there are specific scenarios where they can be powerful.
 
-```php
-use Liveblade\Component;
+The terms "serialize" and "deserialize" refer to a Liveblade component being converted to JSON for the client-side and then converted back into a Python object on the subsequent request.
 
-class UpdatePreferences extends Component
-{
-    public $preferences = [];
+We often use the terms "serialize" and "deserialize" to refer to this process throughout Liveblade's codebase and documentation. 
+<!-- If you'd like more clarity on these terms, you can learn more by [consulting our serialization documentation](#). -->
 
-    public function updatedPreferences($value, $key)
-    {
-        // $value = 'dark'
-        // $key   = 'theme'
-    }
+Let's look at an example that uses both `mount()`, `serialize()`, and `deserialize()` all together to support using a custom [data transfer object (DTO)](https://en.wikipedia.org/wiki/Data_transfer_object) instead of a Django model to store the Post data in the component:
 
-    // ...
-}
+```python
+from pyblade import liveblade
+
+class ShowPost(liveblade.Component):
+    post = None
+    
+    def mount(self, title, content):
+        # Runs at the beginning of the first initial request...
+        
+        self.post = PostDto({
+            'title': title,
+            'content': content,
+        })
+    
+    def serialize(self):
+        # Runs at the beginning of every "subsequent" request...
+        # This doesn't run on the initial request ("mount" does)...
+        
+        self.post = PostDto(self.post)
+      
+    
+    def deserialize(self):
+        # Runs at the end of every single request...
+        self.post = self.post.to_dict()
+        
 ```
 
-## Hydrate & Dehydrate
+Now, from actions and other places inside your component, you can access the `PostDto` object instead of primitive data.
 
-Hydrate and dehydrate are lesser-known and lesser-utilized hooks. However, there are specific scenarios where they can be powerful.
-
-The terms "dehydrate" and "hydrate" refer to a Liveblade component being serialized to JSON for the client-side and then unserialized back into a Python object on the subsequent request.
-
-We often use the terms "hydrate" and "dehydrate" to refer to this process throughout Liveblade's codebase and the documentation. If you'd like more clarity on these terms, you can learn more by [consulting our hydration documentation](/docs/hydration).
-
-Let's look at an example that uses both `mount()` , `hydrate()`, and `dehydrate()` all together to support using a custom [data transfer object (DTO)](https://en.wikipedia.org/wiki/Data_transfer_object) instead of an Eloquent model to store the post data in the component:
-
-```php
-use Liveblade\Component;
-
-class ShowPost extends Component
-{
-    public $post;
-
-    public function mount($title, $content)
-    {
-        // Runs at the beginning of the first initial request...
-
-        $this->post = new PostDto([
-            'title' => $title,
-            'content' => $content,
-        ]);
-    }
-
-    public function hydrate()
-    {
-        // Runs at the beginning of every "subsequent" request...
-        // This doesn't run on the initial request ("mount" does)...
-
-        $this->post = new PostDto($this->post);
-    }
-
-    public function dehydrate()
-    {
-        // Runs at the end of every single request...
-
-        $this->post = $this->post->toArray();
-    }
-
-    // ...
-}
-```
-
-Now, from actions and other places inside your component, you can access the `PostDto` object instead of the primitive data.
-
-The above example mainly demonstrates the abilities and nature of the `hydrate()` and `dehydrate()` hooks. However, it is recommended that you use [Wireables or Synthesizers](/docs/properties#supporting-custom-types) to accomplish this instead.
+The above example mainly demonstrates the abilities and nature of the `serialize()` and `deserialize()` hooks. 
 
 ## Render
 
-If you want to hook into the process of rendering a component's PyBlade Template, you can do so using the `rendering()` and `rendered()` hooks:
+If you want to hook into the process of rendering a component's Pyblade template, you can use the `rendering()` and `rendered()` hooks:
 
-```php
-use Liveblade\Component;
-use App\Models\Post;
+```python
+from pyblade import livablade
+from app.models import Post
 
-class ShowPosts extends Component
-{
-    public function render()
-    {
-        return view('livewire.show-posts', [
-            'post' => Post::all(),
-        ])
-    }
-
-    public function rendering($view, $data)
-    {
-        // Runs BEFORE the provided view is rendered...
-        //
-        // $view: The view about to be rendered
-        // $data: The data provided to the view
-    }
-
-    public function rendered($view, $html)
-    {
-        // Runs AFTER the provided view is rendered...
-        //
-        // $view: The rendered view
-        // $html: The final, rendered HTML
-    }
-
-    // ...
-}
+class ShowPosts(livablade.Component):
+    def render(self):
+        return self.view("show-posts", {
+            "posts": Post.objects.all()
+        })
+    
+    def rendering(self, template, context):
+        # Runs BEFORE the provided template is rendered...
+        #
+        # template: The name of the template about to be rendered
+        # context: The data provided to the view
+        pass
+    
+    def rendered(self, template, html):
+        # Runs AFTER the provided template is rendered...
+        #
+        # template: The name of the rendered template
+        # html: The final, rendered HTML
+        pass
 ```
+
+These hooks allow you to modify data before rendering and process the final output after rendering if needed.
 
 ## Exception
 
-Sometimes it can be helpful to intercept and catch errors, eg: to customize the error message or ignore specific type of exceptions. The `exception()` hook allows you to do just that: you can perform check on the `$error`, and use the `$stopPropagation` parameter to catch the issue.
-This also unlocks powerful patterns when you want to stop further execution of code (return early), this is how internal methods like `validate()` works.
+Sometimes, it can be helpful to intercept and catch errors, such as customizing error messages or ignoring specific types of exceptions. The `exception()` hook allows you to do just that. You can check the error type and use the `stop_propagation()` method to prevent further execution.
 
-```php
-use Liveblade\Component;
+```python
+from pyblade import liveblade
+from app.models import Post
 
-class ShowPost extends Component
-{
-    public function mount() // [tl! highlight:3]
-    {
-        $this->post = Post::find($this->postId);
-    }
+class ShowPost(liveblade.Component):
 
-    public function exception($e, $stopPropagation) {
-        if ($e instanceof NotFoundException) {
-            $this->notify('Post is not found');
-            $stopPropagation();
-        }
-    }
-
-    // ...
-}
+    def mount(self):
+        self.post = Post.objects.get(id=1)
+    
+    def exception(self, exc, stop_propagation):
+        if isinstance(exc, Post.DoesNotExist):
+            self.notify("Post not found")
+            stop_propagation()
 ```
+This hook enables better error handling and control over exceptions in Liveblade components.

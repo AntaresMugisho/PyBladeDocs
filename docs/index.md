@@ -4,7 +4,7 @@ layout: home
 hero:
   name: "PyBlade"
   text: "The lightweight and secure template engine for Python web frameworks !"
-  tagline: "Modern, Elegant and Efficient."
+  tagline: "Modern and Elegant"
   image:
     src: assets/images/pyblade.png
     alt: PyBlade Logo

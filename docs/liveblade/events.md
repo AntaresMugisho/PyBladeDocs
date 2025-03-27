@@ -1,4 +1,4 @@
-<!-- From properties -->
+<!-- From properties
 <!-- From actions -->
 
 # Events
@@ -590,4 +590,4 @@ class OrderTracker extends Component
         $this->showNewOrderNotification = true;
     }
 }
-```
+``` -->
