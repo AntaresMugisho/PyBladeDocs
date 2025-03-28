@@ -35,10 +35,10 @@ class UpdateProfile(liveblade.Component):
 The `mount()` method can also receive parameters when the component is initialized:
 
 ```python
-from pyblade import Component
+from pyblade import liveblade
 from app.models import Post
 
-class UpdatePost(Component):
+class PostUpdate(liveblade.Component):
 
     def mount(self, post: Post):
         self.title = post.title
@@ -52,8 +52,6 @@ The `mount()` method plays a crucial role in initializing Liveblade components. 
 - Receiving data from parent components and templates  
 - Accessing route parameters  
 
----
-
 ## Boot
 
 While `mount()` is helpful, it only runs **once** when the component is first created. However, sometimes you may need to run logic at the beginning of every single request to the server for a given component
@@ -66,7 +64,7 @@ The `boot()` method can be useful for things like initializing private propertie
 from pyblade import liveblade
 from app.models import Post
 
-class ShowPost(liveblade.Component):
+class PostDetail(liveblade.Component):
     _post_id = 1  # Private property that users cannot access or change
 
     def boot(self):
@@ -120,9 +118,9 @@ Below is an example of using `updated()` to ensure a property's value stays cons
 
 
 ```python
-from pyblade import Component
+from pyblade import liveblade
 
-class CreateUser(Component):
+class UserCreate(liveblade.Component):
     username = ""
     email = ""
     
@@ -142,9 +140,9 @@ Now, anytime the `username` property is updated client-side, Liveblade will ensu
 Because you are often targeting a specific property when using update hooks, Liveblade allows you to specify the property name directly as part of the method name. Here's the same example from above but rewritten utilizing this technique:
 
 ```python
-from pyblade import Component
+from pyblade import liveblade
 
-class CreateUser(Component):
+class UserCreate(liveblade.Component):
     username = ""
     email = ""
     
@@ -169,7 +167,7 @@ Let's look at an example that uses both `mount()`, `serialize()`, and `deseriali
 ```python
 from pyblade import liveblade
 
-class ShowPost(liveblade.Component):
+class PostDetail(liveblade.Component):
     post = None
     
     def mount(self, title, content):
@@ -205,7 +203,7 @@ If you want to hook into the process of rendering a component's Pyblade template
 from pyblade import livablade
 from app.models import Post
 
-class ShowPosts(livablade.Component):
+class PostList(livablade.Component):
     def render(self):
         return self.view("show-posts", {
             "posts": Post.objects.all()
@@ -236,7 +234,7 @@ Sometimes, it can be helpful to intercept and catch errors, such as customizing 
 from pyblade import liveblade
 from app.models import Post
 
-class ShowPost(liveblade.Component):
+class PostDetail(liveblade.Component):
 
     def mount(self):
         self.post = Post.objects.get(id=1)
