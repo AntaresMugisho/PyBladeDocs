@@ -52,6 +52,7 @@ export default defineConfig({
           {text: "Validation", link:"/liveblade/features/validation"},
           {text: "Pagination", link:"/liveblade/features/pagination"},
           {text: "File Uploads", link:"/liveblade/features/file-uploads"},
+          // ---
           {text: "Security", link:"/liveblade/security"},
         ]
       },
