@@ -44,7 +44,7 @@ export default defineConfig({
           {text: "Actions", link:"/liveblade/actions"},
           {text: "Lifecycle Hooks", link:"/liveblade/lifecycle-hooks"},
           {text: "Events", link:"/liveblade/events"},
-          {text: "HTML Directives", link:"/liveblade/html-directives"},
+          {text: "Liveblade Directives", link:"/liveblade/liveblade-directives"},
           {text: "Forms", link:"/liveblade/forms"},
           // {text: "FEATURES"},
           {text: "Navigation", link:"/liveblade/features/navigation"},

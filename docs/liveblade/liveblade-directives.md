@@ -1,4 +1,4 @@
-# HTML Directives
+# Liveblade directives
 
 
 ## b-click
@@ -473,21 +473,21 @@ In situations where the same action is triggered with different parameters from 
 
 ```html
 <div>
-    @foreach (posts as post)
-        <div b-key="{{ post->id }}">
-            <h2>{{ post->title }}</h2>
+    @for(post in posts)
+        <div b-key="{{ post.id }}">
+            <h2>{{ post.title }}</h2>
 
-            <button b-click="remove({{ post->id }})">Remove</button>
+            <button b-click="remove({{ post.id }})">Remove</button>
 
-            <div b-loading b-target="remove({{ post->id }})">  <!-- [tl! highlight:2] -->
+            <div b-loading b-target="remove({{ post.id }})">  <!-- [! highlight:2] -->
                 Removing post...
             </div>
         </div>
-    @endforeach
+    @endfor
 </div>
 ```
 
-Without passing `{{ post->id }}` to `b-target="remove"`, the "Removing post..." message would show when any of the buttons on the page are clicked.
+Without passing <span v-pre>`{{ post.id }}`</span> to `b-target="remove"`, the "Removing post..." message would show when any of the buttons on the page are clicked.
 
 However, because we are passing in unique parameters to each instance of `b-target`, Liveblade will only show the loading message when the matching parameters are passed to the "remove" action.
 
@@ -505,7 +505,7 @@ Consider the following example where a form input named `username` uses `b-model
     <input type="text" b-model.live="username">
     @error('username') <span>{{ message }}</span> @enderror
 
-    <div b-loading b-target="username"> <!-- [tl! highlight:2] -->
+    <div b-loading b-target="username"> <!-- [!code highlight:2] -->
         Checking availability of username...
     </div>
 
@@ -525,7 +525,7 @@ Sometimes you may wish to display a loading indicator for every Liveblade reques
 
 The above loading indicator will now be shown for every Liveblade update request on the component _except_ the "download" action.
 
-## Customizing CSS display property
+### Customizing CSS display property
 
 When `b-loading` is added to an element, Liveblade updates the CSS `display` property of the element to show and hide the element. By default, Liveblade uses `none` to hide and `inline-block` to show.
 
@@ -546,7 +546,7 @@ Below is the complete list of available display values:
 <div b-loading.grid>...</div>
 ```
 
-## Delaying a loading indicator
+### Delaying a loading indicator
 
 On fast connections, updates often happen so quickly that loading indicators only flash briefly on the screen before being removed. In these cases, the indicator is more of a distraction than a helpful affordance.
 
@@ -569,228 +569,38 @@ To customize the amount of time to delay the loading indicator, you can use one 
 <div b-loading.delay.longer>...</div>   <!-- 500ms -->
 <div b-loading.delay.longest>...</div>  <!-- 1000ms -->
 ```
-
 
 ## b-navigate
 
-Loading indicators are an important part of crafting good user interfaces. They give users visual feedback when a request is being made to the server, so they know they are waiting for a process to complete.
+Liveblade's `b-navigate` feature makes page navigation much faster, providing an SPA-like experience for your users.
 
-## Basic usage
+This page is a simple reference for the `b-navigate` directive. Be sure to read the page on Liveblade's [Navigate](#) feature for more complete documentation.
 
-Liveblade provides a simple yet extremely powerful syntax for controlling loading indicators: `b-loading`. Adding `b-loading` to any element will hide it by default (using `display: none` in CSS) and show it when a request is sent to the server.
-
-Below is a basic example of a `CreatePost` component's form with `b-loading` being used to toggle a loading message:
+Below is a simple example of adding `b-navigate` to links in a nav bar:
 
 ```html
-<form b-submit="save">
-    <!-- ... -->
-
-    <button type="submit">Save</button>
-
-    <div b-loading> <!-- [tl! highlight:2] -->
-        Saving post...
-    </div>
-</form>
+<nav>
+    <a href="/" b-navigate>Dashboard</a>
+    <a href="/posts" b-navigate>Posts</a>
+    <a href="/users" b-navigate>Users</a>
+</nav>
 ```
 
-When a user presses "Save", the "Saving post..." message will appear below the button while the "save" action is being executed. The message will disappear when the response is received from the server and processed by Liveblade.
+When any of these links are clicked, Liveblade will intercept the click and, instead of allowing the browser to perform a full page visit, Liveblade will fetch the page in the background and swap it with the current page (resulting in much faster and smoother page navigation).
 
-### Removing elements
+### Prefetching pages on hover
 
-Alternatively, you can append `.remove` for the inverse effect, showing an element by default and hiding it during requests to the server:
+By adding the `.hover` modifier, Liveblade will pre-fetch a page when a user hovers over a link. This way, the page will have already been downloaded from the server when the user clicks on the link.
 
 ```html
-<div b-loading.remove>...</div>
+<a href="/" b-navigate.hover>Dashboard</a>
 ```
 
-## Toggling classes
+### Going deeper
 
-In addition to toggling the visibility of entire elements, it's often useful to change the styling of an existing element by toggling CSS classes on and off during requests to the server. This technique can be used for things like changing background colors, lowering opacity, triggering spinning animations, and more.
+For more complete documentation on this feature, visit [Liveblade's navigate](#) documentation page.
 
-Below is a simple example of using the [Tailwind](https://tailwindcss.com/) class `opacity-50` to make the "Save" button fainter while the form is being submitted:
-
-```html
-<button b-loading.class="opacity-50">Save</button>
-```
-
-Like toggling an element, you can perform the inverse class operation by appending `.remove` to the `b-loading` directive. In the example below, the button's `bg-blue-500` class will be removed when the "Save" button is pressed:
-
-```html
-<button class="bg-blue-500" b-loading.class.remove="bg-blue-500">
-    Save
-</button>
-```
-
-## Toggling attributes
-
-By default, when a form is submitted, Liveblade will automatically disable the submit button and add the `readonly` attribute to each input element while the form is being processed.
-
-However, in addition to this default behavior, Liveblade offers the `.attr` modifier to allow you to toggle other attributes on an element or toggle attributes on elements that are outside of forms:
-
-```html
-<button
-    type="button"
-    b-click="remove"
-    b-loading.attr="disabled"
->
-    Remove
-</button>
-```
-
-Because the button above isn't a submit button, it won't be disabled by Liveblade's default form handling behavior when pressed. Instead, we manually added `b-loading.attr="disabled"` to achieve this behavior.
-
-## Targeting specific actions
-
-By default, `b-loading` will be triggered whenever a component makes a request to the server.
-
-However, in components with multiple elements that can trigger server requests, you should scope your loading indicators down to individual actions.
-
-For example, consider the following "Save post" form. In addition to a "Save" button that submits the form, there might also be a "Remove" button that executes a "remove" action on the component.
-
-By adding `b-target` to the following `b-loading` element, you can instruct Liveblade to only show the loading message when the "Remove" button is clicked:
-
-```html
-<form b-submit="save">
-    <!-- ... -->
-
-    <button type="submit">Save</button>
-
-    <button type="button" b-click="remove">Remove</button>
-
-    <div b-loading b-target="remove">  <!-- [tl! highlight:2] -->
-        Removing post...
-    </div>
-</form>
-```
-
-When the above "Remove" button is pressed, the "Removing post..." message will be displayed to the user. However, the message will not be displayed when the "Save" button is pressed.
-
-### Targeting multiple actions
-
-You may find yourself in a situation where you would like `b-loading` to react to some, but not all, actions on a page. In these cases you can pass multiple actions into `b-target` separated by a comma. For example:
-
-```html
-<form b-submit="save">
-    <input type="text" b-model.blur="title">
-
-    <!-- ... -->
-
-    <button type="submit">Save</button>
-
-    <button type="button" b-click="remove">Remove</button>
-
-    <div b-loading b-target="save, remove">  <!-- [!code highlight:2] -->
-        Updating post...
-    </div>
-</form>
-```
-
-The loading indicator ("Updating post...") will now only be shown when the "Remove" or "Save" button are pressed, and not when the `title` field is being sent to the server.
-
-### Targeting action parameters
-
-In situations where the same action is triggered with different parameters from multiple places on a page, you can further scope `b-target` to a specific action by passing in additional parameters. For example, consider the following scenario where a "Remove" button exists for each post on the page:
-
-```html
-<div>
-    @foreach (posts as post)
-        <div b-key="{{ post->id }}">
-            <h2>{{ post->title }}</h2>
-
-            <button b-click="remove({{ post->id }})">Remove</button>
-
-            <div b-loading b-target="remove({{ post->id }})">  <!-- [tl! highlight:2] -->
-                Removing post...
-            </div>
-        </div>
-    @endforeach
-</div>
-```
-
-Without passing `{{ post->id }}` to `b-target="remove"`, the "Removing post..." message would show when any of the buttons on the page are clicked.
-
-However, because we are passing in unique parameters to each instance of `b-target`, Liveblade will only show the loading message when the matching parameters are passed to the "remove" action.
-
-> [!warning] Multiple action parameters aren't supported
-> At this time, Liveblade only supports targeting a loading indicator by a single method/parameter pair. For example `b-target="remove(1)"` is supported, however `b-target="remove(1), add(1)"` is not.
-
-### Targeting property updates
-
-Liveblade also allows you to target specific component property updates by passing the property's name to the `b-target` directive.
-
-Consider the following example where a form input named `username` uses `b-model.live` for real-time validation as a user types:
-
-```html
-<form b-submit="save">
-    <input type="text" b-model.live="username">
-    @error('username') <span>{{ message }}</span> @enderror
-
-    <div b-loading b-target="username"> <!-- [tl! highlight:2] -->
-        Checking availability of username...
-    </div>
-
-    <!-- ... -->
-</form>
-```
-
-The "Checking availability..." message will show when the server is updated with the new username as the user types into the input field.
-
-### Excluding specific loading targets
-
-Sometimes you may wish to display a loading indicator for every Liveblade request _except_ a specific property or action. In these cases you can use the `b-target.except` modifier like so:
-
-```html
-<div b-loading b-target.except="download">...</div>
-```
-
-The above loading indicator will now be shown for every Liveblade update request on the component _except_ the "download" action.
-
-## Customizing CSS display property
-
-When `b-loading` is added to an element, Liveblade updates the CSS `display` property of the element to show and hide the element. By default, Liveblade uses `none` to hide and `inline-block` to show.
-
-If you are toggling an element that uses a display value other than `inline-block`, like `flex` in the following example, you can append `.flex` to `b-loading`:
-
-```html
-<div class="flex" b-loading.flex>...</div>
-```
-
-Below is the complete list of available display values:
-
-```html
-<div b-loading.inline-flex>...</div>
-<div b-loading.inline>...</div>
-<div b-loading.block>...</div>
-<div b-loading.table>...</div>
-<div b-loading.flex>...</div>
-<div b-loading.grid>...</div>
-```
-
-## Delaying a loading indicator
-
-On fast connections, updates often happen so quickly that loading indicators only flash briefly on the screen before being removed. In these cases, the indicator is more of a distraction than a helpful affordance.
-
-For this reason, Liveblade provides a `.delay` modifier to delay the showing of an indicator. For example, if you add `b-loading.delay` to an element like so:
-
-```html
-<div b-loading.delay>...</div>
-```
-
-The above element will only appear if the request takes over 200 milliseconds. The user will never see the indicator if the request completes before then.
-
-To customize the amount of time to delay the loading indicator, you can use one of Liveblade's helpful interval aliases:
-
-```html
-<div b-loading.delay.shortest>...</div> <!-- 50ms -->
-<div b-loading.delay.shorter>...</div>  <!-- 100ms -->
-<div b-loading.delay.short>...</div>    <!-- 150ms -->
-<div b-loading.delay>...</div>          <!-- 200ms -->
-<div b-loading.delay.long>...</div>     <!-- 300ms -->
-<div b-loading.delay.longer>...</div>   <!-- 500ms -->
-<div b-loading.delay.longest>...</div>  <!-- 1000ms -->
-```
-
-# b-current
+## b-current
 
 The `b-current` directive allows you to easily detect and style currently active links on a page.
 
@@ -808,46 +618,19 @@ Now when a user visits `/posts`, the "Posts" link will have a stronger font trea
 
 You should note that `b-current` works out of the box with `b-navigate` links and page changes.
 
-## Exact matching
 
-By default, `b-current` uses a partial matching strategy, meaning it will be applied if the link and current page share the beginning portion of the Url's path.
-
-For example, if the link is `/posts`, and the current page is `/posts/1`, the `b-current` directive will be applied.
-
-If you wish to use exact matching, you can add the `.exact` modifier to the directive.
-
-Here's an example where you might want to use exact matching to prevent the "Dashboard" link from being highlighted when the user visits `/posts`:
-
-```html
-<nav>
-    <a href="/" b-current.exact="font-bold">Dashboard</a>
-</nav>
-```
-
-## Strict matching
-
-By default, `b-current` will remove trailing slashes (`/`) from its comparison.
-
-If you'd like to disable this behavior and force a stract path string comparison, you can append the `.strict` modifier:
-
-```html
-<nav>
-    <a href="/posts/" b-current.strict="font-bold">Dashboard</a>
-</nav>
-```
-
-## Troubleshooting
+### Troubleshooting
 
 If `b-current` is not detecting the current link correctly, ensure the following:
 
-* You have at least one Liveblade component on the page, or have hardcoded `@LivebladeScripts` in your layout
+* You have at least one Liveblade component on the page, or have hardcoded `@liveblade_scripts` in your layout
 * You have a `href` attribute on the link.
 
-# b-cloak
+## b-cloak
 
 `b-cloak` is a directive that hides elements on page load until Liveblade is fully initialized. This is useful for preventing the "flash of unstyled content" that can occur when the page loads before Liveblade has a chance to initialize.
 
-## Basic usage
+### Basic usage
 
 To use `b-cloak`, add the directive to any element you want to hide during page load:
 
@@ -875,9 +658,7 @@ To use `b-cloak`, add the directive to any element you want to hide during page 
 
 In the above example, without `b-cloak`, both icons would be shown before Liveblade initializes. However, with `b-cloak`, both elements will be hidden until initialization.
 
-
-
-# b-dirty
+## b-dirty
 
 In a traditional HTML page containing a form, the form is only ever submitted when the user presses the "Submit" button.
 
@@ -887,7 +668,7 @@ In these "real-time" update scenarios, it can be helpful to signal to your users
 
 When a form contains un-saved input, that form is considered "dirty". It only becomes "clean" when a network request has been triggered to synchronize the server state with the client-side state.
 
-## Basic usage
+### Basic usage
 
 Liveblade allows you to easily toggle visual elements on the page using the `b-dirty` directive.
 
@@ -903,7 +684,7 @@ To demonstrate, here is an example of an `UpdatePost` form containing a visual "
 
     <button type="submit">Update</button>
 
-    <div b-dirty>Unsaved changes...</div> <!-- [tl! highlight] -->
+    <div b-dirty>Unsaved changes...</div> <!-- [!code highlight] -->
 </form>
 ```
 
@@ -919,7 +700,7 @@ By adding the `.remove` modifier to `b-dirty`, you can instead show an element b
 <div b-dirty.remove>The data is in-sync...</div>
 ```
 
-## Targeting property updates
+### Targeting property updates
 
 Imagine you are using `b-model.blur` to update a property on the server immediately after a user leaves an input field. In this scenario, you can provide a "dirty" indication for only that property by adding `b-target` to the element that contains the `b-dirty` directive.
 
@@ -929,13 +710,13 @@ Here is an example of only showing a dirty indication when the title property ha
 <form b-submit="update">
     <input b-model.blur="title">
 
-    <div b-dirty b-target="title">Unsaved title...</div> <!-- [tl! highlight] -->
+    <div b-dirty b-target="title">Unsaved title...</div> <!-- [!code highlight] -->
 
     <button type="submit">Update</button>
 </form>
 ```
 
-## Toggling classes
+### Toggling classes
 
 Often, instead of toggling entire elements, you may want to toggle individual CSS classes on an input when its state is "dirty".
 
@@ -946,7 +727,7 @@ Below is an example where a user types into an input field and the border become
 ```
 
 
-### b-confirm
+## b-confirm
 
 Before performing dangerous actions in Liveblade, you may want to provide your users with some sort of visual confirmation.
 
@@ -960,13 +741,13 @@ Here's an example of adding a confirmation dialog to a "Delete post" button:
     b-click="delete"
     b-confirm="Are you sure you want to delete this post?"
 >
-    Delete post <!-- [tl! highlight:-2,1] -->
+    Delete post <!-- [!code highlight:-2,1] -->
 </button>
 ```
 
 When a user clicks "Delete post", Liveblade will trigger a confirmation dialog (The default browser confirmation alert). If the user hits escape or presses cancel, the action won't be performed. If they press "OK", the action will be completed.
 
-## Prompting users for input
+### Prompting users for input
 
 For even more dangerous actions such as deleting a user's account entirely, you may want to present them with a confirmation prompt which they would need to type in a specific string of characters to confirm the action.
 
@@ -978,16 +759,16 @@ Liveblade provides a helpful `.prompt` modifier, that when applied to `b-confirm
     b-click="delete"
     b-confirm.prompt="Are you sure?\n\nType DELETE to confirm|DELETE"
 >
-    Delete account <!-- [tl! highlight:-2,1] -->
+    Delete account <!-- [!code highlight:-2,1] -->
 </button>
 ```
 
 When a user presses "Delete account", the action will only be performed if "DELETE" is entered into the prompt, otherwise, the action will be cancelled.
 
 
-### b-transition
+## b-transition
 
-## Basic usage
+### Basic usage
 
 Showing or hiding content in Liveblade is as simple as using one of Blade's conditional directives like `@if`. To enhance this experience for your users, Liveblade provides a `b-transition` directive that allows you to transition conditional elements smoothly in and out of the page.
 
@@ -1011,8 +792,8 @@ class ShowPost extends Component
     <button b-click="set('showComments', true)">Show comments</button>
 
     @if (showComments)
-        <div b-transition> <!-- [tl! highlight] -->
-            @foreach (post->comments as comment)
+        <div b-transition> <!-- [!code highlight] -->
+            @foreach (post.comments as comment)
                 <!-- ... -->
             @endforeach
         </div>
@@ -1021,25 +802,26 @@ class ShowPost extends Component
 ```
 Because `b-transition` has been added to the `<div>` containing the post's comments, when the "Show comments" button is pressed, `showComments` will be set to `true` and the comments will "fade" onto the page instead of abruptly appearing.
 
-## Limitations
+### Limitations
 
 Currently, `b-transition` is only supported on a single element inside a Blade conditional like `@if`. It will not work as expected when used in a list of sibling elements. For example, the following will NOT work properly:
 
 ```html
 <!-- Warning: The following is code that will not work properly -->
 <ul>
-    @foreach (post->comments as comment)
-        <li b-transition b-key="{{ comment->id }}">{{ comment->content }}</li>
-    @endforeach
+    @for (commnet in comments)
+        <li b-transition b-key="{{ comment.id }}">{{ comment.content }}</li>
+    @endfor
 </ul>
 ```
 
 If one of the above comment `<li>` elements were to get removed, you would expect Liveblade to transition it out. However, because of hurdles with Liveblade's underlying "morph" mechanism, this will not be the case. There is currently no way to transition dynamic lists in Liveblade using `b-transition`.
 
-## Default transition style
+### Default transition style
 
 By default, Liveblade applies both an opacity and a scale CSS transition to elements with `b-transition`. Here's a visual preview:
 
+```html
 <div x-data="{ show: false }" x-cloak class="border border-gray-700 rounded-xl p-6 w-full flex justify-between">
     <a href="#" x-on:click.prevent="show = ! show" class="py-2.5 outline-none">
         Preview transition <span x-text="show ? 'out' : 'in →'">in</span>
@@ -1058,6 +840,7 @@ By default, Liveblade applies both an opacity and a scale CSS transition to elem
         </div>
     </div>
 </div>
+```
 
 The above transition uses the following values for transitioning by default:
 
@@ -1067,7 +850,7 @@ Transition in | Transition out
 `opacity: [0 - 100]` | `opacity: [100 - 0]`
 `transform: scale([0.95 - 1])` | `transform: scale([1 - 0.95])`
 
-## Customizing transitions
+### Customizing transitions
 
 To customize the CSS Liveblade internally uses when transitioning, you can use any combination of the available modifiers:
 
@@ -1093,6 +876,7 @@ By default, Liveblade both fades and scales the element when transitioning. You 
 <div b-transition.opacity>
 ```
 
+```html
 <div x-data="{ show: false }" x-cloak class="border border-gray-700 rounded-xl p-6 w-full flex justify-between">
     <a href="#" x-on:click.prevent="show = ! show" class="py-2.5 outline-none">
         Preview transition <span x-text="show ? 'out' : 'in →'">in</span>
@@ -1111,6 +895,7 @@ By default, Liveblade both fades and scales the element when transitioning. You 
         </div>
     </div>
 </div>
+```
 
 **Fade-out transition**
 
@@ -1119,7 +904,7 @@ A common transition technique is to show an element immediately when transitioni
 ```html
 <div b-transition.out.opacity.duration.200ms>
 ```
-
+```html
 <div x-data="{ show: false }" x-cloak class="border border-gray-700 rounded-xl p-6 w-full flex justify-between">
     <a href="#" x-on:click.prevent="show = ! show" class="py-2.5 outline-none">
         Preview transition <span x-text="show ? 'out' : 'in →'">in</span>
@@ -1138,6 +923,7 @@ A common transition technique is to show an element immediately when transitioni
         </div>
     </div>
 </div>
+```
 
 **Origin-top transition**
 
@@ -1147,6 +933,7 @@ When using Liveblade to transition an element such as a dropdown menu, it makes 
 <div b-transition.scale.origin.top>
 ```
 
+```html
 <div x-data="{ show: false }" x-cloak class="border border-gray-700 rounded-xl p-6 w-full flex justify-between">
     <a href="#" x-on:click.prevent="show = ! show" class="py-2.5 outline-none">
         Preview transition <span x-text="show ? 'out' : 'in →'">in</span>
@@ -1165,12 +952,13 @@ When using Liveblade to transition an element such as a dropdown menu, it makes 
         </div>
     </div>
 </div>
+```
 
 > [!tip] Liveblade uses Alpine transitions behind the scenes
 > When using `b-transition` on an element, Liveblade is internally applying Alpine's `x-transition` directive. Therefore you can use most if not all syntaxes you would normally use with `x-transition`. Check out [Alpine's transition documentation](https://alpinejs.dev/directives/transition) for all its capabilities.
 
 
-# b-init
+## b-init
 
 Liveblade offers a `b-init` directive to run an action as soon as the component is rendered. This can be helpful in cases where you don't want to hold up the entire page load, but want to load some data immediately after the page load.
 
@@ -1185,10 +973,10 @@ The `loadPosts` action will be run immediately after the Liveblade component ren
 In most cases however, [Liveblade's lazy loading feature](/docs/lazy) is preferable to using `b-init`.
 
 
-### b-poll
+## b-poll
 Polling is a technique used in web applications to "poll" the server (send requests on a regular interval) for updates. It's a simple way to keep a page up-to-date without the need for a more sophisticated technology like [WebSockets](/docs/events#real-time-events-using-laravel-echo).
 
-## Basic usage
+### Basic usage
 
 Using polling inside Liveblade is as simple as adding `b-poll` to an element.
 
@@ -1207,14 +995,14 @@ class SubscriberCount extends Component
     public function render()
     {
         return view('Liveblade.subscriber-count', [
-            'count' => Auth::user()->subscribers->count(),
+            'count' => Auth::user().subscribers.count(),
         ]);
     }
 }
 ```
 
 ```html
-<div b-poll> <!-- [tl! highlight] -->
+<div b-poll> <!-- [!code highlight] -->
     Subscribers: {{ count }}
 </div>
 ```
@@ -1231,7 +1019,7 @@ You can also specify an action to fire on the polling interval by passing a valu
 
 Now, the `refreshSubscribers()` method on the component will be called every `2.5` seconds.
 
-## Timing control
+### Timing control
 
 The primary drawback of polling is that it can be resource intensive. If you have a thousand visitors on a page that uses polling, one thousand network requests will be triggered every `2.5` seconds.
 
@@ -1245,7 +1033,7 @@ You can manually control how often the component will poll by appending the desi
 <div b-poll.15000ms> <!-- In milliseconds... -->
 ```
 
-## Background throttling
+### Background throttling
 
 To further cut down on server requests, Liveblade automatically throttles polling when a page is in the background. For example, if a user keeps a page open in a different browser tab, Liveblade will reduce the number of polling requests by 95% until the user revisits the tab.
 
@@ -1255,7 +1043,7 @@ If you want to opt-out of this behavior and keep polling continuously, even when
 <div b-poll.keep-alive>
 ```
 
-##  Viewport throttling
+###  Viewport throttling
 
 Another measure you can take to only poll when necessary, is to add the `.visible` modifier to `b-poll`. The `.visible` modifier instructs Liveblade to only poll the component when it is visible on the page:
 
@@ -1265,7 +1053,7 @@ Another measure you can take to only poll when necessary, is to add the `.visibl
 
 If a component using `b-visible` is at the bottom of a long page, it won't start polling until the user scrolls it into the viewport. When the user scrolls away, it will stop polling again.
 
-# b-offline
+## b-offline
 
 In certain circumstances it can be helpful for your users to know if they are currently connected to the internet.
 
@@ -1282,7 +1070,7 @@ For example:
 ```
 
 
-# b-ignore
+## b-ignore
 
 Liveblade's ability to make updates to the page is what makes it "live", however, there are times when you might want to prevent Liveblade from updating a portion of the page.
 
@@ -1315,7 +1103,7 @@ You can also instruct Liveblade to only ignore changes to attributes of the root
 ```
 
 
-# b-replace
+## b-replace
 
 Liveblade's DOM diffing is useful for updating existing elements on your page, but occasionally you may need to force some elements to render from scratch to reset internal state.
 
@@ -1347,13 +1135,13 @@ You can also instruct Liveblade to replace the target element as well as all chi
 ```
 
 
-# b-show
+## b-show
 
 Liveblade's `b-show` directive makes it easy to show and hide elements based on the result of an expression.
 
 The `b-show` directive is different than using `@if` in Blade in that it toggles an element's visibility using CSS (`display: none`) rather than removing the element from the DOM entirely. This means the element remains in the page but is hidden, allowing for smoother transitions without requiring a server round-trip.
 
-## Basic usage
+### Basic usage
 
 Here's a practical example of using `b-show` to toggle a "Create Post" modal:
 
@@ -1369,11 +1157,11 @@ class CreatePost extends Component
 
     public function save()
     {
-        Post::create(['content' => this->content]);
+        Post::create(['content' => this.content]);
 
-        this->reset('content');
+        this.reset('content');
 
-        this->showModal = false;
+        this.showModal = false;
     }
 }
 ```
@@ -1394,7 +1182,7 @@ class CreatePost extends Component
 
 When the "Create New Post" button is clicked, the modal appears without a server roundtrip. After successfully saving the post, the modal is hidden and the form is reset.
 
-## Using transitions
+### Using transitions
 
 You can combine `b-show` with Alpine.js transitions to create smooth show/hide animations. Since `b-show` only toggles the CSS `display` property, Alpine's `x-transition` directives work perfectly with it:
 
@@ -1413,10 +1201,10 @@ You can combine `b-show` with Alpine.js transitions to create smooth show/hide a
 
 The Alpine.js transition classes above will create a fade and scale effect when the modal shows and hides.
 
-[View the full x-transition documentation →](https://alpinejs.dev/directives/transition)
+[View the full x-transition documentation →](#)
 
 
-# b-stream
+## b-stream
 
 Liveblade allows you to stream content to a web page before a request is complete via the `b-stream` API. This is an extremely useful feature for things like AI chat-bots which stream responses as they are generated.
 
@@ -1434,11 +1222,11 @@ class CountDown extends Component
 
     public function begin()
     {
-        while (this->start >= 0) {
+        while (this.start >= 0) {
             // Stream the current count to the browser...
-            this->stream(  // [tl! highlight:4]
+            this.stream(  // [!code highlight:4]
                 to: 'count',
-                content: this->start,
+                content: this.start,
                 replace: true,
             );
 
@@ -1446,7 +1234,7 @@ class CountDown extends Component
             sleep(1);
 
             // Decrement the counter...
-            this->start = this->start - 1;
+            this.start = this.start - 1;
         };
     }
 
@@ -1456,7 +1244,7 @@ class CountDown extends Component
         <div>
             <button b-click="begin">Start count-down</button>
 
-            <h1>Count: <span b-stream="count">{{ start }}</span></h1> <!-- [tl! highlight] -->
+            <h1>Count: <span b-stream="count">{{ start }}</span></h1> <!-- [!code highlight] -->
         </div>
         HTML;
     }
@@ -1474,13 +1262,13 @@ All of the above happens while a single network request is out to the server.
 Here's what's happening from the system's perspective when the button is pressed:
 * A request is sent to Liveblade to call the `begin()` method
 * The `begin()` method is called and the `while` loop begins
-* `this->stream()` is called and immediately starts a "streamed response" to the browser
+* `this.stream()` is called and immediately starts a "streamed response" to the browser
 * The browser receives a streamed response with instructions to find the element in the component with `b-stream="count"`, and replace its contents with the received payload ("3" in the case of the first streamed number)
 * The `sleep(1)` method causes the server to hang for one second
 * The `while` loop is repeated and the process of streaming a new number every second continues until the `while` condition is falsy
 * When `begin()` has finished running and all the counts have been streamed to the browser, Liveblade finishes it's request lifecycle, rendering the component and sending the final response to the browser
 
-## Streaming chat-bot responses
+### Streaming chat-bot responses
 
 A common use-case for `b-stream` is streaming chat-bot responses as they are received from an API that supports streamed responses (like [OpenAI's ChatGPT](https://chat.openai.com/)).
 
@@ -1499,17 +1287,17 @@ class ChatBot extends Component
 
     function submitPrompt()
     {
-        this->question = this->prompt;
+        this.question = this.prompt;
 
-        this->prompt = '';
+        this.prompt = '';
 
-        this->js('py.ask()');
+        this.js('py.ask()');
     }
 
     function ask()
     {
-        this->answer = OpenAI::ask(this->question, function (partial) {
-            this->stream(to: 'answer', content: partial); // [tl! highlight]
+        this.answer = OpenAI::ask(this.question, function (partial) {
+            this.stream(to: 'answer', content: partial); // [!code highlight]
         });
     }
 
@@ -1529,7 +1317,7 @@ class ChatBot extends Component
 
                         <hgroup>
                             <h3>ChatBot</h3>
-                            <p b-stream="answer">{{ answer }}</p> <!-- [tl! highlight] -->
+                            <p b-stream="answer">{{ answer }}</p> <!-- [!code highlight] -->
                         </hgroup>
                     </article>
                 @endif
@@ -1548,25 +1336,25 @@ Here's what's going on in the above example:
 * A user types into a text field labeled "Send a message" to ask the chat-bot a question.
 * They press the [Enter] key.
 * A network request is sent to the server, sets the message to the `question` property, and clears the `prompt` property.
-* The response is sent back to the browser and the input is cleared. Because `this->js('...')` was called, a new request is triggered to the server calling the `ask()` method.
+* The response is sent back to the browser and the input is cleared. Because `this.js('...')` was called, a new request is triggered to the server calling the `ask()` method.
 * The `ask()` method calls on the ChatBot API and receives streamed response partials via the `partial` parameter in the callback.
 * Each `partial` gets streamed to the browser into the `b-stream="answer"` element on the page, showing the answer progressively reveal itself to the user.
 * When the entire response is received, the Liveblade request finishes and the user receives the full response.
 
-## Replace vs. append
+### Replace vs. append
 
-When streaming content to an element using `this->stream()`, you can tell Liveblade to either replace the contents of the target element with the streamed contents or append them to the existing contents.
+When streaming content to an element using `this.stream()`, you can tell Liveblade to either replace the contents of the target element with the streamed contents or append them to the existing contents.
 
 Replacing or appending can both be desirable depending on the scenario. For example, when streaming a response from a chatbot, typically appending is desired (and is therefore the default). However, when showing something like a count-down, replacing is more fitting.
 
-You can configure either by passing the `replace:` parameter to `this->stream` with a boolean value:
+You can configure either by passing the `replace:` parameter to `this.stream` with a boolean value:
 
 ```php
 // Append contents...
-this->stream(to: 'target', content: '...');
+this.stream(to: 'target', content: '...');
 
 // Replace contents...
-this->stream(to: 'target', content: '...', replace: true);
+this.stream(to: 'target', content: '...', replace: true);
 ```
 
 Append/replace can also be specified at the target element level by appending or removing the `.replace` modifier:
@@ -1580,19 +1368,19 @@ Append/replace can also be specified at the target element level by appending or
 ```
 
 
-# b-text
+## b-text
 
 `b-text` is a directive that dynamically updates an element's text content based on a component property or expression. Unlike using Blade's <span v-pre>`{{ }}`</span> syntax, `b-text` updates the content without requiring a network roundtrip to re-render the component.
 
 If you are familiar with Alpine's `x-text` directive, the two are essentially the same.
 
-## Basic usage
+### Basic usage
 
 Here's an example of using `b-text` to optimistically show updates to a Liveblade property without waiting for a network roundtrip.
 
 ```php
 use Liveblade\Component;
-use App\Models\Post;
+use App\Models\Post; 
 
 class ShowPost extends Component
 {
@@ -1602,14 +1390,14 @@ class ShowPost extends Component
 
     public function mount()
     {
-        this->likes = this->post->like_count;
+        this.likes = this.post.like_count;
     }
 
     public function like()
     {
-        this->post->like();
+        this.post.like();
 
-        this->likes = this->post->fresh()->like_count;
+        this.likes = this.post.fresh().like_count;
     }
 }
 ```
