@@ -574,7 +574,7 @@ To customize the amount of time to delay the loading indicator, you can use one 
 
 Liveblade's `b-navigate` feature makes page navigation much faster, providing an SPA-like experience for your users.
 
-This page is a simple reference for the `b-navigate` directive. Be sure to read the page on Liveblade's [Navigate](#) feature for more complete documentation.
+This page is a simple reference for the `b-navigate` directive. Be sure to read the page on Liveblade's [Navigation](features/navigation) feature for more complete documentation.
 
 Below is a simple example of adding `b-navigate` to links in a nav bar:
 
@@ -598,7 +598,7 @@ By adding the `.hover` modifier, Liveblade will pre-fetch a page when a user hov
 
 ### Going deeper
 
-For more complete documentation on this feature, visit [Liveblade's navigate](#) documentation page.
+For more complete documentation on this feature, visit [Liveblade's navigation](features/navigation) documentation page.
 
 ## b-current
 
@@ -718,7 +718,7 @@ Here is an example of only showing a dirty indication when the title property ha
 
 ### Toggling classes
 
-Often, instead of toggling entire elements, you may want to toggle individual CSS classes on an input when its state is "dirty".
+Often, instead of toggling entire elements, you may want to toggle individual CSS classes on an input when its state is "dirty". For this purpose, use the `.class`modifier on the `dirty` directive.
 
 Below is an example where a user types into an input field and the border becomes yellow, indicating an "unsaved" state. Then, when the user tabs away from the field, the border is removed, indicating that the state has been saved on the server:
 
@@ -741,13 +741,17 @@ Here's an example of adding a confirmation dialog to a "Delete post" button:
     b-click="delete"
     b-confirm="Are you sure you want to delete this post?"
 >
-    Delete post <!-- [!code highlight:-2,1] -->
+    Delete post <!-- [!code highlight] -->
 </button>
 ```
 
-When a user clicks "Delete post", Liveblade will trigger a confirmation dialog (The default browser confirmation alert). If the user hits escape or presses cancel, the action won't be performed. If they press "OK", the action will be completed.
+When a user clicks "Delete post", Liveblade will trigger a confirmation dialog containing a "Cancel" button and a confirmation button containg the same text as the dialog trigger button (for instance "Delete post"). If the user hits escape or presses the **"Cancel"**, the action won't be performed. If they press the confirmation button, the action will be completed.
 
-### Prompting users for input
+### Customizing the Confirmation dialogue
+
+Of course, you can change che confirmation dialogue design to meet your own. Run the `pyblade liveblade:stubs --confirm`. This command will add a component named "confirm-dialogue", design  you can can re-design it to feet your needs and Liveblade will use it for confirmation dialogues.
+
+<!-- ### Prompting users for input
 
 For even more dangerous actions such as deleting a user's account entirely, you may want to present them with a confirmation prompt which they would need to type in a specific string of characters to confirm the action.
 
@@ -759,52 +763,57 @@ Liveblade provides a helpful `.prompt` modifier, that when applied to `b-confirm
     b-click="delete"
     b-confirm.prompt="Are you sure?\n\nType DELETE to confirm|DELETE"
 >
-    Delete account <!-- [!code highlight:-2,1] -->
+    Delete account 
 </button>
 ```
 
-When a user presses "Delete account", the action will only be performed if "DELETE" is entered into the prompt, otherwise, the action will be cancelled.
+When a user presses "Delete account", the action will only be performed if "DELETE" is entered into the prompt, otherwise, the action will be cancelled. -->
 
+### Using the `@confirm` decorator
+
+For security renforcement, you may use the `@confirm` decorator inside your Liveblade's component class.
+
+>[!danger] 404: Not found
+>Find an example.
 
 ## b-transition
 
 ### Basic usage
 
-Showing or hiding content in Liveblade is as simple as using one of Blade's conditional directives like `@if`. To enhance this experience for your users, Liveblade provides a `b-transition` directive that allows you to transition conditional elements smoothly in and out of the page.
+Showing or hiding content in Liveblade is as simple as using one of PyBlade's conditional directives like `@if`. To enhance this experience for your users, Liveblade provides a `b-transition` directive that allows you to transition conditional elements smoothly in and out of the page.
 
-For example, below is a `ShowPost` component with the ability to toggle viewing comments on and off:
+For example, below is a `PostDetail` component with the ability to toggle viewing comments on and off:
 
-```php
-use App\Models\Post;
+```python
+from pyblade import liveblade
 
-class ShowPost extends Component
-{
-    public Post post;
+class PostDetail(liveblade.Component):
 
-    public showComments = false;
-}
+    show_comments = False
+    ...
+
 ```
 
 ```html
 <div>
     <!-- ... -->
 
-    <button b-click="set('showComments', true)">Show comments</button>
+    <button b-click="set('show_comments', True)">Show comments</button>
 
-    @if (showComments)
+    @if (show_comments)
         <div b-transition> <!-- [!code highlight] -->
-            @foreach (post.comments as comment)
+            @for (comment in post.comments)
                 <!-- ... -->
-            @endforeach
+            @endfor
         </div>
     @endif
 </div>
 ```
-Because `b-transition` has been added to the `<div>` containing the post's comments, when the "Show comments" button is pressed, `showComments` will be set to `true` and the comments will "fade" onto the page instead of abruptly appearing.
+Because `b-transition` has been added to the `<div>` containing the post's comments, when the "Show comments" button is pressed, `show_comments` will be set to `True` and the comments will "fade" onto the page instead of abruptly appearing.
 
 ### Limitations
 
-Currently, `b-transition` is only supported on a single element inside a Blade conditional like `@if`. It will not work as expected when used in a list of sibling elements. For example, the following will NOT work properly:
+Currently, `b-transition` is only supported on a single element inside a PyBlade conditional like `@if`. It will not work as expected when used in a list of sibling elements. For example, the following will NOT work properly:
 
 ```html
 <!-- Warning: The following is code that will not work properly -->
@@ -822,14 +831,14 @@ If one of the above comment `<li>` elements were to get removed, you would expec
 By default, Liveblade applies both an opacity and a scale CSS transition to elements with `b-transition`. Here's a visual preview:
 
 ```html
-<div x-data="{ show: false }" x-cloak class="border border-gray-700 rounded-xl p-6 w-full flex justify-between">
-    <a href="#" x-on:click.prevent="show = ! show" class="py-2.5 outline-none">
-        Preview transition <span x-text="show ? 'out' : 'in →'">in</span>
+<div b-data="{ show: false }" b-cloak class="border border-gray-700 rounded-xl p-6 w-full flex justify-between">
+    <a href="#" b-on:click.prevent="show = ! show" class="py-2.5 outline-none">
+        Preview transition <span b-text="show ? 'out' : 'in →'">in</span>
     </a>
     <div class="hey">
         <div
-            x-show="show"
-            x-transition
+            b-show="show"
+            b-transition
             class="inline-flex px-16 py-2.5 rounded-[10px] bg-pink-400 text-white uppercase font-medium transition focus-visible:outline-none focus-visible:!ring-1 focus-visible:!ring-white"
             style="
                 background: linear-gradient(109.48deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.1) 100%), #EE5D99;
@@ -858,10 +867,10 @@ Modifier | Description
 --- | ---
 `.in` | Only transition the element "in"
 `.out` | Only transition the element "out"
-`.duration.[?]ms` | Customize the transition duration in milliseconds
-`.duration.[?]s` | Customize the transition duration in seconds
-`.delay.[?]ms` | Customize the transition delay in milliseconds
-`.delay.[?]s` | Customize the transition delay in seconds
+`.duration.Xms` | Customize the transition duration in`X` milliseconds
+`.duration.Xs` | Customize the transition duration in `X` seconds
+`.delay.Xms` | Customize the transition delay in `X` milliseconds
+`.delay.Xs` | Customize the transition delay in `X` seconds
 `.opacity` | Only apply the opacity transition
 `.scale` | Only apply the scale transition
 `.origin.[top\|bottom\|left\|right]` | Customize the scale "origin" used
@@ -877,14 +886,14 @@ By default, Liveblade both fades and scales the element when transitioning. You 
 ```
 
 ```html
-<div x-data="{ show: false }" x-cloak class="border border-gray-700 rounded-xl p-6 w-full flex justify-between">
-    <a href="#" x-on:click.prevent="show = ! show" class="py-2.5 outline-none">
-        Preview transition <span x-text="show ? 'out' : 'in →'">in</span>
+<div b-data="{ show: false }" b-cloak class="border border-gray-700 rounded-xl p-6 w-full flex justify-between">
+    <a href="#" b-on:click.prevent="show = ! show" class="py-2.5 outline-none">
+        Preview transition <span b-text="show ? 'out' : 'in →'">in</span>
     </a>
     <div class="hey">
         <div
-            x-show="show"
-            x-transition.opacity
+            b-show="show"
+            b-transition.opacity
             class="inline-flex px-16 py-2.5 rounded-[10px] bg-pink-400 text-white uppercase font-medium transition focus-visible:outline-none focus-visible:!ring-1 focus-visible:!ring-white"
             style="
                 background: linear-gradient(109.48deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.1) 100%), #EE5D99;
@@ -905,14 +914,14 @@ A common transition technique is to show an element immediately when transitioni
 <div b-transition.out.opacity.duration.200ms>
 ```
 ```html
-<div x-data="{ show: false }" x-cloak class="border border-gray-700 rounded-xl p-6 w-full flex justify-between">
-    <a href="#" x-on:click.prevent="show = ! show" class="py-2.5 outline-none">
-        Preview transition <span x-text="show ? 'out' : 'in →'">in</span>
+<div b-data="{ show: false }" b-cloak class="border border-gray-700 rounded-xl p-6 w-full flex justify-between">
+    <a href="#" b-on:click.prevent="show = ! show" class="py-2.5 outline-none">
+        Preview transition <span b-text="show ? 'out' : 'in →'">in</span>
     </a>
     <div class="hey">
         <div
-            x-show="show"
-            x-transition.out.opacity.duration.200ms
+            b-show="show"
+            b-transition.out.opacity.duration.200ms
             class="inline-flex px-16 py-2.5 rounded-[10px] bg-pink-400 text-white uppercase font-medium transition focus-visible:outline-none focus-visible:!ring-1 focus-visible:!ring-white"
             style="
                 background: linear-gradient(109.48deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.1) 100%), #EE5D99;
@@ -934,14 +943,14 @@ When using Liveblade to transition an element such as a dropdown menu, it makes 
 ```
 
 ```html
-<div x-data="{ show: false }" x-cloak class="border border-gray-700 rounded-xl p-6 w-full flex justify-between">
-    <a href="#" x-on:click.prevent="show = ! show" class="py-2.5 outline-none">
-        Preview transition <span x-text="show ? 'out' : 'in →'">in</span>
+<div b-data="{ show: false }" b-cloak class="border border-gray-700 rounded-xl p-6 w-full flex justify-between">
+    <a href="#" b-on:click.prevent="show = ! show" class="py-2.5 outline-none">
+        Preview transition <span b-text="show ? 'out' : 'in →'">in</span>
     </a>
     <div class="hey">
         <div
-            x-show="show"
-            x-transition.origin.top
+            b-show="show"
+            b-transition.origin.top
             class="inline-flex px-16 py-2.5 rounded-[10px] bg-pink-400 text-white uppercase font-medium transition focus-visible:outline-none focus-visible:!ring-1 focus-visible:!ring-white"
             style="
                 background: linear-gradient(109.48deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.1) 100%), #EE5D99;
@@ -954,23 +963,19 @@ When using Liveblade to transition an element such as a dropdown menu, it makes 
 </div>
 ```
 
-> [!tip] Liveblade uses Alpine transitions behind the scenes
-> When using `b-transition` on an element, Liveblade is internally applying Alpine's `x-transition` directive. Therefore you can use most if not all syntaxes you would normally use with `x-transition`. Check out [Alpine's transition documentation](https://alpinejs.dev/directives/transition) for all its capabilities.
-
-
 ## b-init
 
 Liveblade offers a `b-init` directive to run an action as soon as the component is rendered. This can be helpful in cases where you don't want to hold up the entire page load, but want to load some data immediately after the page load.
 
 ```html
-<div b-init="loadPosts">
+<div b-init="load_posts">
     <!-- ... -->
 </div>
 ```
 
-The `loadPosts` action will be run immediately after the Liveblade component renders on the page.
+The `load_posts` action will be run immediately after the Liveblade component renders on the page.
 
-In most cases however, [Liveblade's lazy loading feature](/docs/lazy) is preferable to using `b-init`.
+In most cases however, Liveblade's [Lazy loading feature](/features/lazy-loading) is preferable to using `b-init`.
 
 
 ## b-poll
@@ -1129,7 +1134,7 @@ Below is an example of wrapping a web component with a shadow DOM `b-replace` so
 You can also instruct Liveblade to replace the target element as well as all children with `b-replace.self`.
 
 ```html
-<div x-data="{open: false}" b-replace.self>
+<div b-data="{open: false}" b-replace.self>
   <!-- Ensure that the "open" state is reset to false on each render -->
 </div>
 ```
@@ -1139,7 +1144,7 @@ You can also instruct Liveblade to replace the target element as well as all chi
 
 Liveblade's `b-show` directive makes it easy to show and hide elements based on the result of an expression.
 
-The `b-show` directive is different than using `@if` in Blade in that it toggles an element's visibility using CSS (`display: none`) rather than removing the element from the DOM entirely. This means the element remains in the page but is hidden, allowing for smoother transitions without requiring a server round-trip.
+The `b-show` directive is different than using `@if` in PyBlade in that it toggles an element's visibility using CSS (`display: none`) rather than removing the element from the DOM entirely. This means the element remains in the page but is hidden, allowing for smoother transitions without requiring a server round-trip.
 
 ### Basic usage
 
@@ -1168,7 +1173,7 @@ class CreatePost extends Component
 
 ```html
 <div>
-    <button x-on:click="py.showModal = true">New Post</button>
+    <button b-on:click="py.showModal = true">New Post</button>
 
     <div b-show="showModal">
         <form b-submit="save">
@@ -1184,13 +1189,13 @@ When the "Create New Post" button is clicked, the modal appears without a server
 
 ### Using transitions
 
-You can combine `b-show` with Alpine.js transitions to create smooth show/hide animations. Since `b-show` only toggles the CSS `display` property, Alpine's `x-transition` directives work perfectly with it:
+You can combine `b-show` with Alpine.js transitions to create smooth show/hide animations. Since `b-show` only toggles the CSS `display` property, Alpine's `b-transition` directives work perfectly with it:
 
 ```html
 <div>
-    <button x-on:click="py.showModal = true">New Post</button>
+    <button b-on:click="py.showModal = true">New Post</button>
 
-    <div b-show="showModal" x-transition.duration.500ms>
+    <div b-show="showModal" b-transition.duration.500ms>
         <form b-submit="save">
             <textarea b-model="content"></textarea>
             <button type="submit">Save Post</button>
@@ -1201,7 +1206,7 @@ You can combine `b-show` with Alpine.js transitions to create smooth show/hide a
 
 The Alpine.js transition classes above will create a fade and scale effect when the modal shows and hides.
 
-[View the full x-transition documentation →](#)
+[View the full b-transition documentation →](#)
 
 
 ## b-stream
@@ -1370,9 +1375,9 @@ Append/replace can also be specified at the target element level by appending or
 
 ## b-text
 
-`b-text` is a directive that dynamically updates an element's text content based on a component property or expression. Unlike using Blade's <span v-pre>`{{ }}`</span> syntax, `b-text` updates the content without requiring a network roundtrip to re-render the component.
+`b-text` is a directive that dynamically updates an element's text content based on a component property or expression. Unlike using PyBlade's <span v-pre>`{{ }}`</span> syntax, `b-text` updates the content without requiring a network roundtrip to re-render the component.
 
-If you are familiar with Alpine's `x-text` directive, the two are essentially the same.
+If you are familiar with Alpine's `b-text` directive, the two are essentially the same.
 
 ### Basic usage
 
@@ -1404,7 +1409,7 @@ class ShowPost extends Component
 
 ```html
 <div>
-    <button x-on:click="py.likes++" b-click="like">❤️ Like</button>
+    <button b-on:click="py.likes++" b-click="like">❤️ Like</button>
 
     Likes: <span b-text="likes"></span>
 </div>
