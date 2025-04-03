@@ -963,23 +963,10 @@ When using Liveblade to transition an element such as a dropdown menu, it makes 
 </div>
 ```
 
-## b-init
-
-Liveblade offers a `b-init` directive to run an action as soon as the component is rendered. This can be helpful in cases where you don't want to hold up the entire page load, but want to load some data immediately after the page load.
-
-```html
-<div b-init="load_posts">
-    <!-- ... -->
-</div>
-```
-
-The `load_posts` action will be run immediately after the Liveblade component renders on the page.
-
-In most cases however, Liveblade's [Lazy loading feature](/features/lazy-loading) is preferable to using `b-init`.
-
-
 ## b-poll
-Polling is a technique used in web applications to "poll" the server (send requests on a regular interval) for updates. It's a simple way to keep a page up-to-date without the need for a more sophisticated technology like [WebSockets](/docs/events#real-time-events-using-laravel-echo).
+Polling is a technique used in web applications to "poll" the server (send requests on a regular interval) for updates. It's a simple way to keep a page up-to-date without the need for a more sophisticated technology like [WebSockets](#).
+
+<!-- TODO: Learn how Laravel Echo works  -->
 
 ### Basic usage
 
@@ -987,23 +974,16 @@ Using polling inside Liveblade is as simple as adding `b-poll` to an element.
 
 Below is an example of a `SubscriberCount` component that shows a user's subscriber count:
 
-```php
-<?php
+```python
+from pyblade import liveblade, auth
 
-namespace App\Liveblade;
+class SubscriberCount(liveblade.Component):
 
-use Illuminate\Support\Facades\Auth;
-use Liveblade\Component;
-
-class SubscriberCount extends Component
-{
-    public function render()
-    {
-        return view('Liveblade.subscriber-count', [
-            'count' => Auth::user().subscribers.count(),
+    def render(self):
+        user = auth()
+        return self.view('liveblade.subscriber-count', [
+            'count' => user.subscribers.count(),
         ]);
-    }
-}
 ```
 
 ```html
@@ -1017,18 +997,21 @@ Normally, this component would show the subscriber count for the user and never 
 You can also specify an action to fire on the polling interval by passing a value to `b-poll`:
 
 ```html
-<div b-poll="refreshSubscribers">
+<div b-poll="refresh_subscribers">
     Subscribers: {{ count }}
 </div>
 ```
 
-Now, the `refreshSubscribers()` method on the component will be called every `2.5` seconds.
+Now, the `refresh_subscribers()` method on the component will be called every `2.5` seconds.
 
 ### Timing control
 
 The primary drawback of polling is that it can be resource intensive. If you have a thousand visitors on a page that uses polling, one thousand network requests will be triggered every `2.5` seconds.
 
 The best way to reduce requests in this scenario is simply to make the polling interval longer.
+
+>[!warning] Warning
+>Please checkout the Liveblade's [Security concerns](#) before using this feature as it may lead to some security risks when misused.
 
 You can manually control how often the component will poll by appending the desired duration to `b-poll` like so:
 
@@ -1099,10 +1082,10 @@ Below is an example of wrapping an element used by a third-party library in `b-i
 </form>
 ```
 
-You can also instruct Liveblade to only ignore changes to attributes of the root element rather than observing changes to its contents using `b-ignore.self`.
+You can also instruct Liveblade to only ignore changes to attributes of the root element rather than observing changes to its contents using `b-ignore.attrs`.
 
 ```html
-<div b-ignore.self>
+<div b-ignore.attrs>
     <!-- ... -->
 </div>
 ```
@@ -1124,58 +1107,54 @@ Below is an example of wrapping a web component with a shadow DOM `b-replace` so
 
     <div b-replace>
         <!-- This custom element would have its own internal state -->
-        <json-viewer>@json(someProperty)</json-viewer>
+        <json-viewer>@json(some_property)</json-viewer>
     </div>
 
     <!-- ... -->
 </form>
 ```
 
+<!-- TODO: Add a @json Pyblade directive -->
+
 You can also instruct Liveblade to replace the target element as well as all children with `b-replace.self`.
 
 ```html
-<div b-data="{open: false}" b-replace.self>
-  <!-- Ensure that the "open" state is reset to false on each render -->
+<div b-data="{open: False}" b-replace.self>
+  <!-- Ensure that the "open" state is reset to F alse on each render -->
 </div>
 ```
 
 
 ## b-show
 
-Liveblade's `b-show` directive makes it easy to show and hide elements based on the result of an expression.
+Liveblade's `b-show` directive makes it easy to show and hide elements based on the result of a boolean expression.
 
-The `b-show` directive is different than using `@if` in PyBlade in that it toggles an element's visibility using CSS (`display: none`) rather than removing the element from the DOM entirely. This means the element remains in the page but is hidden, allowing for smoother transitions without requiring a server round-trip.
+The `b-show` directive is different than using `@if` in PyBlade in that it toggles an element's visibility using CSS (`display: none`) rather than entirely removing the element from the DOM. This means the element remains in the page but is hidden, allowing for smoother transitions without requiring a server round-trip.
 
 ### Basic usage
 
 Here's a practical example of using `b-show` to toggle a "Create Post" modal:
 
-```php
-use Liveblade\Component;
-use App\Models\Post;
+```python
+from pyblade import liveblade
+from app.models import Post
 
-class CreatePost extends Component
-{
-    public showModal = false;
+class PostCreate(liveblade.Component):
 
-    public content = '';
+    show_modal: bool = False
+    content: str = ''
 
-    public function save()
-    {
-        Post::create(['content' => this.content]);
-
-        this.reset('content');
-
-        this.showModal = false;
-    }
-}
+    def save(self):
+        Post.objects.create(content=self.content)
+        self.reset('content');
+        self.show_modal = False;
 ```
 
 ```html
 <div>
-    <button b-on:click="py.showModal = true">New Post</button>
+    <button b-click="py.show_modal = True">New Post</button>
 
-    <div b-show="showModal">
+    <div b-show="show_modal"> <!-- [!code highlight] -->
         <form b-submit="save">
             <textarea b-model="content"></textarea>
 
@@ -1185,17 +1164,17 @@ class CreatePost extends Component
 </div>
 ```
 
-When the "Create New Post" button is clicked, the modal appears without a server roundtrip. After successfully saving the post, the modal is hidden and the form is reset.
+When the "New Post" button is clicked, the modal appears without a server roundtrip. After successfully saving the post, the modal is hidden and the form is reset.
 
 ### Using transitions
 
-You can combine `b-show` with Alpine.js transitions to create smooth show/hide animations. Since `b-show` only toggles the CSS `display` property, Alpine's `b-transition` directives work perfectly with it:
+You can combine `b-show`  transitions to create smooth show/hide animations. Since `b-show` only toggles the CSS `display` property, Liveblade's `b-transition` directive work perfectly with it:
 
 ```html
 <div>
-    <button b-on:click="py.showModal = true">New Post</button>
+    <button b-on:click="py.show_modal = True">New Post</button>
 
-    <div b-show="showModal" b-transition.duration.500ms>
+    <div b-show="show_modal" b-transition.duration.500ms>
         <form b-submit="save">
             <textarea b-model="content"></textarea>
             <button type="submit">Save Post</button>
@@ -1204,56 +1183,51 @@ You can combine `b-show` with Alpine.js transitions to create smooth show/hide a
 </div>
 ```
 
-The Alpine.js transition classes above will create a fade and scale effect when the modal shows and hides.
+The  transition classes above will create a fade and scale effect when the modal shows and hides.
 
-[View the full b-transition documentation →](#)
+You can review the full [b-transition](#b-transition) documentation.
 
 
 ## b-stream
 
 Liveblade allows you to stream content to a web page before a request is complete via the `b-stream` API. This is an extremely useful feature for things like AI chat-bots which stream responses as they are generated.
 
-> [!warning] Not compatible with Laravel Octane
-> Liveblade currently does not support using `b-stream` with Laravel Octane.
+To demonstrate the most basic functionality of `b-stream`, below is a simple CountDown component that when a button is pressed displays a count-down to the user from `3` to `0`:
 
-To demonstrate the most basic functionality of `b-stream`, below is a simple CountDown component that when a button is pressed displays a count-down to the user from "3" to "0":
+```python
+import time
+from pyblade import liveblade
 
-```php
-use Liveblade\Component;
+class CountDown(liveblade.Component):
 
-class CountDown extends Component
-{
-    public start = 3;
+    start: int = 3
 
-    public function begin()
-    {
-        while (this.start >= 0) {
-            // Stream the current count to the browser...
-            this.stream(  // [!code highlight:4]
-                to: 'count',
-                content: this.start,
-                replace: true,
-            );
+    def begin(self):
+        while self.start >= 0:
+            # Stream the current count to the browser...
+            self.stream(  # [!code highlight:4]
+                to="count",
+                content=self.start,
+                replace=True,
+            )
 
-            // Pause for 1 second between numbers...
-            sleep(1);
+            # Pause for 1 second between numbers...
+            time.sleep(1)
 
-            // Decrement the counter...
-            this.start = this.start - 1;
-        };
-    }
+            # Decrement the counter...
+            self.start -= 1
 
-    public function render()
-    {
-        return <<<'HTML'
-        <div>
-            <button b-click="begin">Start count-down</button>
+    def render(self):
+        return self.view("liveblade.count-down")
+```
+```html
+<div>
+    <button b-click="begin">Start count-down</button>
 
-            <h1>Count: <span b-stream="count">{{ start }}</span></h1> <!-- [!code highlight] -->
-        </div>
-        HTML;
-    }
-}
+    <h1>Count: <span b-stream="count">{{ start }}</span></h1> <!-- [!code highlight] -->
+</div>
+            
+        
 ```
 
 Here's what's happening from the user's perspective when they press "Start count-down":
@@ -1262,14 +1236,15 @@ Here's what's happening from the user's perspective when they press "Start count
 * One second elapses and "Count: 2" is shown
 * This process continues until "Count: 0" is shown
 
-All of the above happens while a single network request is out to the server.
+>[!info]
+>All of the above happens while **a single** network request is out to the server.
 
 Here's what's happening from the system's perspective when the button is pressed:
 * A request is sent to Liveblade to call the `begin()` method
 * The `begin()` method is called and the `while` loop begins
-* `this.stream()` is called and immediately starts a "streamed response" to the browser
-* The browser receives a streamed response with instructions to find the element in the component with `b-stream="count"`, and replace its contents with the received payload ("3" in the case of the first streamed number)
-* The `sleep(1)` method causes the server to hang for one second
+* `self.stream()` is called and immediately starts a "streamed response" to the browser
+* The browser receives a streamed response with instructions to find the element in the component with `b-stream="count"`, and replace its contents with the received payload (`3` in the case of the first streamed number)
+* The `time.sleep(1)` method causes the server to hang for one second
 * The `while` loop is repeated and the process of streaming a new number every second continues until the `while` condition is falsy
 * When `begin()` has finished running and all the counts have been streamed to the browser, Liveblade finishes it's request lifecycle, rendering the component and sending the final response to the browser
 
@@ -1279,137 +1254,127 @@ A common use-case for `b-stream` is streaming chat-bot responses as they are rec
 
 Below is an example of using `b-stream` to accomplish a ChatGPT-like interface:
 
-```php
-use Liveblade\Component;
+```python
+import openai # You need to install this (pip install openai)
+from pyblade import liveblade
 
-class ChatBot extends Component
-{
-    public prompt = '';
+openai.api_key = "your-api-key" # Replace with your actual OpenAI API Key
 
-    public question = '';
+class ChatBot(liveblade.Component):
 
-    public answer = '';
+    prompt: str = ""
+    question: str = ""
+    answer: str = ""
 
-    function submitPrompt()
-    {
-        this.question = this.prompt;
+    def submit_prompt(self):
+        self.question = self.prompt
+        self.prompt = ""
+        self.js("py.ask()")
 
-        this.prompt = '';
+    def ask(self):
+        response = openai.ChatCompletion.create(
+            model="gpt-4", 
+            messages=[{"role": "user", "content": self.question}], 
+            stream=True
+        )
 
-        this.js('py.ask()');
-    }
+        for chunk in response:
+            if "choices" in chunk and chunk["choices"]:
+                self.anwser = chunk["choices"][0]["delta"].get("content", "")
+                self.stream(to="answer", content: self.answer); # [!code highlight]
 
-    function ask()
-    {
-        this.answer = OpenAI::ask(this.question, function (partial) {
-            this.stream(to: 'answer', content: partial); // [!code highlight]
-        });
-    }
+    def render(self):
+        self.view("liveblade.chat-bot")
+```
+```html
+<div>
+    <section>
+        <div>ChatBot</div>
 
-    public function render()
-    {
-        return <<<'HTML'
-        <div>
-            <section>
-                <div>ChatBot</div>
+        @if (question)
+            <article>
+                <hgroup>
+                    <h3>User</h3>
+                    <p>{{ question }}</p>
+                </hgroup>
 
-                @if (question)
-                    <article>
-                        <hgroup>
-                            <h3>User</h3>
-                            <p>{{ question }}</p>
-                        </hgroup>
+                <hgroup>
+                    <h3>ChatBot</h3>
+                    <p b-stream="answer">{{ answer }}</p> <!-- [!code highlight] -->
+                </hgroup>
+            </article>
+        @endif
+    </section>
 
-                        <hgroup>
-                            <h3>ChatBot</h3>
-                            <p b-stream="answer">{{ answer }}</p> <!-- [!code highlight] -->
-                        </hgroup>
-                    </article>
-                @endif
-            </section>
-
-            <form b-submit="submitPrompt">
-                <input b-model="prompt" type="text" placeholder="Send a message" autofocus>
-            </form>
-        </div>
-        HTML;
-    }
-}
+    <form b-submit="submit_prompt">
+        <input b-model="prompt" type="text" placeholder="Send a message" autofocus>
+    </form>
+</div>
 ```
 
 Here's what's going on in the above example:
-* A user types into a text field labeled "Send a message" to ask the chat-bot a question.
-* They press the [Enter] key.
+* A user types into a text field labeled **"Send a message"** to ask the chat-bot a question.
+* They press the **_Enter_** key.
 * A network request is sent to the server, sets the message to the `question` property, and clears the `prompt` property.
-* The response is sent back to the browser and the input is cleared. Because `this.js('...')` was called, a new request is triggered to the server calling the `ask()` method.
-* The `ask()` method calls on the ChatBot API and receives streamed response partials via the `partial` parameter in the callback.
-* Each `partial` gets streamed to the browser into the `b-stream="answer"` element on the page, showing the answer progressively reveal itself to the user.
+* The response is sent back to the browser and the input is cleared. Because `self.js('...')` was called, a new request is triggered to the server calling the `ask()` method.
+* The `ask()` method calls on the OpenAI API and receives streamed response via the `stream=True` argument in the `openai.ChatCompletion.create()` method.
+* Each `chunk` gets streamed to the browser into the `b-stream="answer"` element on the page, showing the answer progressively reveal itself to the user.
 * When the entire response is received, the Liveblade request finishes and the user receives the full response.
 
 ### Replace vs. append
 
-When streaming content to an element using `this.stream()`, you can tell Liveblade to either replace the contents of the target element with the streamed contents or append them to the existing contents.
+When streaming content to an element using `self.stream()`, you can tell Liveblade to either replace the contents of the target element with the streamed contents or append them to the existing contents.
 
 Replacing or appending can both be desirable depending on the scenario. For example, when streaming a response from a chatbot, typically appending is desired (and is therefore the default). However, when showing something like a count-down, replacing is more fitting.
 
-You can configure either by passing the `replace:` parameter to `this.stream` with a boolean value:
+You can configure either by passing the `replace` parameter to `self.stream` with a boolean value:
 
-```php
-// Append contents...
-this.stream(to: 'target', content: '...');
+```python
+# Append contents...
+self.stream(to='target', content="...")
 
-// Replace contents...
-this.stream(to: 'target', content: '...', replace: true);
+# Replace contents...
+self.stream(to='target', content="...", replace=True)
 ```
 
 Append/replace can also be specified at the target element level by appending or removing the `.replace` modifier:
 
 ```html
-// Append contents...
+<!-- Append contents... -->
 <div b-stream="target">
 
-// Replace contents...
+<!-- Replace contents...  -->
 <div b-stream.replace="target">
 ```
 
-
 ## b-text
 
-`b-text` is a directive that dynamically updates an element's text content based on a component property or expression. Unlike using PyBlade's <span v-pre>`{{ }}`</span> syntax, `b-text` updates the content without requiring a network roundtrip to re-render the component.
-
-If you are familiar with Alpine's `b-text` directive, the two are essentially the same.
+`b-text` is a directive that dynamically updates an element's text content based on a component property or a boolean expression. Unlike using PyBlade's <span v-pre>`{{ }}`</span> syntax, `b-text` updates the content without requiring a network roundtrip to re-render the component.
 
 ### Basic usage
 
 Here's an example of using `b-text` to optimistically show updates to a Liveblade property without waiting for a network roundtrip.
 
-```php
-use Liveblade\Component;
-use App\Models\Post; 
+```python
+from pyblade import liveblade
+from app.models import Post
 
-class ShowPost extends Component
-{
-    public Post post;
+class PostDetail(liveblade.Component):
+    
+    post: Post
+    likes: int
 
-    public likes;
+    def mount(self):
+        self.likes = self.post.like_count
 
-    public function mount()
-    {
-        this.likes = this.post.like_count;
-    }
-
-    public function like()
-    {
-        this.post.like();
-
-        this.likes = this.post.fresh().like_count;
-    }
-}
+    def like(self):
+        self.post.like()
+        self.likes = self.post.fresh().like_count;
 ```
 
 ```html
 <div>
-    <button b-on:click="py.likes++" b-click="like">❤️ Like</button>
+    <button b:click="py.likes++" b-click="like">❤️ Like</button>
 
     Likes: <span b-text="likes"></span>
 </div>

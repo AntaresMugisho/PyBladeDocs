@@ -3,8 +3,8 @@ layout: home
 
 hero:
   name: "PyBlade"
-  text: "The lightweight and secure template engine for Python web frameworks !"
-  tagline: "Modern and Elegant"
+  text: "The frontend framework for Python web frameworks."
+  tagline: "Secure, Elegant and Lightweight !"
   image:
     src: assets/images/pyblade.png
     alt: PyBlade Logo
@@ -26,7 +26,7 @@ features:
   
   - icon: 🧩
     title: Component-Driven Development
-    details: Create reusable, self-contained components with client-side rendering capabilities. Build interactive UIs efficiently, similar to modern frontend frameworks.
+    details: Create reusable, self-contained components with server-side rendering capabilities. Build interactive UIs efficiently, similar to modern frontend frameworks.
   
   - icon: 🛠️
     title: Powerful CLI Toolkit
