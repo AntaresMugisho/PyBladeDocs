@@ -3,7 +3,7 @@ import { defineConfig } from 'vitepress'
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   title: "PyBlade",
-  description: "The lightweight and secure template engine for Python web frameworks !",
+  description: "The lightwieght and secure frontend framework for Python web frameworks.",
   ignoreDeadLinks: true,
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config

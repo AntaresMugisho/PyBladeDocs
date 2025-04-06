@@ -6,7 +6,7 @@ hero:
   text: "The frontend framework for Python web frameworks."
   tagline: "Secure, Elegant and Lightweight !"
   image:
-    src: assets/images/pyblade.png
+    src: "https://avatars.githubusercontent.com/u/194779993"
     alt: PyBlade Logo
   actions:
     - theme: brand
