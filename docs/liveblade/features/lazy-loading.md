@@ -7,10 +7,10 @@ For example, imagine you have a `Revenue` component which contains a slow databa
 ```python
 from django.db.models import Sum
 from pyblade import liveblade
-
 from app.models import Transaction
 
 class Revenue(liveblade.Component):
+
     amount: float
 
     def mount(self):
@@ -36,7 +36,7 @@ To enable lazy loading, you can pass the `lazy` attribute into the component tag
 <liveblade:revenue lazy />
 ```
 
-... or set it to True if when using the @component PyBlade directive:
+... or set the `lazy=True` key-word argument  when using the `@liveblade` directive:
 
  ```blade
 @liveblade("revenue", lazy=True)
@@ -49,74 +49,132 @@ Now, instead of loading the component right away, Liveblade will skip this compo
 
 ## Rendering placeholder HTML
 
-By default, Liveblade will insert an empty `<div></div>` for your component before it is fully loaded. As the component will initially be invisible to users, it can be jarring when the component suddenly appears on the page.
+By default, Liveblade will insert an empty `<div></div>` for your lazy loading component before it is fully loaded. As the component will initially be invisible to users, it can be jarring when the component suddenly appears on the page.
 
 To signal to your users that the component is being loaded, you can define a `placeholder()` method to render any kind of placeholder HTML you like, including loading spinners and skeleton placeholders:
 
-```php
-<?php
+```python
+from django.db.models import Sum
+from pyblade import liveblade
+from app.models import Transaction
 
-namespace App\Liveblade;
+class Revenue(liveblade.Component):
 
-use Liveblade\Component;
-use App\Models\Transaction;
+    amount: float
 
-class Revenue extends Component
-{
-    public amount;
+    def mount(self):
+        # Slow database query...
+        self.amount = Transaction.objects.month_to_date().aggregate(
+            total=Sum('amount', default=0))['total']
 
-    public function mount()
-    {
-        // Slow database query...
-        this->amount = Transaction::monthToDate()->sum('amount');
-    }
+    def placeholder(self):
+        return self.inline("""
+            <div>
+                <!-- Loading spinner... -->
+                <svg>...</svg>
+            </div>
+        """)
 
-    public function placeholder()
-    {
-        return <<<'HTML'
-        <div>
-            <!-- Loading spinner... -->
-            <svg>...</svg>
-        </div>
-        HTML;
-    }
-
-    public function render()
-    {
-        return view('liveblade.revenue');
-    }
-}
+    def render(self):
+        return self.view('liveblade.revenue')
 ```
 
-Because the above component specifies a "placeholder" by returning HTML from a `placeholder()` method, the user will see an SVG loading spinner on the page until the component is fully loaded.
+Because the above component specifies a "placeholder" by returning inline HTML from a `placeholder()` method, the user will see an SVG loading spinner on the page until the component is fully loaded.
 
 > [!warning] The placeholder and the component must share the same element type
-> For instance, if your placeholder's root element type is a `<div>`,' your component must also use a `<div>` as root element.
+> For instance, if your placeholder's root element type is a `<div>`, your component must also use a `<div>` as root element.
 
-### Rendering a placeholder via a view
+For more complex loaders, such as **skeletons**, you can return a template from the `placeholder()` similar to `render()`.
 
-For more complex loaders (such as skeletons) you can return a `view` from the `placeholder()` similar to `render()`.
+```python
+def placeholder(self):
+    return self.view('liveblade.placeholders.skeleton', context={})
+```
 
-```php
-public function placeholder(array params = [])
-{
-    return view('liveblade.placeholders.skeleton', params);
+<!-- Any parameters from the component being lazy loaded will be available as an `params` argument passed to the `placeholder()` method. -->
+
+
+If you want to set a default placeholder template for all your lazy-loaded components, you can do so by referencing the view in the `pyblade.json` config file:
+
+```json
+"liveblade":{
+    "enabled": true,
+    "lazy_placeholder": "liveblade.placeholders.default", // [!code highlight]
 }
 ```
 
-Any parameters from the component being lazy loaded will be available as an `params` argument passed to the `placeholder()` method.
+Now, when a component is lazy-loaded and no `placeholder()` method is defined, Liveblade will use the configured PyBlade component (`liveblade.placeholders.default` in this case.)
 
 ## Lazy loading outside of the viewport
 
 By default, Lazy-loaded components aren't full loaded until they enter the browser's viewport, for example when a user scrolls to one.
 
-If you'd rather lazy load all components on a page as soon as the page is loaded, without waiting for them to enter the viewport, you can do so by passing "on-load" into the `lazy` parameter:
+If you'd rather lazy load all components on a page as soon as the page is loaded, without waiting for them to enter the viewport, you can do so by passing "onload" into the `lazy` parameter:
 
 ```blade
-<liveblade:revenue lazy="on-load" />
+<liveblade:revenue lazy="onload" />
+```
+
+... or set the `lazy="onload"` key-word argument  when using the `@liveblade` directive:
+
+```blade
+@liveblade("revenue", lazy="onload")
 ```
 
 Now this component will load after the page is ready without waiting for it to be inside the viewport.
+
+
+## Lazy load by default
+
+If you want to enforce that all usages of a component will be lazy-loaded, you can add the `@lazy` decorator above the component class:
+
+```python
+
+from pyblade import liveblade
+
+@lazy
+class Revenue(liveblade.Component):
+    ...
+```
+
+>[!tip] Pro tip !
+> You may enable [lazy loading outside of the viewport](#lazy-loading-outside-of-the-viewport) with the `onload=True` parameter:
+>```python
+>@lazy(onload=True)
+>class Revenue(liveblade.Component):
+>    ...
+>```
+
+If you want to override lazy loading somewhere, you can set the `lazy` parameter to `False`:
+
+```blade
+<liveblade:revenue :lazy="False" />
+```
+
+or
+
+
+```blade
+@liveblade("revenue", lazy=False)
+```
+
+### Disabling request isolation
+
+If there are multiple lazy-loaded components on the page, each component will make an independent network request, rather than each lazy update being bundled into a single request.
+
+If you want to disable this isolation behavior and instead bundle all updates together in a single network request you can do so with the `isolate=False` parameter:
+
+```python
+
+from pyblade import liveblade
+
+@lazy(isolate=False)
+class Revenue(liveblade.Component):
+    ...
+```
+
+Now, if there are ten `Revenue` components on the same page, when the page loads, all ten updates will be bundled and sent the server as single network request.
+
 
 ## Passing in props
 
@@ -125,159 +183,41 @@ In general, you can treat `lazy` components the same as normal components, since
 For example, here's a scenario where you might pass a time interval into the `Revenue` component from a parent component:
 
 ```blade
-<input type="date" wire:model="start">
-<input type="date" wire:model="end">
+<input type="date" b-model="start">
+<input type="date" b-model="end">
 
-<liveblade:revenue lazy :start :end />
+<liveblade:revenue lazy :start="start" :end="end" />
 ```
 
 You can accept this data in `mount()` just like any other component:
 
-```php
-<?php
+```python
+from django.db.models import Sum
+from pyblade import liveblade
+from app.models import Transaction
 
-namespace App\Liveblade;
+class Revenue(liveblade.Component):
 
-use Liveblade\Component;
-use App\Models\Transaction;
+    amount: float
 
-class Revenue extends Component
-{
-    public amount;
+    def mount(self, start, end):  # [!code highlight]
+        ...
 
-    public function mount(start, end)
-    {
-        // Expensive database query...
-        this->amount = Transactions::between(start, end)->sum('amount');
-    }
+    def placeholder(self):
+        return self.view('liveblade.placeholders.skeleton', context={})
 
-    public function placeholder()
-    {
-        return <<<'HTML'
-        <div>
-            <!-- Loading spinner... -->
-            <svg>...</svg>
-        </div>
-        HTML;
-    }
-
-    public function render()
-    {
-        return view('liveblade.revenue');
-    }
-}
+    def render(self):
+        return self.view('liveblade.revenue')
 ```
 
 However, unlike a normal component load, a `lazy` component has to serialize or "dehydrate" any passed-in properties and temporarily store them on the client-side until the component is fully loaded.
 
-For example, you might want to pass in an Eloquent model to the `Revenue` component like so:
+For example, you might want to pass in a Database model to the `Revenue` component like so:
 
 ```blade
-<liveblade:revenue lazy :user />
+<liveblade:revenue lazy :user="user" />
 ```
 
-In a normal component, the actual PHP in-memory `user` model would be passed into the `mount()` method of `Revenue`. However, because we won't run `mount()` until the next network request, Liveblade will internally serialize `user` to JSON and then re-query it from the database before the next request is handled.
+In a normal component, the actual Python in-memory `user` model would be passed into the `mount()` method of `Revenue`. However, because we won't run `mount()` until the next network request, Liveblade will internally serialize `user` to JSON and then re-query it from the database before the next request is handled.
 
 Typically, this serialization should not cause any behavioral differences in your application.
-
-## Lazy load by default
-
-If you want to enforce that all usages of a component will be lazy-loaded, you can add the `#[Lazy]` attribute above the component class:
-
-```php
-<?php
-
-namespace App\Liveblade;
-
-use Liveblade\Component;
-use Liveblade\Attributes\Lazy;
-
-#[Lazy]
-class Revenue extends Component
-{
-    // ...
-}
-```
-
-If you want to override lazy loading you can set the `lazy` parameter to `false`:
-
-```blade
-<liveblade:revenue :lazy="false" />
-```
-
-### Disabling request isolation
-
-If there are multiple lazy-loaded components on the page, each component will make an independent network request, rather than each lazy update being bundled into a single request.
-
-If you want to disable this isolation behavior and instead bundle all updates together in a single network request you can do so with the `isolate: false` parameter:
-
-```php
-<?php
-
-namespace App\Liveblade;
-
-use Liveblade\Component;
-use Liveblade\Attributes\Lazy;
-
-#[Lazy(isolate: false)] // [tl! highlight]
-class Revenue extends Component
-{
-    // ...
-}
-```
-
-Now, if there are ten `Revenue` components on the same page, when the page loads, all ten updates will be bundled and sent the server as single network request.
-
-## Full-page lazy loading
-
-You may want to lazy load full-page Liveblade components. You can do this by calling `->lazy()` on the route like so:
-
-```php
-Route::get('/dashboard', \App\Liveblade\Dashboard::class)->lazy();
-```
-
-Or alternatively, if there is a component that is lazy-loaded by default, and you would like to opt-out of lazy-loading, you can use the following `enabled: false` parameter:
-
-```php
-Route::get('/dashboard', \App\Liveblade\Dashboard::class)->lazy(enabled: false);
-```
-
-## Default placeholder view
-
-If you want to set a default placeholder view for all your components you can do so by referencing the view in the `/config/liveblade.php` config file:
-
-```php
-'lazy_placeholder' => 'liveblade.placeholder',
-```
-
-Now, when a component is lazy-loaded and no `placeholder()` is defined, Liveblade will use the configured Blade view (`liveblade.placeholder` in this case.)
-
-## Disabling lazy loading for tests
-
-When unit testing a lazy component, or a page with nested lazy components, you may want to disable the "lazy" behavior so that you can assert the final rendered behavior. Otherwise, those components would be rendered as their placeholders during your tests.
-
-You can easily disable lazy loading using the `Liveblade::withoutLazyLoading()` testing helper like so:
-
-```php
-<?php
-
-namespace Tests\Feature\Liveblade;
-
-use App\Liveblade\Dashboard;
-use Liveblade\Liveblade;
-use Tests\TestCase;
-
-class DashboardTest extends TestCase
-{
-    /** @test */
-    public function renders_successfully()
-    {
-        Liveblade::withoutLazyLoading() // [tl! highlight]
-            ->test(Dashboard::class)
-            ->assertSee(...);
-    }
-}
-```
-
-Now, when the dashboard component is rendered for this test, it will skip rendering the `placeholder()` and instead render the full component as if lazy loading wasn't applied at all.
-
