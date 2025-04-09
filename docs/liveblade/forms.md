@@ -199,8 +199,8 @@ from pyblade import liveblade
 
 Now, if the user only types three characters into the "title" input, then clicks on the next input in the form, a validation message will be shown to them indicating there is a five character minimum for that field.
 
-
-Liveblade has a lot more validation features to offer. For more information, visit our dedicated documentation page on [Validation](/features/validation).
+>[!info]
+>Liveblade has a lot more validation features to offer. For more information, visit our dedicated documentation page on [Validation](features/validation).
 
 ## Showing a loading indicator
 
