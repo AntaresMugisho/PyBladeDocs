@@ -109,16 +109,16 @@ Now, when a component is lazy-loaded and no `placeholder()` method is defined, L
 
 By default, Lazy-loaded components aren't full loaded until they enter the browser's viewport, for example when a user scrolls to one.
 
-If you'd rather lazy load all components on a page as soon as the page is loaded, without waiting for them to enter the viewport, you can do so by passing "onload" into the `lazy` parameter:
+If you'd rather lazy load all components on a page as soon as the page is loaded, without waiting for them to enter the viewport, you can do so by passing "on_load" into the `lazy` parameter:
 
 ```blade
-<liveblade:revenue lazy="onload" />
+<liveblade:revenue lazy="on_load" />
 ```
 
-... or set the `lazy="onload"` key-word argument  when using the `@liveblade` directive:
+... or set the `lazy="on_load"` key-word argument  when using the `@liveblade` directive:
 
 ```blade
-@liveblade("revenue", lazy="onload")
+@liveblade("revenue", lazy="on_load")
 ```
 
 Now this component will load after the page is ready without waiting for it to be inside the viewport.
@@ -138,9 +138,9 @@ class Revenue(liveblade.Component):
 ```
 
 >[!tip] Pro tip !
-> You may enable [lazy loading outside of the viewport](#lazy-loading-outside-of-the-viewport) with the `onload=True` parameter:
+> You may enable [lazy loading outside of the viewport](#lazy-loading-outside-of-the-viewport) with the `on_load=True` parameter:
 >```python
->@lazy(onload=True)
+>@lazy(on_load=True)
 >class Revenue(liveblade.Component):
 >    ...
 >```

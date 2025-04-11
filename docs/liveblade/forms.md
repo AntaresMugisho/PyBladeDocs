@@ -58,10 +58,10 @@ Now, as a user types into this field, network requests will be sent to the serve
 
 ### Debouncing input
 
-When using `.live` on a text input, you may want more fine-grained control over how often a network request is sent. By default, a debounce of "250ms" is applied to the input; however, you can customize this using the `.debounce` modifier:
+When live-updating with `b-model.debounce` on a text input, you may want more fine-grained control over how often a network request is sent. By default, a debounce of "250ms" is applied to the input; however, you can customize this using the `.Xms` modifier, `X` representing the number of milliseconds:
 
 ```blade
-<input type="text" b-model.live.debounce.150ms="title" >
+<input type="text" b-model.debounce.150ms="title" >
 ```
 
 Now that `.debounce.150ms` has been added to the field, a shorter debounce of "150ms" will be used when handling input updates for this field. In other words, as a user types, a network request will only be sent if the user stops typing for at least 150 milliseconds.
@@ -75,7 +75,7 @@ Sometimes this isn't the desired behavior, and you would rather send a request a
 In these cases, you can instead use `.throttle` to signify a time interval to send network requests:
 
 ```blade
-<input type="text" b-model.live.throttle.150ms="title" >
+<input type="text" b-model.throttle.150ms="title" >
 ```
 
 In the above example, as a user is typing continuously in the "title" field, a network request will be sent every 150 milliseconds until the user is finished.
@@ -93,14 +93,13 @@ If instead of sending network requests as a user types, you want to instead only
 Now the component class on the server won't be updated until the user presses tab or clicks away from the text input.
 
 
-
 ## Form validation
 
 To avoid storing incomplete or dangerous user input, most forms need some sort of input validation.
 
-Liveblade makes validating your forms as simple as using the `@rules` decorator above the properties you want to be validated. This is similar to the python built-in `@property` decorator. So we are going to define our properties like methods.
+Liveblade makes validating your forms as simple as using the `@validators` decorator above the properties you want to be validated. This is similar to the python built-in `@property` decorator. So we are going to define our properties like methods.
 
-Once a method has a `@rules` decorator attached to it, the validation rule will be applied to the property's value any time it's updated server-side.
+Once a method has a `@validators` decorator attached to it, the validation rule will be applied to the property's value any time it's updated server-side.
 
 Let's add some basic validation rules to the `title` and `content` properties in our `CreatePost` component:
 
@@ -110,10 +109,10 @@ from app.models import Post
 
 class PostCreate(liveblade.Component):
 
-    @rules("required") # [!code highlight]
+    @validators("required") # [!code highlight]
     def title(self): pass
 
-    @rules("required") # [!code highlight]
+    @validators("required") # [!code highlight]
     def content(self): pass
 
     def save(self):
@@ -148,9 +147,9 @@ We'll also modify our PyBlade template to show any validation errors on the page
 Now, if the user tries to submit the form without filling in any of the fields, they will see validation messages telling them which fields are required before saving the post.
 
 >[!Note]
->Validation rules may be a list strings, or a string of `|` (pipe) separated values.
+>Validation rules may be a list of strings, or a string of `|` (pipe) separated values.
 
-You may also use the `rules()` method within your component to define validation rules. The method must return a `dictionary` where `keys` represent the names of properties you want to validate and `values` are the validation rules to apply, either a string of pipe-separated values or a list.
+You may also use the `validators()` method within your component to define validation rules. The method must return a `dictionary` where `keys` represent the names of properties you want to validate and `values` are the validation rules to apply, either a string of pipe-separated values or a list.
 ```python
 from pyblade import liveblade
 from app.models import Post
@@ -160,7 +159,7 @@ class PostCreate(liveblade.Component):
     title: str = ""
     content: str = ""
 
-    def rules(self): # [!code highlight:5]
+    def validators(self): # [!code highlight:5]
         return {
             "title" : "required|min:5",
             "content" : ["required", "min:5"]
@@ -193,7 +192,7 @@ Liveblade handles this sort of thing automatically. By using `.live` or `.blur` 
 ```python
 from pyblade import liveblade
 ...
-    @rules('required|min:5')
+    @validators('required|min:5')
     def title(self)
 ```
 
