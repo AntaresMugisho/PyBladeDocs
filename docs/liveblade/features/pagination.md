@@ -5,7 +5,7 @@ Because most of these paginators were designed for static applications, in a non
 
 However, when you use pagination inside a Liveblade component, users can navigate between pages while remaining on the same page. Liveblade will handle everything behind the scenes, including updating the URL query string with the current page.
 
-All it takes to enable pagination in your component is to inherit from the liveblade.Paginator mixin — it's that effortless.
+All it takes to enable pagination in your component is to inherit from the `liveblade.Paginator` mixin — it's that effortless.
 
 ## Basic usage
 
