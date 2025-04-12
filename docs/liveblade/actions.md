@@ -110,20 +110,34 @@ Everytime an action in your component is trigerred, the `render()` method is cal
 
 But, sometimes there might be an action in your component with no side effects that would change the rendered PyBlade template when the action is invoked. If so, you can skip the `render` portion of Liveblade's lifecycle by adding the `@renderless` decorator above the action method.
 
->[!danger] 404 : Not found
-> Looking for a better example !
+Let's say you want to track when a user clicks on a button, but this interaction doesn’t change any visible part of the UI.
 
 ```python
-...
+from pyblade.liveblade import Component
+from app.models import ActivityLog
 
+class ActivityTracker(Component):
+    user_id = None
+
+    def mount(self, user_id):
+        self.user_id = user_id
+
+    @renderless
+    def track_click(self):
+        # Log the click to your database or analytics service
+        ActivityLog.objects.create(user_id=self.user_id, action="clicked_button")
 ```
 
 ```html
+<button wire:click="track_click" class="btn">
+    Click Me
+</button>
 ```
 
-The example above uses [`b-intersect`](#), a Liveblade utility that calls the expression when the element enters the viewport (typically used to detect when a user scrolls to an element further down the page).
+What happens here is that when the `track_click` method is called, the `@renderless` decorator tells Liveblade not to call the `render()` method afterward.
 
-As you can see, when a user scrolls to the bottom of the post, `increment_view_count()` is invoked. Since `@renderless` was added to the action, the view is logged, but the template doesn't re-render and no part of the page is affected.
+This saves time and prevents an unnecessary re-render of the component.
+It’s perfect for fire-and-forget logic — like logging, silent actions, or external calls.
 
 If you prefer to not utilize method attributes or need to conditionally skip rendering, you may invoke the `skip_render()` method in your component action:
 
@@ -151,10 +165,6 @@ Liveblade allows you to define JavaScript actions that run entirely on the clien
 To define a JavaScript action, you can use the `js()` function inside a `<script>` tag in your component.
 
 Here's an example of bookmarking a post that uses a JavaScript action to optimistically update the UI before making a server request. The JavaScript action immediately shows the filled bookmark icon, then makes a request to persist the bookmark in the database:
-
->[!danger] 404 : Not found
-> Looking for a simple example !
-
 
 ```python
 from pyblade import liveblade 

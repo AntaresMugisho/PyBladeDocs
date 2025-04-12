@@ -773,8 +773,31 @@ When a user presses "Delete account", the action will only be performed if "DELE
 
 For security renforcement, you may use the `@confirm` decorator inside your Liveblade's component class.
 
->[!danger] 404: Not found
->Find an example.
+Imagine you have a `PostDelete` component where a user can delete a blog post. To prevent accidental or malicious deletions, you can enforce a confirmation step using the `@confirm` decorator.
+
+```python
+from pyblade import Component, confirm
+
+class PostDelete(Component):
+    post_id = None
+
+    def mount(self, post_id):
+        self.post_id = post_id
+
+    @confirm("Are you sure you want to delete this post?")
+    def delete(self):
+        post = Post.objects.get(self.post_id)
+        post.delete()
+        self.notify("The post has been deleted.")
+```
+
+```html
+<button b-click="delete" class="btn btn-danger">
+    Delete Post
+</button>
+```
+
+This is ideal for destructive actions like deleting users, posts, or clearing data.
 
 ## b-transition
 
