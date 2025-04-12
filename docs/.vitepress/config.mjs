@@ -38,21 +38,28 @@ export default defineConfig({
           {text:"Prelude", link:"/liveblade/prelude"},
           {text: "Quick start", link:"/liveblade/quickstart"},
           {text: "Installation", link:"/liveblade/installation"},
-          // {text: "ESSENTIALS"},
-          {text: "Components", link:"/liveblade/components"},
-          {text: "Properties", link:"/liveblade/properties"},
-          {text: "Actions", link:"/liveblade/actions"},
-          {text: "Lifecycle Hooks", link:"/liveblade/lifecycle-hooks"},
-          {text: "Events", link:"/liveblade/events"},
-          {text: "Liveblade Directives", link:"/liveblade/liveblade-directives"},
-          {text: "Forms", link:"/liveblade/forms"},
-          // {text: "FEATURES"},
-          {text: "Navigation", link:"/liveblade/features/navigation"},
-          {text: "Lazy Loading", link:"/liveblade/features/lazy-loading"},
-          {text: "Validation", link:"/liveblade/features/validation"},
-          {text: "Pagination", link:"/liveblade/features/pagination"},
-          {text: "File Uploads", link:"/liveblade/features/file-uploads"},
-          // ---
+          {text: "Essentials", 
+            items: [
+              {text: "Components", link:"/liveblade/components"},
+              {text: "Properties", link:"/liveblade/properties"},
+              {text: "Actions", link:"/liveblade/actions"},
+              {text: "Lifecycle Hooks", link:"/liveblade/lifecycle-hooks"},
+              {text: "Events", link:"/liveblade/events"},
+              {text: "Liveblade Directives", link:"/liveblade/liveblade-directives"},
+              {text: "Forms", link:"/liveblade/forms"},
+            ]
+          },
+          
+          {text: "Features",
+            items: [
+              {text: "Navigation", link:"/liveblade/features/navigation"},
+              {text: "Lazy Loading", link:"/liveblade/features/lazy-loading"},
+              {text: "Validation", link:"/liveblade/features/validation"},
+              {text: "File Uploads", link:"/liveblade/features/file-uploads"},
+              {text: "Pagination", link:"/liveblade/features/pagination"},
+            ]
+          },
+
           {text: "Security", link:"/liveblade/security"},
         ]
       },

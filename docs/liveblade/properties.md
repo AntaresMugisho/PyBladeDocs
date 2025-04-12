@@ -118,7 +118,7 @@ Any changes made to the text input will be automatically synchronized with the `
 >[!tip] Pro tip
 >To enable "live" updating as a user types, you can use `b-model.live` instead.
 
-Let's add a method in our component's class so that we can trigger an "action" from the browser to test it out.
+Let's add a method in our component's class so that we can trigger an "action" from the browser to test it out. 
 
 ```python{7-8}
 from pyblade import liveblade
