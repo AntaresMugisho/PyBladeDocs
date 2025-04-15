@@ -1,81 +1,5 @@
 # Available commands
 
-PyBlade CLI commands are categorized for easy navigation. Click on any command to learn more about its usage and options.
-
-### 1. Django Commands
-These commands are specific to Django project management.
-
-| Command                     | Description                                                                 |
-|-----------------------------|-----------------------------------------------------------------------------|
-| `pyblade startproject`      | Create a new Django project.                                                |
-| `pyblade startapp`          | Create a new Django application within a project.                          |
-| `pyblade makemigrations`    | Generate migration files for database changes.                             |
-| `pyblade migrate`           | Apply migrations to the database.                                          |
-| `pyblade createsuperuser`   | Create a superuser for the Django admin panel.                             |
-| `pyblade collectstatic`     | Collect static files into the designated directory.                        |
-| `pyblade runserver`         | Start the Django development server.                                       |
-| `pyblade shell`             | Open the Django interactive shell.                                         |
-| `pyblade test`              | Run tests for your Django applications.                                    |
-
----
-
-### 2. Database Commands
-Commands for managing databases and migrations.
-
-| Command                     | Description                                                                 |
-|-----------------------------|-----------------------------------------------------------------------------|
-| `pyblade db:reset`          | Reset the database by dropping and recreating it.                          |
-| `pyblade db:seed`           | Seed the database with test data.                                          |
-| `pyblade db:status`         | Show the current migration status of the database.                         |
-| `pyblade db:rollback`       | Rollback the last database migration.                                      |
-
----
-
-### 3. Artisan-Inspired Commands
-Commands inspired by Laravel's Artisan for additional utility.
-
-| Command                     | Description                                                                 |
-|-----------------------------|-----------------------------------------------------------------------------|
-| `pyblade make:model`        | Create a new Eloquent model (Django model).                                |
-| `pyblade make:controller`   | Create a new controller for handling requests.                             |
-| `pyblade make:middleware`   | Create a new middleware class.                                             |
-| `pyblade make:migration`    | Create a new migration file.                                               |
-| `pyblade make:seeder`       | Create a new database seeder.                                              |
-| `pyblade make:factory`      | Create a new model factory for generating test data.                       |
-| `pyblade route:list`        | Display a list of all registered routes.                                   |
-| `pyblade cache:clear`       | Clear the application cache.                                               |
-| `pyblade config:cache`      | Cache the configuration files for faster performance.                      |
-
----
-
-### 4. Utility Commands
-General-purpose commands for development and debugging.
-
-| Command                     | Description                                                                 |
-|-----------------------------|-----------------------------------------------------------------------------|
-| `pyblade serve`             | Serve the application on a local development server.                       |
-| `pyblade tinker`            | Interact with your application in a REPL environment.                      |
-| `pyblade queue:work`        | Process jobs in the queue.                                                 |
-| `pyblade schedule:run`      | Run scheduled tasks.                                                       |
-| `pyblade storage:link`      | Create a symbolic link for public storage.                                 |
-| `pyblade optimize`          | Optimize the application for production.                                  |
-
----
-
-### 5. Custom Commands
-Commands specific to PyBlade CLI for advanced functionality.
-
-| Command                     | Description                                                                 |
-|-----------------------------|-----------------------------------------------------------------------------|
-| `pyblade blade:init`        | Initialize a new PyBlade project structure.                                |
-| `pyblade blade:update`      | Update PyBlade CLI to the latest version.                                 |
-| `pyblade blade:info`       | Display information about the current PyBlade environment.                |
-| `pyblade blade:docs`       | Open the PyBlade CLI documentation in your browser.                       |
-
----
-
---- 
-
 
 ## `pyblade init`
 
@@ -127,27 +51,79 @@ This starts the server with debug mode enabled.
   Solution: Check if another process is using the default port (8000). You can stop that process or specify a different port using the `--port` option.
 
 
+## `pyblade convert`
+
+Migrates existing Django templates to the PyBlade templates by replacing Django Template tags and filters with their PyBlade equivalent.
+
+#### Usage
+```bash
+pyblade convert
+```
+
+#### Examples:
+```bash
+pyblade convert
+```
+
+This will scan your Django templates and convert them into PyBlade-compatible templates.
+
+#### Common Issues & Troubleshooting:
+- **Error: "Template parsing failed"**  
+  **Solution**: Ensure the original Django templates follow valid syntax and avoid non-standard template tags.
+
+## `pyblade make:template`
+
+Generates a new PyBlade template.
+
+#### Usage
+```bash
+pyblade make:component <name>  [-f | --force] 
+```
+
+### Arguments
+`name`: The name of the component to generate.
+
+### Options
+`-f, --force`: Override the template if already exists.
+
+### Aliases
+``pyblade maketemplate
+
+#### Examples:
+```bash
+pyblade make:template home
+```
+
+This creates a new `tempalates/home.html` PyBlade component file.
+
+#### Common Issues & Troubleshooting:
+- Error: "Component already exists"  
+  Solution: Check the `templates/components` directory to see if a componenet with the same name (_kebab-cased_) already exists. You can either override the existing component by using the `--force` option or choose a different name.
+
+Here’s the full documentation for all the commands you listed, using the same structure and tone as your `make:template` example:
+
 ## `pyblade make:component`
 
 Generates a new PyBlade component. These components are reusable UI elements that can be embedded in templates.
 
 #### Usage
 ```bash
-pyblade make:component <ComponentName | component-name> [-f | --force]
+pyblade make:component <name>  [-f | --force] 
 ```
 
 ### Arguments
-`ComponentName`: The name of the component to generate (e.g., `AlertBox`).
+`name`: The name of the component to generate..
 
-### Arguments
+### Options
 `-f, --force`: Override the component if already exists.
 
 
 #### Examples:
 ```bash
-pyblade make:component AlertBox
+pyblade make:component alert-box
 ```
-This creates a new `alert-box.html` component file.
+
+This creates a new `tempalates/components/alert-box.html` PyBlade component file.
 
 #### Common Issues & Troubleshooting:
 - Error: "Component already exists"  
@@ -155,132 +131,488 @@ This creates a new `alert-box.html` component file.
 
 Visit [PyBlade Components]("/components") to learn more about them. 
 
+
+## `pyblade make:liveblade`
+
+Creates a new Liveblade component for reactive UI rendering.
+
+#### Usage
+```bash
+pyblade make:liveblade <name> [-f | --force]
+```
+
+### Arguments
+`name`: The _CamelCased_ name of the Liveblade component.
+
+### Options
+`-f, --force`: Overwrite the component if it already exists.
+
+#### Examples:
+```bash
+pyblade make:liveblade counter
+```
+
+#### Common Issues & Troubleshooting:
+- **LiveBlade component name conflict**  
+  Use `--force` or change the name.
+
 ---
 
-### 4. `pyblade make:model <ModelName>`
+## `pyblade make:messages`
 
-#### Description:
-Generates a new model file that interacts with the database and represents the application's data structures.
+Scans source files and creates or updates `.po` translation message files.
 
-#### Arguments:
-| Argument      | Description                              |
-|---------------|------------------------------------------|
-| `<ModelName>` | The name of the model to create (e.g., `User`). |
-
-#### Options:
-| Option        | Description                              |
-|---------------|------------------------------------------|
-| `--database`  | Specify the database connection to use (default: primary). |
-
-#### Aliases:
-- None.
-
-#### Usage:
+#### Usage
 ```bash
-pyblade make:model <ModelName> [--database <database_name>]
+pyblade make:messages
 ```
 
 #### Examples:
 ```bash
-pyblade make:model User
+pyblade make:messages
 ```
-This creates a `User.py` model file.
-
-```bash
-pyblade make:model Post --database secondary
-```
-This creates the `Post` model and links it to a secondary database.
-
-#### Common Issues & Troubleshooting:
-- Error: "Model already exists"  
-  Solution: Check the `app/models` directory. If the model exists, you can modify it or choose a different name.
-
-#### Related Commands:
-- `pyblade make:migration <MigrationName>`: Create migration files related to the model.
-- `pyblade make:controller <ControllerName>`: Link the model with a controller.
 
 ---
 
-### 5. `pyblade make:migration <MigrationName>`
+## `pyblade make:migrations`
 
-#### Description:
-Generates a migration file that allows you to modify your database schema, such as creating tables or altering columns.
+Creates new migration files based on model changes.
 
-#### Arguments:
-| Argument      | Description                              |
-|---------------|------------------------------------------|
-| `<MigrationName>` | The name of the migration (e.g., `create_users_table`). |
-
-#### Options:
-| Option        | Description                              |
-|---------------|------------------------------------------|
-| None          | No additional options for this command.  |
-
-#### Aliases:
-- None.
-
-#### Usage:
+#### Usage
 ```bash
-pyblade make:migration <MigrationName>
+pyblade make:migrations
 ```
 
 #### Examples:
 ```bash
-pyblade make:migration create_users_table
+pyblade make:migrations
 ```
-This creates a migration file to define the `users` table schema.
-
-#### Common Issues & Troubleshooting:
-- Error: "Invalid migration name"  
-  Solution: Ensure the migration name follows proper naming conventions (e.g., `create_<table_name>_table`).
-
-#### Related Commands:
-- `pyblade migrate`: Apply the migration to update the database.
-- `pyblade db:seed`: Seed the database after applying migrations.
 
 ---
 
-### 6. `pyblade migrate`
+## `pyblade app:start`
 
-#### Description:
-Applies all pending migrations to the database.
+Creates a new Django app within the current project.
 
-#### Arguments:
-| Argument      | Description                              |
-|---------------|------------------------------------------|
-| None          | No required arguments for this command.  |
-
-#### Options:
-| Option        | Description                              |
-|---------------|------------------------------------------|
-| `--force`     | Force the migration to run even if it has been applied previously. |
-| `--rollback`  | Roll back the last migration batch. |
-
-#### Aliases:
-- None.
-
-#### Usage:
+#### Usage
 ```bash
-pyblade migrate [--force] [--rollback]
+pyblade app:start <app-name>
+```
+
+### Arguments
+`app-name`: The name of the new Django app.
+
+#### Examples:
+```bash
+pyblade app:start blog
+```
+
+#### Common Issues & Troubleshooting:
+- **App name conflict**  
+  Make sure no other app with the same name exists in the project directory.
+
+---
+
+## `pyblade compile:messages`
+
+Compiles translation message files into `.mo` files.
+
+#### Usage
+```bash
+pyblade compile:messages
+```
+
+#### Examples:
+```bash
+pyblade compile:messages
+```
+
+#### Common Issues & Troubleshooting:
+- **Missing `.po` files**  
+  Run `make:messages` first to generate translation files.
+
+---
+
+## `pyblade db:migrate`
+
+Applies all database migrations.
+
+#### Usage
+```bash
+pyblade db:migrate
+```
+
+#### Examples:
+```bash
+pyblade db:migrate
+```
+
+#### Common Issues & Troubleshooting:
+- **Migration errors**  
+  Check your models and run `make:migrations` before applying changes.
+
+---
+
+## `pyblade db:shell`
+
+Launches an interactive database shell.
+
+#### Usage
+```bash
+pyblade db:shell
+```
+
+#### Examples:
+```bash
+pyblade db:shell
+```
+
+---
+
+
+## `pyblade shell`
+
+Starts an interactive Python shell with Django context loaded.
+
+#### Usage
+```bash
+pyblade shell
+```
+
+#### Examples:
+```bash
+pyblade shell
+```
+
+---
+
+## `pyblade static:collect`
+
+Collects all static files into a single location (typically for deployment).
+
+#### Usage
+```bash
+pyblade static:collect
+```
+
+#### Examples:
+```bash
+pyblade static:collect
+```
+
+#### Common Issues & Troubleshooting:
+- **Permissions error**  
+  Ensure you have write access to the `STATIC_ROOT` directory.
+
+Absolutely! Here's the documentation for those Django-related commands, continuing the same structure and formatting:
+
+---
+
+## `pyblade startapp`
+
+Creates a new Django app within an existing project.
+
+#### Usage
+```bash
+pyblade startapp <app-name>
+```
+
+### Arguments
+`app-name`: The name of the new app.
+
+#### Examples:
+```bash
+pyblade startapp blog
+```
+
+This will create a new app directory with models, views, and other standard files.
+
+---
+
+## `pyblade makemigrations`
+
+Generates migration files for model changes in your Django apps.
+
+#### Usage
+```bash
+pyblade makemigrations [<app-name>]
+```
+
+### Arguments
+`app-name` _(optional)_: Specify an app to create migrations for.
+
+#### Examples:
+```bash
+pyblade makemigrations
+pyblade makemigrations accounts
+```
+
+---
+
+## `pyblade migrate`
+
+Applies all unapplied migrations to the database.
+
+#### Usage
+```bash
+pyblade migrate
 ```
 
 #### Examples:
 ```bash
 pyblade migrate
 ```
-This applies all pending migrations to the database.
 
-```bash
-pyblade migrate --rollback
-```
-This rolls back the last batch of migrations.
-
-#### Common Issues & Troubleshooting:
-- Error: "Database connection failed"  
-  Solution: Verify your database credentials in the configuration file and ensure the database is running.
-
-#### Related Commands:
-- `pyblade make:migration <MigrationName>`: Create new migration files.
-- `pyblade db:seed`: Seed the database after applying migrations.
+This synchronizes your database schema with the current set of models and migrations.
 
 ---
+
+## `pyblade createsuperuser`
+
+Creates a superuser account to access the Django admin interface.
+
+#### Usage
+```bash
+pyblade createsuperuser
+```
+
+#### Examples:
+```bash
+pyblade createsuperuser
+```
+
+You will be prompted to enter a username, email, and password interactively.
+
+---
+
+## `pyblade collectstatic`
+
+Collects all static files from apps and places them into the static root directory.
+
+#### Usage
+```bash
+pyblade collectstatic
+```
+
+#### Examples:
+```bash
+pyblade collectstatic
+```
+
+Used primarily for preparing static assets before deployment.
+
+
+## `pyblade shell`
+
+Opens the Django interactive shell with your project's context loaded.
+
+#### Usage
+```bash
+pyblade shell
+```
+
+#### Examples:
+```bash
+pyblade shell
+```
+
+This shell is preloaded with Django settings and all models, making it ideal for testing queries.
+
+---
+
+## `pyblade test`
+
+Runs the test suite for your Django apps.
+
+#### Usage
+```bash
+pyblade test [<app-name>]
+```
+
+### Arguments
+`app-name` _(optional)_: Run tests for a specific app only.
+
+#### Examples:
+```bash
+pyblade test
+pyblade test blog
+```
+
+
+## `pyblade update`
+
+Updates PyBlade to the latest available version.
+
+#### Usage
+```bash
+pyblade update
+```
+
+#### Examples:
+```bash
+pyblade update
+```
+
+This fetches and installs the latest release of PyBlade.
+
+#### Common Issues & Troubleshooting:
+- **Permission denied**  
+  Try using `sudo` if installing globally.
+
+---
+
+## `pyblade info`
+
+Displays information about the current PyBlade project and environment.
+
+#### Usage
+```bash
+pyblade info
+```
+
+#### Examples:
+```bash
+pyblade info
+```
+
+Outputs details such as framework version, project name, and environment configuration.
+
+---
+
+## `pyblade docs`
+
+Opens the PyBlade CLI documentation in your default browser.
+
+#### Usage
+```bash
+pyblade docs
+```
+
+#### Examples:
+```bash
+pyblade docs
+```
+
+---
+
+## `pyblade make:model`
+
+Creates a new Django model class inside an app.
+
+#### Usage
+```bash
+pyblade make:model <name> [--app <app-name>]
+```
+
+### Arguments
+`name`: Name of the model.
+
+### Options
+`--app`: The Django app where the model should be created.
+
+#### Examples:
+```bash
+pyblade make:model Post --app blog
+```
+
+Creates a `Post` model inside the `blog/models.py` file.
+
+---
+
+## `pyblade make:form`
+
+Generates a new Django `Form` class.
+
+#### Usage
+```bash
+pyblade make:form <name> [--app <app-name>]
+```
+
+### Arguments
+`name`: Name of the form.
+
+### Options
+`--app`: The Django app where the form should be created.
+
+#### Examples:
+```bash
+pyblade make:form ContactForm --app core
+```
+
+Creates a `ContactForm` in `core/forms.py`.
+
+---
+
+## `pyblade make:migration`
+
+Creates a new blank migration file.
+
+#### Usage
+```bash
+pyblade make:migration [<app-name>]
+```
+
+### Arguments
+`app-name` _(optional)_: The Django app to generate the migration for.
+
+#### Examples:
+```bash
+pyblade make:migration
+pyblade make:migration accounts
+```
+
+Use this when you need to write a custom migration manually.
+
+---
+
+## `pyblade route:list`
+
+Displays a list of all registered routes in the application.
+
+#### Usage
+```bash
+pyblade route:list
+```
+
+#### Examples:
+```bash
+pyblade route:list
+```
+
+Useful for debugging route definitions and HTTP methods.
+
+---
+
+## `pyblade cache:clear`
+
+Clears all cached data from the application.
+
+#### Usage
+```bash
+pyblade cache:clear
+```
+
+#### Examples:
+```bash
+pyblade cache:clear
+```
+
+Use this after updating config or template files to ensure fresh values are used.
+
+---
+
+## `pyblade config:cache`
+
+Caches the configuration files to speed up application boot time.
+
+#### Usage
+```bash
+pyblade config:cache
+```
+
+#### Examples:
+```bash
+pyblade config:cache
+```
+
+This command compiles all configuration into a single cache file for optimized performance.
