@@ -304,9 +304,6 @@ pyblade static:collect
 - **Permissions error**  
   Ensure you have write access to the `STATIC_ROOT` directory.
 
-Absolutely! Here's the documentation for those Django-related commands, continuing the same structure and formatting:
-
----
 
 ## `pyblade startapp`
 
