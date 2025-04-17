@@ -76,9 +76,9 @@
         }
     </style>
 </head>
-<body class="font-sans bg-night-black text-white">
+<body class="font-sans text-white">
     <!-- Hero Section -->
-    <div class="relative overflow-hidden min-h-screen">
+    <div class="relative bg-night-black overflow-hidden min-h-screen">
         <!-- Background Elements -->
         <div class="absolute inset-0 hero-gradient opacity-70"></div>
         <div class="absolute inset-0 grid-pattern opacity-30"></div>
@@ -246,13 +246,21 @@
     </div>
 </div>
 
-    <!-- Features Section -->
-    <div class="py-24 bg-white">
+    <!-- Features Section
+    <div class="fixed bottom-0 left-0 bg-0 w-full -z-10 h-64 py-24 hide">
+        <!-- Blurred background image -->
+        <!-- <div
+          class="absolute inset-0 bg-[url('assets/images/py-waves.jpg')] bg-center bg-cover"
+        ></div>
+      </div>  -->
+
+      
+    <div class="py-24 bg-python-blue/20">
         <div class="container mx-auto px-6">
             <h2 class="text-4xl font-bold text-center mb-16">Features</h2>
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <div class="p-6 rounded-lg border border-gray-200 hover:shadow-lg transition">
-                    <div class="text-4xl mb-4">🐍</div>
+                    <div class="text-4xl mb-4 rounded-full bg-white/10 p-2 w-">🐍</div>
                     <h3 class="text-xl font-semibold mb-3">Pythonic Template Engine</h3>
                     <p class="text-gray-600">Write templates with a familiar Python-like syntax. Full Python expression support with built-in security features.</p>
                 </div>
@@ -287,7 +295,7 @@
     </div>
 
     <!-- Team Section -->
-    <div class="py-24 bg-white">
+    <div class="py-24 bg-transparent">
         <div class="container mx-auto px-6 text-center">
             <h2 class="text-4xl font-bold mb-16">Meet the Creators</h2>
             <div class="grid md:grid-cols-2 gap-12 max-w-4xl mx-auto">
