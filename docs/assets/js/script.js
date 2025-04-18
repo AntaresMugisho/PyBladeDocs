@@ -7,6 +7,7 @@ from app.models import Task
 
 class Todo(liveblade.Component):
     title: str
+    tasks = Task.objects.all()
 
     def add(self):
         if self.title:
@@ -15,20 +16,26 @@ class Todo(liveblade.Component):
 
     def render(self):
         return self.view("livablade.todo")
-
-`
-
-const pybladeComponentCode = `@props(type="success")
-<div class="alert-{{ type }}">
-    {{ slot }}
-</div>
-sdsds
 `
 
 const livebladeComponentCode = `<form b-submit="add">
-<input type="text" b-model="title">
-<button type="submit">Add Task</button>
+    <input type="text" b-model="title">
+    <button type="submit">Add Task</button>
 </form>
+
+@for(task in tasks)
+    <b-task-item :task="task" key="task.id" />
+@endfor
+`
+
+const pybladeComponentCode = `<div class="task-item">
+    <input 
+      type="checkbox"
+      b-click="toggle_status({{ task.id }})"
+      @checked(task.done)
+    />
+    <h3>{{ task.title }}</h3>
+</div>
 `
 
 const homeCode = `@extends("layout")
@@ -47,24 +54,25 @@ const homeCode = `@extends("layout")
   @else
     <p>Please login !</p>
   @endauth
-
 @endsection
 `
 
+
 const liveblade = document.getElementById("liveblade-snippet")
-liveblade.innerHTML =`<pre>${livebladeCode}</pre>`
-liveblade.innerHTML = await codeToHtml(livebladeCode, {lang: 'python', theme: 'one-dark-pro'})
-
-const pybladeComponent = document.getElementById("component-snippet")
-pybladeComponent.innerHTML = `<pre>${pybladeComponentCode}</pre>`
-pybladeComponent.innerHTMl = await codeToHtml(pybladeComponentCode, {lang: "html", theme: "one-dark-pro"})
-
 const livebladeComponent = document.getElementById("liveblade-component-snippet")
+const pybladeComponent = document.getElementById("pyblade-component-snippet")
+// const home = document.getElementById("home-snippet")
+
+
+liveblade.innerHTML =`<pre>${livebladeCode}</pre>`
 livebladeComponent.innerHTML = `<pre>${livebladeComponentCode}</pre>`
-livebladeComponent.innerHTML = await codeToHtml(livebladeComponentCode, {lang: "html", theme: "one-dark-pro"})
+pybladeComponent.innerHTML = `<pre>${pybladeComponentCode}</pre>`
+// home.innerHTML = `<pre>${homeCode}</pre>`
+
+liveblade.innerHTML = await codeToHtml(livebladeCode, {lang: 'python', theme: 'one-dark-pro'})
+livebladeComponent.innerHTML = await codeToHtml(livebladeComponentCode, {lang: "blade", theme: "one-dark-pro"})
+pybladeComponent.innerHTML = await codeToHtml(pybladeComponentCode, {lang: "blade", theme: "one-dark-pro"})
+// home.innerHTML = await codeToHtml(homeCode, {lang: "blade", theme: "one-dark-pro"})
 
 
-const home = document.getElementById("home-snippet")
-home.innerHTML = `<pre><code>${homeCode}</code></pre>`
-home.innerHTMl = await codeToHtml(homeCode, {lang: "html", theme: "one-dark-pro"})
 
