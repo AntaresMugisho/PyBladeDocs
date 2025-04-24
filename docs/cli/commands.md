@@ -25,11 +25,23 @@ pyblade serve [--host <host>] [--port <port>] [--debug]
 ```
 
 #### Options
-`--host` : The host address to run the server on (default: `127.0.0.1`)
-
-`--port` : The port number to run the server on (default: `8000`).
-
-`--debug`: Enable debug mode for more detailed logging.
+|Option      | Description
+|------------------|--------------------------------------|
+|`-h, --help`  |          show this help message and exit
+|`--host` | The host address to run the server on (default: `127.0.0.1`)
+|`--port` | The port number to run the server on (default: `8000`).
+|`--debug` | Enable debug mode for more detailed logging.
+|`--ipv6, -6`    |        Tells Django to use an IPv6 address.
+|`--nothreading`  |       Tells Django to NOT use threading.
+|`--noreload` |           Tells Django to NOT use the auto-reloader.
+|`--nostatic`  |          Tells Django to NOT automatically serve static files at STATIC_URL.
+|`--insecure`   |         Allows serving static files even if DEBUG is False.
+|`--version`     |        Show program's version number and exit.
+|`--settings`| The Python path to a settings module, e.g. "myproject.settings.main". If this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be used.
+|`-pythonpath`|  A directory to add to the Python path, e.g. "/home/djangoprojects/myproject".
+|` --no-color`  |          Don't colorize the command output.
+|`--force-color` |        Force colorization of the command output.         
+|`--skip-checks`  |       Skip system checks.
 
 
 #### Aliases
