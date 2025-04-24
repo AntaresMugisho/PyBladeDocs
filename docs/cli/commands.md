@@ -5,10 +5,19 @@
 
 Creates a new PyBlade-powered project with the necessary initial directory structure and your preferred  framemework configuration.
 
+
 #### Usage
 ```bash
 pyblade init
 ```
+
+This command will prompt you to provide the following details:
+
+- **Project Name**: Choose a name for your project.
+- **Python Web Framework**: Choose the Python Web framework you want to use for your project. Only Django is supported.
+- **CSS Framework**: Choose one either Bootstrap 5 or Tailwind CSS for an automatic configuration or None if you want to manually configure it later or don't want to use a CSS Framework.
+- **Use LiveBlade**: Enable or disable Liveblade configuration, which adds additional features like real-time UI updates and dynamic components.
+
 
 #### Common Issues & Troubleshooting
 - Error: "Permission denied"  
@@ -275,7 +284,7 @@ optionally in the given directory.
 
 #### Usage
 ```bash
-pyblade app:start <name> [<directory>]
+pyblade app:start <name> [<directory>] [OPTIONS]
 ```
 
 #### Arguments
@@ -316,7 +325,7 @@ Compiles `.po` files to `.mo` files for use with builtin gettext support.
 
 #### Usage
 ```bash
-pyblade messages:compile
+pyblade messages:compile [OPTIONS]
 ```
 
 #### Options
@@ -344,9 +353,9 @@ pyblade messages:compile
 - `pyblade compilemessages`
 
 #### Common Issues & Troubleshooting
-- **Error**: Missing `.po` files
-  **Solution**: Run `pyblade make:messages` first to generate translation files.
+- **Error**: "Missing `.po` files"
 
+  **Solution**: Run `pyblade make:messages` first to generate translation files.
 
 ## `pyblade migrate`
 
@@ -354,63 +363,71 @@ Updates database schema. Manages both apps with migrations and those without.
 
 #### Usage
 ```bash
-pyblade migrate
+pyblade migrate [<app_label>] [<migration_name>] [OPTIONS]
 ```
 
 #### Arguments
 |Argument|Description|
 |--------|-----------|
-| `app_label`        | App label of an application to synchronize the state.
-| `migration_name`   | Database state will be brought to the state after that migration. Use the name `zero` to unapply all migrations.
+| `app_label`        | App label of an application to synchronize the state. This is an optional argument.
+| `migration_name`   | Database state will be brought to the state after that migration. Use the name `zero` to unapply all migrations. This is an optional argument.
 
 
 #### Options
- -h, --help            show this help message and exit
-  --noinput, --no-input
-                        Tells Django to NOT prompt the user for input of any kind.
-  --database {default}  Nominates a database to synchronize. Defaults to the "default"
-                        database.
-  --fake                Mark migrations as run without actually running them.
-  --fake-initial        Detect if tables already exist and fake-apply initial migrations if
-                        so. Make sure that the current database schema matches your initial
-                        migration before using this flag. Django will only check for an
-                        existing table name.
-  --plan                Shows a list of the migration actions that will be performed.
-  --run-syncdb          Creates tables for apps without migrations.
-  --check               Exits with a non-zero status if unapplied migrations exist and does
-                        not actually apply migrations.
-  --prune               Delete nonexistent migrations from the django_migrations table.
+|Option|Description|
+|------|-----------|
+|`-h` `--help` | show the help message and exit.
+|`--noinput` `--no-input` | Tells Django to NOT prompt the user for input of any kind.
+|`--database {default}` | Nominates a database to synchronize. Defaults to the `default` database.
+|`--fake` | Mark migrations as run without actually running them.
+|`--fake-initial` | Detect if tables already exist and fake-apply initial migrations if so. Make sure that the current database schema matches your initial migration before using this flag. Django will only check for an existing table name.
+|`--plan`       | Shows a list of the migration actions that will be performed.
+|`--run-syncdb` | Creates tables for apps without migrations.
+|`--check`      | Exits with a non-zero status if unapplied migrations exist and does not actually apply migrations.
+|`--prune`      | Delete nonexistent migrations from the django_migrations table.
+|`-v` `--verbosity {0,1,2,3}` | Verbosity level. Use `0` for minimal output, `1` for normal output, `2` for verbose output or `3` for very verbose output.
+|`--settings`| The Python path to a settings module, e.g. `myproject.settings.main`. If this isn't provided, the `DJANGO_SETTINGS_MODULE` environment variable will be used.
+|`--pythonpath`|  A directory to add to the Python path, e.g. `/home/djangoprojects/myproject`.
+|` --no-color`  |          Don't colorize the command output.
+|`--force-color` |        Force colorization of the command output.         
+|`--skip-checks`  |       Skip system checks.
 
 #### Examples
 ```bash
-pyblade migrate
+pyblade migrate blog --plan
 ```
 
 #### Aliases
-- pyblade db:migrate
-
-#### Common Issues & Troubleshooting
-- **Migration errors**  
-  Check your models and run `make:migrations` before applying changes.
-
----
+- `pyblade db:migrate`
 
 ## `pyblade db:shell`
 
-Launches an interactive database shell.
+Runs the command-line client for specified database, or the default database if none is
+provided.
 
 #### Usage
 ```bash
-pyblade db:shell
+pyblade db:shell [OPTIONS]
 ```
+
+#### Options
+|Option|Description|
+|------|-----------|
+|`-h` `--help`                | Show the help message and exit.
+|`-d` `--database {default}`  | Nominates a database onto which to open a shell. Defaults to the `default` database.
+|`-v` `--verbosity {0,1,2,3}` | Verbosity level. Use `0` for minimal output, `1` for normal output, `2` for verbose output or `3` for very verbose output.
+|`--settings`                 | The Python path to a settings module, e.g. `myproject.settings.main`. If this isn't provided, the `DJANGO_SETTINGS_MODULE` environment variable will be used.
+|`--pythonpath`               | A directory to add to the Python path, e.g. `/home/djangoprojects/myproject`.
+|` --no-color`                | Don't colorize the command output.
+|`--force-color`              | Force colorization of the command output.         
 
 #### Examples
 ```bash
 pyblade db:shell
 ```
 
----
-
+#### Aliases
+- `pyblade dbshell`
 
 ## `pyblade shell`
 
@@ -426,7 +443,6 @@ pyblade shell
 pyblade shell
 ```
 
----
 
 ## `pyblade static:collect`
 
@@ -446,66 +462,6 @@ pyblade static:collect
 - **Permissions error**  
   Ensure you have write access to the `STATIC_ROOT` directory.
 
-
-## `pyblade startapp`
-
-Creates a new Django app within an existing project.
-
-#### Usage
-```bash
-pyblade startapp <app-name>
-```
-
-### Arguments
-`app-name`: The name of the new app.
-
-#### Examples
-```bash
-pyblade startapp blog
-```
-
-This will create a new app directory with models, views, and other standard files.
-
----
-
-## `pyblade makemigrations`
-
-Generates migration files for model changes in your Django apps.
-
-#### Usage
-```bash
-pyblade makemigrations [<app-name>]
-```
-
-### Arguments
-`app-name` _(optional)_: Specify an app to create migrations for.
-
-#### Examples
-```bash
-pyblade makemigrations
-pyblade makemigrations accounts
-```
-
----
-
-## `pyblade migrate`
-
-Applies all unapplied migrations to the database.
-
-#### Usage
-```bash 
-pyblade --help
-pyblade migrate [<app_label>] [<migration_name>] [OPTIONS]
-```
-
-#### Examples
-```bash
-pyblade migrate
-```
-
-This synchronizes your database schema with the current set of models and migrations.
-
----
 
 ## `pyblade createsuperuser`
 
