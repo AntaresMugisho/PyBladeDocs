@@ -34,16 +34,16 @@ pyblade serve [<addrport>] [OPTIONS]
 #### Options
 |Option| Description
 |--------|------------|
-|`-h, --help`  |          show the help message and exit
+|`-h` `--help`  |          show the help message and exit
 |`--host` | The host address to run the server on (default: `127.0.0.1`)
 |`--port` | The port number to run the server on (default: `8000`).
-|`--ipv6, -6`    |        Tells Django to use an IPv6 address.
+|`-6` `--ipv6`    |        Tells Django to use an IPv6 address.
 |`--nothreading`  |       Tells Django to NOT use threading.
 |`--noreload` |           Tells Django to NOT use the auto-reloader.
 |`--nostatic`  |          Tells Django to NOT automatically serve static files at STATIC_URL.
 |`--insecure`   |         Allows serving static files even if `DEBUG` is `False`.
 |`--settings`| The Python path to a settings module, e.g. `myproject.settings.main`. If this isn't provided, the `DJANGO_SETTINGS_MODULE` environment variable will be used.
-|`-pythonpath`|  A directory to add to the Python path, e.g. `/home/djangoprojects/myproject`.
+|`--pythonpath`|  A directory to add to the Python path, e.g. `/home/djangoprojects/myproject`.
 |` --no-color`  |          Don't colorize the command output.
 |`--force-color` |        Force colorization of the command output.         
 |`--skip-checks`  |       Skip system checks.
@@ -91,10 +91,10 @@ pyblade make:template <name>  [OPTIONS]
 ### Options
 |Option| Description
 |--------|------------|
-|`-h, --help`  | show the help message and exit
-|`-f, --force`| Override the template if already exists.
+|`-h` `--help`  | show the help message and exit
+|`-f` `--force`| Override the template if already exists.
 
-#### Examples:
+#### Examples
 ```bash
 pyblade make:template home
 ```
@@ -104,7 +104,7 @@ pyblade make:template home
 
 This creates a new `tempalates/home.html` file.
 
-#### Common Issues & Troubleshooting:
+#### Common Issues & Troubleshooting
 - **Error**: "Template already exists"  
   **Solution**: Check the `templates` directory to see if a componenet with the same name (*case sensitive*) already exists. You can either override the existing component by using the `--force` option or choose a different name for your template
 
@@ -125,17 +125,17 @@ pyblade make:component <name>  [OPTIONS]
 #### Options
 |Option| Description
 |--------|------------|
-`-h, --help`| Show the help message and exit.
-`-f, --force`| Override the component if already exists.
+`-h` `--help`| Show the help message and exit.
+`-f` `--force`| Override the component if already exists.
 
-#### Examples:
+#### Examples
 ```bash
 pyblade make:component alert-box
 ```
 
 This creates a new `tempalates/components/alert-box.html` file.
 
-#### Common Issues & Troubleshooting:
+#### Common Issues & Troubleshooting
 - **Error**: "Component already exists"  
   **Solution**: Check the `templates/components` directory to see if a componenet with the same name (_kebab-cased_) already exists. You can either override the existing component by using the `--force` option or choose a different name.
 
@@ -158,10 +158,10 @@ pyblade make:liveblade <name> [OPTIONS]
 ### Options
 |Option| Description
 |--------|------------|
-`-h, --help`| Show the help message and exit.
-`-f, --force`| Overwrite the component if it already exists.
+`-h` `--help`| Show the help message and exit.
+`-f` `--force`| Overwrite the component if it already exists.
 
-#### Examples:
+#### Examples
 ```bash
 pyblade make:liveblade counter
 ```
@@ -171,7 +171,7 @@ This creates two new files:
 - A `templates/liveblade/couter.html` file which holds the HTML Component's template.
 
 
-#### Common Issues & Troubleshooting:
+#### Common Issues & Troubleshooting
 - **Error**: "Component already exists"  
   **Solution**: Check the `liveblade` directory to see if a python file with the same name (*snake_cased*) already exists. Also Check the `templates/liveblade` directory to see if a HTML file with the same name (_kebab-cased_) already exists. You can either override the existing component by using the `--force` option or choose a different name.
 
@@ -185,7 +185,7 @@ for translation. It creates (or updates) a message file in the conf/locale (in t
 tree) or locale (for projects and applications) directory. 
 
 >[!important]Important
->You must run this command with one of either the `--locale`, `--exclude`, or `--all` options.
+>You must run this command with one of either the `--locale` `--exclude`, or `--all` options.
 
 #### Usage
 ```bash
@@ -195,28 +195,28 @@ pyblade make:messages [OPTIONS]
 #### Options
 |Option| Description
 |--------|------------|
-  `-h, --help`|            show the help message and exit
-  `-l, --locale` | Creates or updates the message files for the given locale(s) (e.g. `en_US`). Can be used multiple times.
-  `-x, --exclude` | Locales to exclude. Default is none. Can be used multiple times.
-  `-a, --all` | Updates the message files for all existing locales.
-  `-d, --domain` | The domain of the message files (default: `django`).
-  `-e, --extension` | The file extension(s) to examine (default: `html,txt,py`, or `js` if the domain is `djangojs`). Separate multiple extensions with commas, or use `-e` multiple times.
-  `-s, --symlinks` | Follows symlinks to directories when examining source code and templates for translation strings.
- `-i, --ignore` | Ignore files or directories matching this glob-style pattern. Use multiple times to ignore more.
-  `--no-default-ignore` | Don't ignore the common glob-style patterns `CVS`, `.*`, `*~` and `*.pyc`.
-  `--no-wrap`  | Don't break long message lines into several lines.
-  `--no-location` | Don't write `#: filename:line` lines.
-  `--add-location [{full,file,never}]` | Controls `#: filename:line` lines. If the option is `full` (the default if not given), the lines include both file name and line number. If it's `file`, the line number is omitted. If it's `never`, the lines are suppressed (same as `--no-location`). `--add-location` requires gettext 0.19 or newer.
-  `--no-obsolete` | Remove obsolete message strings.
-  `--keep-pot` | Keep `.pot` file after making messages. Useful when debugging.
-  `-v, --verbosity {0,1,2,3}` | Verbosity level. Use `0` for minimal output, `1` for normal output, `2` for verbose output or `3` for very verbose output.
-  `--settings SETTINGS` | The Python path to a settings module, e.g. "myproject.settings.main". If this isn't provided, the DJANGO_SETTINGS_MODULE environment variable will be used.
-  `--pythonpath PYTHONPATH` | A directory to add to the Python path, e.g. `/home/djangoprojects/myproject`.
-  `--traceback`   | Display a full stack trace on `CommandError` exceptions.
-  `--no-color`    | Don't colorize the command output.
-  `--force-color`| Force colorization of the command output
+|`-h` `--help`|            show the help message and exit
+|`-l` `--locale` | Creates or updates the message files for the given locale(s) (e.g. `en_US`). Can be used multiple times.
+|`-x` `--exclude` | Locales to exclude. Default is none. Can be used multiple times.
+|`-a` `--all` | Updates the message files for all existing locales.
+|`-d` `--domain` | The domain of the message files (default: `django`).
+|`-e` `--extension` | The file extension(s) to examine (default: `html,txt,py`, or `js` if the domain is `djangojs`). Separate multiple extensions with commas, or use `-e` multiple times.
+|`-s` `--symlinks` | Follows symlinks to directories when examining source code and templates for translation strings.
+|`-i` `--ignore` | Ignore files or directories matching this glob-style pattern. Use multiple times to ignore more.
+|`--no-default-ignore` | Don't ignore the common glob-style patterns `CVS` `.*` `*~` and `*.pyc`.
+|`--no-wrap`  | Don't break long message lines into several lines.
+|`--no-location` | Don't write `#: filename:line` lines.
+|`--add-location [{full,file,never}]` | Controls `#: filename:line` lines. If the option is `full` (the default if not given), the lines include both file name and line number. If it's `file`, the line number is omitted. If it's `never`, the lines are suppressed (same as `--no-location`). `--add-location` requires gettext 0.19 or newer.
+|`--no-obsolete` | Remove obsolete message strings.
+|`--keep-pot` | Keep `.pot` file after making messages. Useful when debugging.
+|`-v` `--verbosity {0,1,2,3}` | Verbosity level. Use `0` for minimal output, `1` for normal output, `2` for verbose output or `3` for very verbose output.
+|`--settings`                 | The Python path to a settings module, e.g. `myproject.settings.main`. If this isn't provided, the `DJANGO_SETTINGS_MODULE` environment variable will be used.
+|`---pythonpath PYTHONPATH` | A directory to add to the Python path, e.g. `/home/djangoprojects/myproject`.
+|`--traceback`   | Display a full stack trace on `CommandError` exceptions.
+|`--no-color`    | Don't colorize the command output.
+|`--force-color`| Force colorization of the command output
 
-#### Examples:
+#### Examples
 ```bash
 pyblade make:messages --locale fr_FR
 ```
@@ -242,23 +242,24 @@ pyblade make:migrations [<app_label>] [OPTIONS]
 #### Options
 |Option|Description|
 |------|-----------|
-|`-h, --help`            |show the help message and exit
-|`--dry-run`             |Just show what migrations would be made; don't actually write them.
-|`--merge`               |Enable fixing of migration conflicts.
-|`--empty`               |Create an empty migration.
-|`--noinput, --no-input` |Tells Django to NOT prompt the user for input of any kind.
-|`-n, --name`    |Use this name for migration file(s).
-|`--no-header`             |Do not add header comments to new migration file(s).
-|`--check`                 |Exit with a non-zero status if model changes are missing migrations and don't actually write them. Implies `--dry-run`.
-|`--scriptable`            |Divert log output and input prompts to `stderr`, writing only paths of generated migration files to `stdout`.
-|`--update`                |Merge model changes into the latest migration and optimize the resulting operations.
-|`--settings`| The Python path to a settings module, e.g. `myproject.settings.main`. If this isn't provided, the `DJANGO_SETTINGS_MODULE` environment variable will be used.
-|`-pythonpath`|  A directory to add to the Python path, e.g. `/home/djangoprojects/myproject`.
-|` --no-color`  |  Don't colorize the command output.
-|`--force-color` |  Force colorization of the command output.         
-|`--skip-checks`  |  Skip system checks.
+|`-h` `--help`                 | show the help message and exit
+|`--dry-run`                  | Just show what migrations would be made; don't actually write them.
+|`--merge`                    | Enable fixing of migration conflicts.
+|`--empty`                    | Create an empty migration.
+|`--noinput` `--no-input`      | Tells Django to NOT prompt the user for input of any kind.
+|`-n` `--name`                 | Use this name for migration file(s).
+|`--no-header`                | Do not add header comments to new migration file(s).
+|`--check`                    | Exit with a non-zero status if model changes are missing migrations and don't actually write them. Implies `--dry-run`.
+|`--scriptable`               | Divert log output and input prompts to `stderr`, writing only paths of generated migration files to `stdout`.
+|`--update`                   | Merge model changes into the latest migration and optimize the resulting operations.
+|`-v` `--verbosity {0,1,2,3}`  | Verbosity level. Use `0` for minimal output, `1` for normal output, `2` for verbose output or `3` for very verbose output.
+|`--settings`                 | The Python path to a settings module, e.g. `myproject.settings.main`. If this isn't provided, the `DJANGO_SETTINGS_MODULE` environment variable will be used.
+|`--pythonpath`                | A directory to add to the Python path, e.g. `/home/djangoprojects/myproject`.
+|`--no-color`                | Don't colorize the command output.
+|`--force-color`              | Force colorization of the command output.         
+|`--skip-checks`              | Skip system checks.
 
-#### Examples:
+#### Examples
 ```bash
 pyblade make:migrations
 ```
@@ -269,62 +270,126 @@ pyblade make:migrations
 
 ## `pyblade app:start`
 
-Creates a new Django app within the current project.
+Creates a Django app directory structure for the given app name in the current directory or
+optionally in the given directory.
 
 #### Usage
 ```bash
-pyblade app:start <app-name>
+pyblade app:start <name> [<directory>]
 ```
 
-### Arguments
-`app-name`: The name of the new Django app.
+#### Arguments
+|Argument|Description|
+|------|-----------|
+`name`     | The name of the application.
+`directory`| Optional destination directory.
 
-#### Examples:
+#### Options
+|Option|Description|
+|------|-----------|
+|`-h` `--help`                | Show the help message and exit
+|`-d` `--directory`           | The destination directory
+|`--template`                | The path or URL to load the template from.
+|`--extension`               | The file extension(s) to render (default: `py`). Separate multiple extensions with commas, or use `-e` multiple times.
+|`-n` `--name`                | The file name(s) to render. Separate multiple file names with commas, or use `-n` multiple times.
+|`x` `--exclude`              | The directory name(s) to exclude, in addition to `.git` and `__pycache__`. Can be used multiple times.
+|`-v` `--verbosity {0,1,2,3}` | Verbosity level. Use `0` for minimal output, `1` for normal output, `2` for verbose output or `3` for very verbose output.
+|`--settings`                | The Python path to a settings module, e.g. `myproject.settings.main`. If this isn't provided, the `DJANGO_SETTINGS_MODULE` environment variable will be used.
+|`--pythonpath`              | A directory to add to the Python path, e.g. `/home/djangoprojects/myproject`.
+|` --no-color`               | Don't colorize the command output.
+|`--force-color`             | Force colorization of the command output.         
+
+#### Examples
 ```bash
-pyblade app:start blog
+pyblade app:start blog apps
 ```
 
-#### Common Issues & Troubleshooting:
-- **App name conflict**  
-  Make sure no other app with the same name exists in the project directory.
+This will create a new application folder in the `apps` directory.
 
----
+#### Aliases
+- `pyblade startapp`
+- `pyblade start:app`
 
-## `pyblade compile:messages`
+## `pyblade messages:compile`
 
-Compiles translation message files into `.mo` files.
+Compiles `.po` files to `.mo` files for use with builtin gettext support.
 
 #### Usage
 ```bash
-pyblade compile:messages
+pyblade messages:compile
 ```
 
-#### Examples:
+#### Options
+|Option|Description|
+|------|-----------|
+|`-h` `--help`                | Show the help message and exit.
+|`-l` `--locale`              | Locale(s) to process (e.g. de_AT). Default is to process all. Can be used multiple times.
+|`-x` `--exclude`             | Locales to exclude. Default is none. Can be used multiple times.
+|`-f` `--use-fuzzy`,          | Use fuzzy translations.
+|`-i` `--ignore`              | Ignore directories matching this glob-style pattern. Use multiple times to ignore more.
+|`-v` `--verbosity {0,1,2,3}` | Verbosity level. Use `0` for minimal output, `1` for normal output, `2` for verbose output or `3` for very verbose output.
+|`--settings`                 | The Python path to a settings module, e.g. `myproject.settings.main`. If this isn't provided, the `DJANGO_SETTINGS_MODULE` environment variable will be used.
+|`--pythonpath`               | A directory to add to the Python path, e.g. `/home/djangoprojects/myproject`.
+|`--no-color`                 | Don't colorize the command output.
+|`--force-color`              | Force colorization of the command output.
+|`--skip-checks`              | Skip system checks.
+
+#### Examples
 ```bash
-pyblade compile:messages
+pyblade messages:compile
 ```
 
-#### Common Issues & Troubleshooting:
-- **Missing `.po` files**  
-  Run `make:messages` first to generate translation files.
+#### Aliases
+- `pyblade compile:messages`
+- `pyblade compilemessages`
 
----
+#### Common Issues & Troubleshooting
+- **Error**: Missing `.po` files
+  **Solution**: Run `pyblade make:messages` first to generate translation files.
 
-## `pyblade db:migrate`
 
-Applies all database migrations.
+## `pyblade migrate`
+
+Updates database schema. Manages both apps with migrations and those without.
 
 #### Usage
 ```bash
-pyblade db:migrate
+pyblade migrate
 ```
 
-#### Examples:
+#### Arguments
+|Argument|Description|
+|--------|-----------|
+| `app_label`        | App label of an application to synchronize the state.
+| `migration_name`   | Database state will be brought to the state after that migration. Use the name `zero` to unapply all migrations.
+
+
+#### Options
+ -h, --help            show this help message and exit
+  --noinput, --no-input
+                        Tells Django to NOT prompt the user for input of any kind.
+  --database {default}  Nominates a database to synchronize. Defaults to the "default"
+                        database.
+  --fake                Mark migrations as run without actually running them.
+  --fake-initial        Detect if tables already exist and fake-apply initial migrations if
+                        so. Make sure that the current database schema matches your initial
+                        migration before using this flag. Django will only check for an
+                        existing table name.
+  --plan                Shows a list of the migration actions that will be performed.
+  --run-syncdb          Creates tables for apps without migrations.
+  --check               Exits with a non-zero status if unapplied migrations exist and does
+                        not actually apply migrations.
+  --prune               Delete nonexistent migrations from the django_migrations table.
+
+#### Examples
 ```bash
-pyblade db:migrate
+pyblade migrate
 ```
 
-#### Common Issues & Troubleshooting:
+#### Aliases
+- pyblade db:migrate
+
+#### Common Issues & Troubleshooting
 - **Migration errors**  
   Check your models and run `make:migrations` before applying changes.
 
@@ -339,7 +404,7 @@ Launches an interactive database shell.
 pyblade db:shell
 ```
 
-#### Examples:
+#### Examples
 ```bash
 pyblade db:shell
 ```
@@ -356,7 +421,7 @@ Starts an interactive Python shell with Django context loaded.
 pyblade shell
 ```
 
-#### Examples:
+#### Examples
 ```bash
 pyblade shell
 ```
@@ -372,12 +437,12 @@ Collects all static files into a single location (typically for deployment).
 pyblade static:collect
 ```
 
-#### Examples:
+#### Examples
 ```bash
 pyblade static:collect
 ```
 
-#### Common Issues & Troubleshooting:
+#### Common Issues & Troubleshooting
 - **Permissions error**  
   Ensure you have write access to the `STATIC_ROOT` directory.
 
@@ -394,7 +459,7 @@ pyblade startapp <app-name>
 ### Arguments
 `app-name`: The name of the new app.
 
-#### Examples:
+#### Examples
 ```bash
 pyblade startapp blog
 ```
@@ -415,7 +480,7 @@ pyblade makemigrations [<app-name>]
 ### Arguments
 `app-name` _(optional)_: Specify an app to create migrations for.
 
-#### Examples:
+#### Examples
 ```bash
 pyblade makemigrations
 pyblade makemigrations accounts
@@ -428,11 +493,12 @@ pyblade makemigrations accounts
 Applies all unapplied migrations to the database.
 
 #### Usage
-```bash
-pyblade migrate
+```bash 
+pyblade --help
+pyblade migrate [<app_label>] [<migration_name>] [OPTIONS]
 ```
 
-#### Examples:
+#### Examples
 ```bash
 pyblade migrate
 ```
@@ -450,7 +516,7 @@ Creates a superuser account to access the Django admin interface.
 pyblade createsuperuser
 ```
 
-#### Examples:
+#### Examples
 ```bash
 pyblade createsuperuser
 ```
@@ -468,7 +534,7 @@ Collects all static files from apps and places them into the static root directo
 pyblade collectstatic
 ```
 
-#### Examples:
+#### Examples
 ```bash
 pyblade collectstatic
 ```
@@ -485,7 +551,7 @@ Opens the Django interactive shell with your project's context loaded.
 pyblade shell
 ```
 
-#### Examples:
+#### Examples
 ```bash
 pyblade shell
 ```
@@ -506,7 +572,7 @@ pyblade test [<app-name>]
 ### Arguments
 `app-name` _(optional)_: Run tests for a specific app only.
 
-#### Examples:
+#### Examples
 ```bash
 pyblade test
 pyblade test blog
@@ -522,14 +588,14 @@ Updates PyBlade to the latest available version.
 pyblade update
 ```
 
-#### Examples:
+#### Examples
 ```bash
 pyblade update
 ```
 
 This fetches and installs the latest release of PyBlade.
 
-#### Common Issues & Troubleshooting:
+#### Common Issues & Troubleshooting
 - **Permission denied**  
   Try using `sudo` if installing globally.
 
@@ -544,7 +610,7 @@ Displays information about the current PyBlade project and environment.
 pyblade info
 ```
 
-#### Examples:
+#### Examples
 ```bash
 pyblade info
 ```
@@ -562,7 +628,7 @@ Opens the PyBlade CLI documentation in your default browser.
 pyblade docs
 ```
 
-#### Examples:
+#### Examples
 ```bash
 pyblade docs
 ```
@@ -584,7 +650,7 @@ pyblade make:model <name> [--app <app-name>]
 ### Options
 `--app`: The Django app where the model should be created.
 
-#### Examples:
+#### Examples
 ```bash
 pyblade make:model Post --app blog
 ```
@@ -608,7 +674,7 @@ pyblade make:form <name> [--app <app-name>]
 ### Options
 `--app`: The Django app where the form should be created.
 
-#### Examples:
+#### Examples
 ```bash
 pyblade make:form ContactForm --app core
 ```
@@ -629,7 +695,7 @@ pyblade make:migration [<app-name>]
 ### Arguments
 `app-name` _(optional)_: The Django app to generate the migration for.
 
-#### Examples:
+#### Examples
 ```bash
 pyblade make:migration
 pyblade make:migration accounts
@@ -648,7 +714,7 @@ Displays a list of all registered routes in the application.
 pyblade route:list
 ```
 
-#### Examples:
+#### Examples
 ```bash
 pyblade route:list
 ```
@@ -666,7 +732,7 @@ Clears all cached data from the application.
 pyblade cache:clear
 ```
 
-#### Examples:
+#### Examples
 ```bash
 pyblade cache:clear
 ```
@@ -684,7 +750,7 @@ Caches the configuration files to speed up application boot time.
 pyblade config:cache
 ```
 
-#### Examples:
+#### Examples
 ```bash
 pyblade config:cache
 ```
