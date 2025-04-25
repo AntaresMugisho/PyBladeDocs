@@ -15,7 +15,7 @@ This command will prompt you to provide the following details:
 
 - **Project Name**: Choose a name for your project.
 - **Python Web Framework**: Choose the Python Web framework you want to use for your project. Only Django is supported.
-- **CSS Framework**: Choose one either Bootstrap 5 or Tailwind CSS for an automatic configuration or None if you want to manually configure it later or don't want to use a CSS Framework.
+- **CSS Framework**: Choose one either Bootstrap 5 or Tailwind CSS 4 for an automatic configuration or None if you want to manually configure it later or don't want to use a CSS Framework.
 - **Use LiveBlade**: Enable or disable Liveblade configuration, which adds additional features like real-time UI updates and dynamic components.
 
 
@@ -431,18 +431,32 @@ pyblade db:shell
 
 ## `pyblade shell`
 
-Starts an interactive Python shell with Django context loaded.
+Runs an interactive Python interpreter. Tries to use [IPython](https://pypi.org/project/ipython/) or [bpython](https://pypi.org/project/bpython/), if one of them is
+available. Any standard input is executed as code.
 
 #### Usage
 ```bash
-pyblade shell
+pyblade shell [OPTIONS]
 ```
+
+#### Options
+|Option|Description|
+|------|-----------|
+|`-h` `--help`                | Show the help message and exit.
+|`--no-startup`               | When using plain Python, ignore the PYTHONSTARTUP environment variable and ~/.pythonrc.py script.
+|`--no-imports`               | Disable automatic imports of models.
+|`-i` `--interface {ipython,bpython,python}` |Specify an interactive interpreter interface. Available options: `ipython`, `bpython` and `python`
+|`-c` `--command`             | Instead of opening an interactive shell, run a command as Django and exit.
+|`-v` `--verbosity {0,1,2,3}` | Verbosity level. Use `0` for minimal output, `1` for normal output, `2` for verbose output or `3` for very verbose output.
+|`--settings`                 | The Python path to a settings module, e.g. `myproject.settings.main`. If this isn't provided, the `DJANGO_SETTINGS_MODULE` environment variable will be used.
+|`--pythonpath`               | A directory to add to the Python path, e.g. `/home/djangoprojects/myproject`.
+|` --no-color`                | Don't colorize the command output.
+|`--force-color`              | Force colorization of the command output. 
 
 #### Examples
 ```bash
 pyblade shell
 ```
-
 
 ## `pyblade static:collect`
 
@@ -450,83 +464,118 @@ Collects all static files into a single location (typically for deployment).
 
 #### Usage
 ```bash
-pyblade static:collect
+pyblade static:collect [OPTIONS]
 ```
+
+#### Options
+|Option|Description|
+|------|-----------|
+|`-h, --help`                  | Show this help message and exit
+|`--noinput, --no-input`       | Do NOT prompt the user for input of any kind.
+|`--no-post-process`           | Do NOT post process collected files.
+|`-i` ` --ignore`                 | Ignore files or directories matching this glob-style pattern. Use multiple times to ignore more.
+|`-n, --dry-run`               | Do everything except modify the filesystem.
+|`-c, --clear`                 | Clear the existing files using the storage before trying to copy or link the original file.
+|`-l, --link`                  | Create a symbolic link to each file instead of copying.
+|`--no-default-ignore`         | Don't ignore the common private glob-style patterns (defaults to `CVS` `.*` and `*~`).
+|`-v` `--verbosity {0,1,2,3}` | Verbosity level. Use `0` for minimal output, `1` for normal output, `2` for verbose output or `3` for very verbose output.
+|`--settings`                  | The Python path to a settings module, e.g. `myproject.settings.main`. If this isn't provided, the `DJANGO_SETTINGS_MODULE` environment variable will be used.
+|`--pythonpath`                | A directory to add to the Python path, e.g. `/home/djangoprojects/myproject`.
+|`--no-color`                  | Don't colorize the command output.
+|`--force-color`               | Force colorization of the command output.         
+|`--skip-checks`               | Skip system checks.
 
 #### Examples
 ```bash
 pyblade static:collect
 ```
 
-#### Common Issues & Troubleshooting
-- **Permissions error**  
-  Ensure you have write access to the `STATIC_ROOT` directory.
+#### Aliases
+- `pyblade collectstatic`
+- `pyblade collect:static`
 
 
-## `pyblade createsuperuser`
+## `pyblade superuser:create`
 
-Creates a superuser account to access the Django admin interface.
-
-#### Usage
-```bash
-pyblade createsuperuser
-```
-
-#### Examples
-```bash
-pyblade createsuperuser
-```
-
-You will be prompted to enter a username, email, and password interactively.
-
----
-
-## `pyblade collectstatic`
-
-Collects all static files from apps and places them into the static root directory.
+Creates a superuser account.
 
 #### Usage
 ```bash
-pyblade collectstatic
+pyblade superuser:create [OPTIONS]
 ```
 
-#### Examples
-```bash
-pyblade collectstatic
-```
+#### Options
+|Option|Description|
+|------|-----------|
+|`-h, --help`                  | Show this help message and exit
+|`--username`                  | Specifies the login for the superuser.
+|`--noinput` `--no-input`      | Tells Django to NOT prompt the user for input of any kind. You must use `--username` with -`-noinput`, along with an option for any other required field. Superusers created with `--noinput` will not be able to log in until they're given a valid password.
+|`--database {default}`        | Specifies the database to use. Default is `default`.
+|`--email `                    | Specifies the email for the superuser.
+|`-v` `--verbosity {0,1,2,3}`  | Verbosity level. Use `0` for minimal output, `1` for normal output, `2` for verbose output or `3` for very verbose output.
+|`--settings`                  | The Python path to a settings module, e.g. `myproject.settings.main`. If this isn't provided, the `DJANGO_SETTINGS_MODULE` environment variable will be used.
+|`--pythonpath`                | A directory to add to the Python path, e.g. `/home/djangoprojects/myproject`.
+|`--no-color`                  | Don't colorize the command output.
+|`--force-color`               | Force colorization of the command output.         
+|`--skip-checks`               | Skip system checks.
 
-Used primarily for preparing static assets before deployment.
 
+#### Aliases
+- `pyblade createsuperuser`
+- `pyblade create:superuser`
+- `pyblade su:create`
 
-## `pyblade shell`
+## `pyblade route:list`
 
-Opens the Django interactive shell with your project's context loaded.
+Displays a list of all registered routes (URL patterns) in the application.
+Useful for debugging route definitions and HTTP methods.
 
 #### Usage
 ```bash
-pyblade shell
+pyblade route:list
 ```
-
-#### Examples
-```bash
-pyblade shell
-```
-
-This shell is preloaded with Django settings and all models, making it ideal for testing queries.
-
----
 
 ## `pyblade test`
 
-Runs the test suite for your Django apps.
+Discover and run tests in the specified modules or the current directory if no module is specified.
 
 #### Usage
 ```bash
-pyblade test [<app-name>]
+pyblade test [<test_label>] [OPTIONS]
 ```
 
-### Arguments
-`app-name` _(optional)_: Run tests for a specific app only.
+#### Arguments
+|Argument|Description|
+|------|-----------|
+`test_label` | Module paths to test. Can be `modulename`, `modulename.TestCase` or `modulename.TestCase.test_method`. This is oprional.
+
+#### Options
+|Option|Description|
+|------|-----------|
+`-h, --help`           | Show the help message and exit
+`--noinput, --no-input` | Tells Django to NOT prompt the user for input of any kind.
+`--testrunner` |  Tells Django to use specified test runner class instead of the one specified by the `TEST_RUNNER` setting.
+`--failfast`   | Stops the test suite after the first failure.
+`-t, --top-level-directory`  | Top level of project for unittest discovery.
+`-p`  `--pattern` | The test matching pattern. Defaults to `test*.py`.
+`--keepdb`             | Preserves the test DB between runs.
+`--shuffle [SEED]`     | Shuffles test case order.
+`-r, --reverse`        | Reverses test case order.
+`--debug-mode`         | Sets `settings.DEBUG` to `True`.
+`-d, --debug-sql`      | Prints logged SQL queries on failure.
+`--parallel [N]`       | Run tests using up to `N` parallel processes. Use the value `auto` to run one test process for each processor core.
+`--tag`           | Run only tests with the specified tag. Can be used multiple times.
+`--exclude-tag ` | Do not run tests with the specified tag. Can be used multiple times.
+`--pdb`                | Runs a debugger (pdb, or ipdb if installed) on error or failure.
+`-b, --buffer`         | Discard output from passing tests.
+`--no-faulthandler`    | Disables the Python faulthandler module during tests.
+`--timing`             | Output timings, including database set up and total run time.
+`-k` | Only run test methods and classes that match the pattern or substring. Can be used multiple times. Same as `unittest -k` option.
+|`-v` `--verbosity {0,1,2,3}`  | Verbosity level. Use `0` for minimal output, `1` for normal output, `2` for verbose output or `3` for very verbose output.
+|`--settings`                  | The Python path to a settings module, e.g. `myproject.settings.main`. If this isn't provided, the `DJANGO_SETTINGS_MODULE` environment variable will be used.
+|`--pythonpath`                | A directory to add to the Python path, e.g. `/home/djangoprojects/myproject`.
+|`--no-color`                  | Don't colorize the command output.
+|`--force-color`               | Force colorization of the command output.   
 
 #### Examples
 ```bash
@@ -534,28 +583,25 @@ pyblade test
 pyblade test blog
 ```
 
+## `pyblade cache:clear`
 
-## `pyblade update`
-
-Updates PyBlade to the latest available version.
+Clears all cached data from the application.
+Use this after updating config or template files to ensure fresh values are used.
 
 #### Usage
 ```bash
-pyblade update
+pyblade cache:clear
 ```
 
-#### Examples
+## `pyblade config:cache`
+
+Caches the configuration files to speed up application boot time.
+This command compiles all configuration into a single cache file for optimized performance.
+
+#### Usage
 ```bash
-pyblade update
+pyblade config:cache
 ```
-
-This fetches and installs the latest release of PyBlade.
-
-#### Common Issues & Troubleshooting
-- **Permission denied**  
-  Try using `sudo` if installing globally.
-
----
 
 ## `pyblade info`
 
@@ -566,14 +612,15 @@ Displays information about the current PyBlade project and environment.
 pyblade info
 ```
 
-#### Examples
+## `pyblade update`
+
+Updates PyBlade to the latest available version.
+
+#### Usage
 ```bash
-pyblade info
+pyblade update
 ```
 
-Outputs details such as framework version, project name, and environment configuration.
-
----
 
 ## `pyblade docs`
 
@@ -588,127 +635,3 @@ pyblade docs
 ```bash
 pyblade docs
 ```
-
----
-
-## `pyblade make:model`
-
-Creates a new Django model class inside an app.
-
-#### Usage
-```bash
-pyblade make:model <name> [--app <app-name>]
-```
-
-### Arguments
-`name`: Name of the model.
-
-### Options
-`--app`: The Django app where the model should be created.
-
-#### Examples
-```bash
-pyblade make:model Post --app blog
-```
-
-Creates a `Post` model inside the `blog/models.py` file.
-
----
-
-## `pyblade make:form`
-
-Generates a new Django `Form` class.
-
-#### Usage
-```bash
-pyblade make:form <name> [--app <app-name>]
-```
-
-### Arguments
-`name`: Name of the form.
-
-### Options
-`--app`: The Django app where the form should be created.
-
-#### Examples
-```bash
-pyblade make:form ContactForm --app core
-```
-
-Creates a `ContactForm` in `core/forms.py`.
-
----
-
-## `pyblade make:migration`
-
-Creates a new blank migration file.
-
-#### Usage
-```bash
-pyblade make:migration [<app-name>]
-```
-
-### Arguments
-`app-name` _(optional)_: The Django app to generate the migration for.
-
-#### Examples
-```bash
-pyblade make:migration
-pyblade make:migration accounts
-```
-
-Use this when you need to write a custom migration manually.
-
----
-
-## `pyblade route:list`
-
-Displays a list of all registered routes in the application.
-
-#### Usage
-```bash
-pyblade route:list
-```
-
-#### Examples
-```bash
-pyblade route:list
-```
-
-Useful for debugging route definitions and HTTP methods.
-
----
-
-## `pyblade cache:clear`
-
-Clears all cached data from the application.
-
-#### Usage
-```bash
-pyblade cache:clear
-```
-
-#### Examples
-```bash
-pyblade cache:clear
-```
-
-Use this after updating config or template files to ensure fresh values are used.
-
----
-
-## `pyblade config:cache`
-
-Caches the configuration files to speed up application boot time.
-
-#### Usage
-```bash
-pyblade config:cache
-```
-
-#### Examples
-```bash
-pyblade config:cache
-```
-
-This command compiles all configuration into a single cache file for optimized performance.
