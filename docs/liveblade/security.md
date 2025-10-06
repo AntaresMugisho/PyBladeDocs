@@ -1,8 +1,7 @@
-<!-- 
-# From Properties
-# From Actions 
-
--->
+---
+editLink: false
+next: "PyBlade CLI: Overview"
+---
 
 # Security Concerns & Best Practices in Liveblade
 
@@ -22,7 +21,7 @@ class ShowPost(Component):
     title = ""    # Public, exposed to the frontend
 ```
 
-> ✅ **Best Practice**: Keep all internal state, computed caches, or sensitive backend-only data in `_private` properties.
+> **Best Practice**: Keep all internal state, computed caches, or sensitive backend-only data in `_private` properties.
 
 ## 2. **Always Validate Incoming Data**
 
@@ -75,7 +74,7 @@ Locked props **can be seen in the UI**, but cannot be changed by the frontend �
 
 Be careful about what data you expose in templates, even as read-only. Anything rendered in HTML is **visible to the user** and can be inspected via the browser dev tools.
 
-> ✅ Keep passwords, API keys, tokens, or internal-only logic on the server side and behind `_private` variables.
+> Keep passwords, API keys, tokens, or internal-only logic on the server side and behind `_private` variables.
 
 ---
 
@@ -143,7 +142,7 @@ When shipping components, take time to **review what is public**:
 
 You can even build tools to **auto-scan component properties** and flag potential risks in CI.
 
-## ✅ Summary
+## Summary
 
 | Best Practice                             | Why It Matters                                      |
 |-------------------------------------------|-----------------------------------------------------|

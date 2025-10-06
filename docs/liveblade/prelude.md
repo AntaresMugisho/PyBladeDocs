@@ -1,3 +1,6 @@
+---
+editLink: false
+---
 
 # Liveblade
 

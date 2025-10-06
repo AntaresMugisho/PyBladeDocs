@@ -1,3 +1,7 @@
+---
+next: "PyBlade: Template Engine"
+---
+
 # Migration Guide
 
 ::: danger ⚠️ Warning: Experimental Feature

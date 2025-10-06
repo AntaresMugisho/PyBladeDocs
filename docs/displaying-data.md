@@ -1,3 +1,7 @@
+---
+prev: "PyBlade: Template Engine"
+---
+
 # Displaying data in PyBlade
 
 In PyBlade, displaying data inside templates is straightforward and designed to feel intuitive for developers, especially those familiar with Blade from Laravel. To display variables, PyBlade uses the <span v-pre>`{{ }}`</span> syntax, which is both secure and simple to use.

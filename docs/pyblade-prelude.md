@@ -1,3 +1,7 @@
+---
+editLink: false
+---
+
 # PyBlade: Template Engine
 
 ::: danger ⚠️ Warning: Experimental Feature

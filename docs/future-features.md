@@ -1,3 +1,7 @@
+---
+editLink: false
+---
+
 # Future Features and Community Contributions
 
 As PyBlade continues to grow, a few key directions for development are in consideration:

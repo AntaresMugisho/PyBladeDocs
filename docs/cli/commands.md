@@ -1,5 +1,9 @@
-# Available commands
+---
+prev: "PyBlad CLIe: Overview"
+---
 
+
+# Available commands
 
 ## `pyblade init`
 

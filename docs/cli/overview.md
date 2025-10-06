@@ -1,3 +1,7 @@
+---
+editLink: false
+---
+
 # PyBlade CLI Overview
 
 Learn how to use the PyBlade command-line interface (CLI) to manage and configure your PyBlade projects from the command line. The PyBlade CLI allows you to interact with your PyBlade environment efficiently, whether you're working with Django or Flask. With it, you can streamline your development workflow, manage templates, and configure settings, all from the terminal.

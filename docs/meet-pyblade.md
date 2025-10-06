@@ -1,3 +1,7 @@
+---
+editLink: false
+---
+
 # Meet PyBlade
 ::: danger ⚠️ Warning: Experimental Feature
 PyBlade is currently in experimental mode. While we are actively developing and testing its features, please be aware that it may contain bugs or incomplete functionality. We recommend using PyBlade exclusively in test environments or with caution in production environments.

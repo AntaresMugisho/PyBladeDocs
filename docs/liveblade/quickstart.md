@@ -1,3 +1,8 @@
+---
+prev: "Liveblade: Reactive UIs"
+---
+
+
 # Quick Start
 
 To begin your Liveblade journey, we will create a simple "counter" component and render it in the browser. This example is a great way to experience Liveblade for the first time as it demonstrates PyBlade's _liveness_ in the simplest way possible.

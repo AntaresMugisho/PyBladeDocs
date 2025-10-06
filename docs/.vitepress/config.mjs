@@ -83,6 +83,16 @@ export default defineConfig({
 
     socialLinks: [
       { icon: 'github', link: 'https://github.com/antaresmugisho/pyblade' }
-    ]
+    ],
+
+    search: {
+      provider: 'local'
+    },
+
+    cleanUrls: true,
+
+    editLink: {
+      pattern: 'https://github.com/antaresmugisho/pybladedocs/edit/main/docs/:path'
+    }
   }
 })

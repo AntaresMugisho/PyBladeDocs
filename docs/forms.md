@@ -1,3 +1,8 @@
+---
+next: "Liveblade: Reactive UIs"
+---
+
+
 # Forms
 
 Forms are essential in web applications, allowing users to submit data for processing. PyBlade provides some usefull directives that simplifies form rendering, enhance security, improve flexibility.  
