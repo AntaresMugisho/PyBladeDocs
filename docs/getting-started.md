@@ -59,7 +59,6 @@ This command will prompt you to provide the following details:
 1. **Project Name**: Choose a name for your project.
 2. **Python Web Framework**: Currently, only Django is supported.
 3. **CSS Framework**: Choose one either Bootstrap 5 or Tailwind CSS for an automatic configuration or None if you want to manually configure it later or don't want to use a CSS Framework.
-4. **Use LiveBlade**: Enable or disable Liveblade configuration, which adds additional features like real-time UI updates and dynamic components.
 
 PyBlade will then generate the standard project structure based on the web framework you choosed, ensuring everything is set up correctly from the start. Additionally, a `pyblade.json` file will be created into the project root folder, which is essential for PyBlade to function properly. You don’t need to modify or delete this file — just leave it as is to ensure everything runs smoothly.
 
