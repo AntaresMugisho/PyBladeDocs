@@ -110,7 +110,7 @@ Now, the output will be properly rendered as:
 >[!warning] Warning
 >Always be cautious when turning off auto-escaping, especially with user-generated content, to maintain security best practices.
 
-To make it even clearer, the `@autoescape` directive also accepts `on` or `off` as arguments, so `@autoescape(True) `works the same way as `@autoescape(off)`, and `@autoescape(False)` is the same as `@autoescape(off)`
+To make it even clearer, the `@autoescape` directive also accepts `on` or `off` as arguments, so `@autoescape(True) `works the same way as `@autoescape(on)`, and `@autoescape(False)` is the same as `@autoescape(off)`
 
 ## Displaying data with default values
 
@@ -179,10 +179,6 @@ If you want to capitalize only the first letter of `name`, you can use `.capital
 ```
 
 ### Getting the length of a list
-::: info Upcoming feature
-This feature is not yet implemented but should be ready in the next version. This part of documentation is provided for informative purpose only.
-:::
-
 If you have a list called `items`, you can display its length with `len()`:
 
 ```html
