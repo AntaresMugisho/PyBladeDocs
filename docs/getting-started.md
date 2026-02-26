@@ -1,8 +1,10 @@
 # Getting started
 ::: danger ⚠️ Warning: Experimental Feature
-PyBlade is currently in experimental mode. While we are actively developing and testing its features, please be aware that it may contain bugs or incomplete functionality. We recommend using PyBlade exclusively in test environments or with caution in production environments.
+PyBlade is currently in an experimental phase. Although its core features are under active development and continuous testing, you should expect potential bugs, breaking changes, or incomplete functionality.
 
-Your feedback is invaluable as we work toward a stable release. Thank you for helping us improve PyBlade!
+At this stage, PyBlade is best suited for testing, prototyping, and non-critical environments. If you choose to use it in production, do so with caution and ensure appropriate safeguards are in place.
+
+Your feedback, bug reports, and real-world usage insights are essential to refining the framework and moving toward a stable release. We appreciate your contribution to the evolution of PyBlade.
 :::
 
 PyBlade is a lightweight  template engine for Python, designed primarily for Django applications. Inspired by Laravel’s Blade and Livewire, it simplifies frontend development through developer-friendly @-based directives and interactive components.

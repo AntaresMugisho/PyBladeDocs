@@ -4,7 +4,7 @@ prev: "PyBlade: Template Engine"
 
 # Displaying data in PyBlade
 
-In PyBlade, displaying data inside templates is straightforward and designed to feel intuitive for developers, especially those familiar with Blade from Laravel. To display variables, PyBlade uses the <span v-pre>`{{ }}`</span> syntax, which is both secure and simple to use.
+In PyBlade, displaying data inside templates is straightforward and designed to feel intuitive for developers. To display data, PyBlade uses the <span v-pre>`{{ }}`</span> syntax, which is both secure and simple to use.
 
 Here's how you can display data in PyBlade templates:
 
@@ -36,171 +36,136 @@ def show_greeting(request):
 ```
 ---
 
-When you insert data using this syntax, PyBlade will automatically escape the content to protect against common vulnerabilities like Cross-Site Scripting (XSS) attacks. For cases where you need to output unescaped HTML, there is another syntax.
-
-## Displaying unescaped HTML data
-
-For data that includes HTML, such as `<strong>`, `<em>`, or custom HTML content, use `{!! !!}` to output the data without escaping. This is useful for displaying HTML content stored in your variables.
-
-**Example**
-
-If a variable `message` contains HTML, such as `"<strong>Welcome back!</strong>"`, you can display it like this:
-
-```python
-# views.py
-from django.shortcuts import render
-
-def show_message(request):
-    context = {'message': '<strong>Welcome back!</strong>'}
-    return render(request, 'welcome', context)
-```
-
-```html
-<!-- welcome.html -->
-<p>{!! message !!}</p>
-```
-
-**Output**
-```html
-<p><strong>Welcome back!</strong></p>
-```
-
-::: warning
-Use `{!! !!}` with caution. Always ensure that the content is safe to display to avoid security risks.
-:::
-
-### The `@autoescape` directive
----
-
-When rendering dynamic content in a web application, security is a top priority. That's why by default, PyBlade escapes all variable output to prevent security risks like. However, in some cases, you might want to disable this behavior to allow safe HTML content to be rendered as intended.
-
-The `@autoescape` directive in PyBlade controls whether HTML escaping is applied to variables within its block. It takes either `True` or `False` as an argument. It must be closed with `@endautoescape`.  
-
-**Basic Usage** 
-
-When auto-escaping is enabled, all variables are automatically escaped, meaning that any HTML tags inside them are treated as plain text.  
-
-```html
-@autoescape(True)
-    <p>{{ user.bio }}</p>
-@endautoescape
-```
-
-If `user.bio` contains `<strong>Developer</strong>`, the output will be:  
-
-```
-<strong>Developer</strong>
-```
-
-This prevents HTML from being rendered, ensuring that user-generated content does not break the page structure or introduce security vulnerabilities.  
-
-On the other hand, if you want to allow HTML content to be displayed as intended, you can disable auto-escaping:  
-
-```html
-@autoescape(False)
-    <p>{{ user.bio }}</p>
-@endautoescape
-```
-
-Now, the output will be properly rendered as:  
-
-**Developer**  
-
-
->[!warning] Warning
->Always be cautious when turning off auto-escaping, especially with user-generated content, to maintain security best practices.
-
-To make it even clearer, the `@autoescape` directive also accepts `on` or `off` as arguments, so `@autoescape(True) `works the same way as `@autoescape(off)`, and `@autoescape(False)` is the same as `@autoescape(off)`
+When you insert data using this syntax, PyBlade will automatically escape the content to protect against common vulnerabilities like Cross-Site Scripting (XSS) attacks. For cases where you need to render unescaped HTML, there is [another syntax](#rendering-unescaped-html).
 
 ## Displaying data with default values
 
-In PyBlade, you can also define default values for variables. This is helpful in cases where the variable might not always be defined.
+In PyBlade, you can define fallback values directly inside <span v-pre>`{{ ... }}`</span> using the Python `or` operator.
+This is particularly useful when a variable may be undefined or evaluates to a falsy value (`None`, empty string, etc.).
 
 **Example**
 
-If you want to display `name`, but fallback to "Guest" if it’s undefined, you can use the following syntax:
-
+If you want to display `name`, but fall back to `"Guest"` when `name` is not defined or is falsy, you can write:
 ```html
 <p>Hello, {{ name or 'Guest' }} !</p>
 ```
 
-If `name` is undefined, the output will be:
+## Rendering unescaped HTML
+
+By default, PyBlade automatically escapes all output inside <span v-pre>`{{ ... }}`</span>.
+This means HTML tags are converted into safe text.
+
+For example:
 
 ```html
-<p>Hello, Guest !</p>
+{{ message }}
 ```
 
-## Using methods on variables
-
-In PyBlade, you can not only display variables but also call methods on them directly within the curly braces.
-
-For example, if you have a string variable like `name`, you can use Python string methods such as `.upper()` or `.capitalize()` directly within <span v-pre>`{{ }}`</span> to transform the data before displaying it.
-
-**Example**
-
-If `name` is a string variable, you can call `.upper()` to display it in uppercase:
+If:
 
 ```python
-# views.py
-from django.shortcuts import render
-
-def show_greeting(request):
-    context = {'name': 'Jane'}
-    return render(request, 'greeting', context)
+message = "<strong>Welcome back!</strong>"
 ```
+
+The browser will render:
 
 ```html
-<!-- greeting.html -->
-<p>Hello, {{ name.upper() }} !</p>
+&lt;strong&gt;Welcome back!&lt;/strong&gt;
 ```
 
-**Output**
+So the `<strong>` tag is displayed as text — not interpreted as HTML.
+
+
+But, in some cases, you may intentionally want the browser to interpret the HTML tags. For that purpose, you can use the `{!! !!}` syntax as following:
+
 ```html
-<p>Hello, JANE !</p>
+{!! message !!}
 ```
 
-This flexibility allows you to use any method that is available on the variable type (e.g., strings, lists, dictionaries), including custom methods if the variable is an object.
+With
 
+```python
+message = "<strong>Welcome back!</strong>"
+```
+
+The browser will render
+
+```html
+<strong>Welcome back!</strong>
+```
+
+Now the `<strong>` tag is parsed and applied correctly.
 
 ::: warning
-Avoid using too many methods or computationally expensive operations within <span v-pre>`{{ }}`</span> in your templates. While PyBlade supports calling methods directly on variables, it’s best to keep these calls minimal and efficient. Overusing or relying on time-consuming methods can slow down rendering, impacting user experience.
+Rendering unescaped content is dangerous especially if the data comes from users.
+Use `{!! !!}` with caution. Always ensure that the content is trusted and safe before rendering.
 :::
 
-### Other useful examples
 
-Here are a few more examples to illustrate the versatility of using methods directly in the template.
+## Using filters on variables
 
-#### Capitalizing a String
+PyBlade allows you to not only display variables but also _transform_ them directly in templates using __filters__.
+Instead of calling methods on objects like `name.upper()`, PyBlade uses a **dot-based filter syntax**.
 
-If you want to capitalize only the first letter of `name`, you can use `.capitalize()`:
+### Filter Syntax
 
-```html
-<p>Welcome, {{ name.capitalize() }}!</p>
-```
-
-### Getting the length of a list
-::: info Upcoming feature
-This feature is not yet implemented but should be ready in the next version. This part of documentation is provided for informative purpose only.
-:::
-
-If you have a list called `items`, you can display its length with `len()`:
+Filters are applied directly after a variable using dot notation.
+Arguments, if any, are placed inside parentheses:
 
 ```html
-<p>You have {{ len(items) }} items in your list.</p>
+{{ title.upper.truncate(20) }}
 ```
 
-#### Accessing Dictionary Keys
+This applies the `upper` filter first, then the `truncate(20)` filter on the result.
 
-If a variable `user` is a dictionary with a key `email`, you can access it like this:
+Filters can be **chained** in any order, and PyBlade will evaluate them left to right. This means expressions like `user.name.upper.slugify` work naturally.
 
-```html
-<p>Your email: {{ user.get('email') }}</p>
-```
+### Built-in filters
 
-Using methods within curly braces allows for greater flexibility and keeps your template expressions clear and readable.
+Below is a categorization of PyBlade’s built-in filters, organized by data type.
+Filters are simple functions that accept a value and optionally additional arguments, and return a transformed value.
 
-:::tip
-For best performance and maintainability, follow the principle of “Logic in the backend”, templates are for display only. Perform complex logic and data transformations in your views or controllers, passing only the final, display-ready data to your templates. This keeps templates focused solely on presentation, enhancing readability and performance.
+#### String & Text filters
+
+| Filter             | Description                                                       |
+| ------------------ | ----------------------------------------------------------------- |
+| `upper`            | Convert text to UPPERCASE                                         |
+| `lower`            | Convert text to lowercase                                         |
+| `title`            | Convert text to Title Case                                        |
+| `capitalize`       | Capitalize First character                                        |
+| `strip`            | Trim whitespace from both ends                                    | 
+| `slugify`          | Convert to URL-friendly slug (lowercase, hyphens, no punctuation) | 
+| `truncate(length)` | Truncate to a maximum of `length` characters                      | 
+
+#### Collection filters (Lists, Tuples, Dicts)
+
+| Filter      | Description                             |
+| ----------- | --------------------------------------- |
+| `length`    | Number of items in the collection       |
+| `first`     | First item or element                   |
+| `last`      | Last item or element                    |
+| `join(sep)` | Join items into a string with separator |
+
+
+#### Numeric filters
+
+| Filter        | Description       |
+| ------------- | ----------------- |
+| `add(x)`      | Add a number      |
+| `subtract(x)` | Subtract a number |
+| `multiply(x)` | Multiply          |
+| `divide(x)`   | Divide            |
+
+
+#### Date & Time filters
+
+| Filter        | Description                            |
+| ------------- | -------------------------------------- |
+| `format(fmt)` | Format a `datetime` according to `fmt`. Date format specifiers follow the standard Python `strftime` conventions (e.g. `%Y` for year, `%m` for month). |
+| `humanize`    | Show relative time (e.g. "2 hours ago") |
+
+:::tip Pro Tip
+Keep template logic simple; heavy computations should occur in view code, passing only the final, display-ready data to your templates. This keeps templates focused solely on presentation, enhancing readability and performance.
 :::
 
 ## PyBlade and JavaScript Frameworks
@@ -288,7 +253,7 @@ This will render as:
 <p><a href="foo/">Foo</a></p>
 ```
 
-As you can see, all unnecessary spaces between the HTML tags have been removed, making the output cleaner and more efficient.  
+As you can see, all spaces between the HTML tags have been removed, making the output cleaner.  
 
 The `@spaceless` directive in PyBlade removes whitespace between HTML tags. This includes tab characters and newlines.
 
@@ -308,7 +273,55 @@ The output will still include the space around "Hello":
 ```html
 <strong> Hello </strong>
 ```
+## Debugging
 
+When developing a web application, debugging plays a crucial role in identifying issues and understanding how data flows within your templates. Whether you are troubleshooting missing data, unexpected outputs, or just trying to understand what’s available in your template, PyBlade provides an easy-to-use debugging directive.
+
+### The `@debug` directive
+
+One of the simplest ways to gain insights into your template execution is by using the `@debug` directive. This directive prints a detailed breakdown of the current template context, helping you analyze the available variables and their values.
+
+Using `@debug` is as simple as adding it inside your template:
+
+```html
+@debug
+```
+
+This outputs a structured overview of the template context, helping you identify missing variables or unexpected values.
+
+>[!info]
+>The `@debug` directive only works when debugging is enabled (`DEBUG=True`). In production (`DEBUG=False`), it outputs nothing, ensuring sensitive data remains hidden.
+
+### The `@lorem` directive
+
+The `@lorem` directive generates random "lorem ipsum" text, which is commonly used as placeholder content in templates. This can be particularly useful when designing a template or layout, as it helps visualize how text will appear without needing to write out actual content. The generated text can either be a standard "lorem ipsum" or, when specified, random Latin words or paragraphs.
+
+The `@lorem` directive can be used with up to three optional arguments:
+
+```blade
+@lorem([count], [method], [random])
+```
+
+Here's a breakdown of each argument:
+
+- **`count`**:  
+  The number of items (paragraphs or words) you want to generate. This can either be a fixed number or a context variable that holds the number. By default, it will generate one paragraph.
+
+- **`method`**:  
+  Specifies the type of content to generate. It can be one of the following:
+  - `'w'` for **words**: Will generate random Latin words.
+  - `'p'` for **HTML paragraphs**: Will generate full paragraphs wrapped in `<p>` tags.
+  - `'b'` for **plain-text paragraph blocks**: Will generate plain-text paragraphs without any HTML tags. This is the default option.
+
+- **`random`**:  
+  If the set to `True`, it will ensure that the generated content is random Latin text, instead of the usual standard "Lorem ipsum dolor sit amet..." paragraph. This adds variability in the generated text.
+  
+  For example, the following will output three paragraphs, each wrapped in `<p>` tags, containing the standard "lorem ipsum" text.
+
+   ```html
+   @lorem(3, 'p')
+   ```
+   
 ## Comments
 
 In PyBlade, comments allow you to include notes within your templates without rendering them in the final output. This is useful for adding explanations, reminders, or temporary code blocks without affecting the generated HTML.
@@ -345,52 +358,5 @@ Sample usage:
 @endcomment
 ```
 
-## Debugging
 
-When developing a web application, debugging plays a crucial role in identifying issues and understanding how data flows within your templates. Whether you are troubleshooting missing data, unexpected outputs, or just trying to understand what’s available in your template, PyBlade provides an easy-to-use debugging directive.
-
-### The `@debug` directive
-
-One of the simplest ways to gain insights into your template execution is by using the `@debug` directive. This directive prints a detailed breakdown of the current template context, imported modules, and other relevant information about your template, helping you analyze the available variables and their values.
-
-Using `@debug` is as simple as adding it inside your template:
-
-```html
-@debug
-```
-
-This outputs a structured overview of the template context, helping you identify missing variables or unexpected values.
-
->[!info]
->In Django applications, the `@debug` directive only works when debugging is enabled (`DEBUG=True`). In production (`DEBUG=False`), it outputs nothing, ensuring sensitive data remains hidden.
-
-### The `@lorem` directive
-
-The `@lorem` directive generates random "lorem ipsum" text, which is commonly used as placeholder content in templates. This can be particularly useful when designing a template or layout, as it helps visualize how text will appear without needing to write out actual content. The generated text can either be a standard "lorem ipsum" or, when specified, random Latin words or paragraphs.
-
-The `@lorem` directive can be used with up to three optional arguments:
-
-```blade
-@lorem([count], [method], [random])
-```
-
-Here's a breakdown of each argument:
-
-- **`count`**:  
-  The number of items (paragraphs or words) you want to generate. This can either be a fixed number or a context variable that holds the number. By default, it will generate one paragraph/word.
-
-- **`method`**:  
-  Specifies the type of content to generate. It can be one of the following:
-  - `w` for **words**: Will generate random Latin words.
-  - `p` for **HTML paragraphs**: Will generate full paragraphs wrapped in `<p>` tags.
-  - `b` for **plain-text paragraph blocks**: Will generate plain-text paragraphs without any HTML tags. This is the default option.
-
-- **`random`**:  
-  If the word `random` is provided, it will ensure that the generated content is random Latin text, instead of the usual standard "Lorem ipsum dolor sit amet..." paragraph. This adds variability in the generated text.
-  
-  For example, the following will output three paragraphs, each wrapped in `<p>` tags, containing the standard "lorem ipsum" text.
-
-   ```html
-   @lorem(3, p)
-   ```
    
