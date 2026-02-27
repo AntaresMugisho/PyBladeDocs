@@ -101,11 +101,144 @@ Rendering unescaped content is dangerous especially if the data comes from users
 Use `{!! !!}` with caution. Always ensure that the content is trusted and safe before rendering.
 :::
 
+## Dictionary key access with dot notation
+
+In PyBlade, dictionary keys can be accessed using **dot notation** when the key is a valid identifier.
+
+This means you can write:
+
+```html
+{{ my_dict.key }}
+```
+
+Instead of:
+
+```html
+{{ my_dict["key"] }}
+```
+Both are equivalent and will produce the same result.
+
+**Example**
+
+Given:
+
+```python
+context = {
+    "user": {
+        "name": "Alice",
+        "email": "alice@example.com",
+    }
+}
+```
+
+You can write:
+
+```html
+{{ user.name }}
+```
+
+Output:
+
+```
+Alice
+```
+
+
+::: info Good to know
+Dictionary key access with dot notation works only if the key is a valid alphanumeric identifier.
+
+If the key contains whitespaces or unsupported special characters, use bracket syntax:
+
+```html
+{{ my_dict.key }}           # valid  // [!code ++]
+{{ my_dict.other_key }}     # valid  // [!code ++]
+{{ my_dict.1 }}             # valid  // [!code ++]
+{{ my_dict.first-name }}    # invalid  // [!code --]
+{{ my_dict.first name }}    # invalid  // [!code --]
+{{ my_dict.user id }}       # invalid  // [!code --]
+```
+:::
+
+## Index access with dot notation
+
+PyBlade allows convenient access to data of type `list` and `tuple` using the `.index` notation.
+
+**Example**
+
+Given the following context:
+```python
+context = {
+    "countries": ["France", "Germany", "Japan"],
+}
+```
+
+Instead of writing bracket syntax:
+
+```html
+{{ countries[0] }}
+```
+
+You can access elements like this:
+
+```html
+{{ countries.0 }}
+```
+
+**Output:**
+```
+France
+```
+
+Both methods work, but the dot-index notation is more readable and less verbose.
+
+### Chained access
+
+Dot-index notation also works in nested expressions:
+
+```python
+context = {
+    "countries": [
+        {"name": "France"},
+        {"name": "Germany"},
+        {"name": "Japan"},
+    ]
+}
+```
+
+You may combine attribute access and index access freely:
+
+```html
+{{ countries.1.name }}
+```
+
+**Output:**
+```
+Germany
+```
+
+### Negative indexing
+
+You can also use negative index to access elements from the end of a list:
+
+```html
+{{ countries.-1.name }}
+```
+
+**Output:**
+```
+Japan
+```
+
+
 
 ## Using filters on variables
 
 PyBlade allows you to not only display variables but also _transform_ them directly in templates using __filters__.
 Instead of calling methods on objects like `name.upper()`, PyBlade uses a **dot-based filter syntax**.
+
+### What are filters ?
+
+Filters are simple functions that accept a _value_ and optionally additional arguments, and return a _transformed value_.
 
 ### Filter Syntax
 
@@ -123,7 +256,6 @@ Filters can be **chained** in any order, and PyBlade will evaluate them left to 
 ### Built-in filters
 
 Below is a categorization of PyBlade’s built-in filters, organized by data type.
-Filters are simple functions that accept a value and optionally additional arguments, and return a transformed value.
 
 #### String & Text filters
 
@@ -298,7 +430,7 @@ The `@lorem` directive generates random "lorem ipsum" text, which is commonly us
 
 The `@lorem` directive can be used with up to three optional arguments:
 
-```blade
+```html
 @lorem([count], [method], [random])
 ```
 
