@@ -69,7 +69,7 @@ message = "<strong>Welcome back!</strong>"
 
 The browser will render:
 
-```html
+```
 &lt;strong&gt;Welcome back!&lt;/strong&gt;
 ```
 
@@ -90,7 +90,7 @@ message = "<strong>Welcome back!</strong>"
 
 The browser will render
 
-```html
+```
 <strong>Welcome back!</strong>
 ```
 

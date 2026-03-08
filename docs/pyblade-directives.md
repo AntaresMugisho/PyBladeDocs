@@ -1,5 +1,9 @@
 # PyBlade Directives
 
+PyBlade directives are special template instructions that control rendering, loops, conditionals, and other dynamic behaviors.
+
+Using the concise `@directive` syntax helps write templates faster and more efficiently, keeping your code readable and consistent.
+
 ## If statements
 
 PyBlade provides a set of intuitive and developer-friendly directives for conditional statements, allowing you to control the flow of your templates easily. These conditionals work similarly to Python’s `if`, `elif`, and `else` statements, making it simple to render content based on certain conditions.
@@ -122,7 +126,7 @@ And if `user.is_authenticated` is `False`, the output will be:
 In PyBlade, you can also use logical expressions such as `and`, `or`, and `not` within conditional statements, similar to Python. This allows you to combine multiple conditions in a single directive for more complex checks.
 
 :::warning Warning: Keep logic out of templates
-For performance and readability, avoid complex or time-consuming logic within conditional statements. Templates should primarily focus on displaying pre-processed data, not performing heavy logic. Keep calculations and condition checks within views or controllers wherever possible to adhere to the principle of "Logic in the code, templates are for display only."
+For performance and readability, avoid complex or time-consuming logic within conditional statements. Templates should primarily focus on displaying pre-processed data, not performing heavy logic. Keep calculations and condition checks within views or controllers wherever possible."
 :::
 
 ### Authentication directives
@@ -130,7 +134,7 @@ For performance and readability, avoid complex or time-consuming logic within co
 When working with authentication, you often need to conditionally display content based on whether a user is logged in. Instead of manually checking `@if(user.is_authenticated)`, PyBlade provides `@auth` and `@guest` directives for a cleaner, more readable approach.  
 
 
-The `@auth` directive ensures that the enclosed content is visible only to lauthenticated users. It’s useful for dashboards, account settings, or other user-specific content.  
+The `@auth` directive ensures that the enclosed content is visible only to authenticated users. It’s useful for dashboards, account settings, or other user-specific content.  
 
 ```html
 @auth
@@ -162,13 +166,13 @@ If the user is not logged in, they see login and signup links. Otherwise, they a
 
 ## Match Case statements
 
-Similar to Python, PyBlde also provides support for `@match` statements, which are useful for handling multiple conditions based on the value of a single variable. This can help simplify templates by reducing the need for multiple `@if`, `@elif`, and `@else` statements.
+Similar to Python, PyBlde also provides support for `@match` statements, which are useful for handling multiple conditions based on the value of a single variable. This can help simplify templates by reducing the need for multiple `@elif` statements.
 
 With `@match`, you can check a variable's value and define multiple `@case` conditions. If none of the cases match, an optional `@default` can be specified as a fallback.
 
 ### Basic Syntax
 
-The `@match` directive takes a variable as its argument. Within the `@match` block, each condition is checked using `@case`, and the code in the matching `@case` block will execute. If no cases match, the `@default` block will execute (if it is provided).
+The `@match` directive takes a variable as its argument. Within the `@match` block, each condition is checked using `@case`, and the code in the matching `@case` block will execute. If no cases match, the `@default` block, if provided, will execute.
 
 ```html
 @match(variable)
@@ -243,9 +247,9 @@ So the above example is equivalent to this:
 @endswitch
 ```
 
-### Nested `@match` Statements
-
-Just like other conditional structures, `@match` statements can be nested, though it’s best to keep templates as simple as possible to maintain readability.
+:::warning Good to know
+The `@match` directive does not support other directives in the `@case` statement's body. Even nested `@match` statements are not supported.
+:::
 
 
 
