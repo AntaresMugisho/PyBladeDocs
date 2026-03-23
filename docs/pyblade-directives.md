@@ -27,7 +27,7 @@ def show_status(request):
 
 ```html
 <!-- status.html -->
-@if(status == 'active')
+@if (status == 'active')
     <p>Your account is active.</p>
 @elif (status == 'pending')
     <p>Your account is pending approval.</p>
@@ -131,7 +131,7 @@ For performance and readability, avoid complex or time-consuming logic within co
 
 ### Authentication directives
 
-When working with authentication, you often need to conditionally display content based on whether a user is logged in. Instead of manually checking `@if(user.is_authenticated)`, PyBlade provides `@auth` and `@guest` directives for a cleaner, more readable approach.  
+When working with authentication, you often need to conditionally display content based on whether a user is logged in. Instead of manually checking `@if (user.is_authenticated)`, PyBlade provides `@auth` and `@guest` directives for a cleaner, more readable approach.  
 
 
 The `@auth` directive ensures that the enclosed content is visible only to authenticated users. It’s useful for dashboards, account settings, or other user-specific content.  
@@ -305,10 +305,10 @@ def show_fruits(request):
 ```html
 <!-- In fruits.html -->
 <ul>
-    @for(fruit in fruits)
+    @for (fruit in fruits)
         <li>{{ fruit }}</li>
     @empty
-        <li>No fruits available.</li>
+        <li>No fruit available.</li>
     @endfor
 </ul>
 ```
@@ -323,60 +323,50 @@ def show_fruits(request):
 
 Using `@empty` ensures that the template provides meaningful feedback in cases where a list or iterable is empty, improving user experience.
 
-### Using the `loop` Variable
+### The `loop` Variable
 
-In addition, PyBlade provides a special `loop` variable inside each loop, giving you helpful information about the current iteration. This variable allows you to access details like the current index, whether it’s the first or last iteration, and more.
-
-Here is a full list of available properties on the loop variable.
-
-
-| Property         | Description|
-| -------------    | ---------- |
-| `loop.index`     | The index of the current loop iteration (starts at 0).|
-| `loop.iteration` | The current loop iteration (starts at 1).|
-| `loop.first`     | Whether this is the first iteration through the loop.|
-| `loop.last`      | Whether this is the last iteration through the loop.|
-| `loop.count`     | The total number of iterations.|
-| `loop.remaining` | The iterations remaining in the loop.|
-| `loop.even`      | Whether this is an even iteration through the loop.|
-| `loop.odd`       | Whether this is an odd iteration through the loop.|
-
-
-**Example** with `loop` Variable
-
-Let’s enhance the previous example to use the `loop` variable for displaying additional information about each item:
+While iterating through a `for` loop, PyBlade provides a special `loop` variable available inside your loop. This variable holds helpful information about the current iteration like the current index, whether it’s the first or last iteration, and more.
 
 ```html
-<!-- items.html -->
-<ul>
-    @for(fruit in fruits)
-        <li>
-            @if(loop.first)
-                First item:
-            @elif(loop.last)
-                Last item:
-            @else
-                Item {{ loop.iteration }} of {{ loop.count }}:
-            @endif
-            {{ item }}
-        </li>
+@for (user in users)
+    @if (loop.first)
+        This is the first iteration.
+    @endif
+    
+    @if (loop.last)
+        This is the last iteration.
+    @endif
+
+    <p>This is user {{ user.name }}.</p>
+@endfor
+```
+
+If you are in a nested loop, you may access the parent loop's `loop` variable via the `parent` property:
+
+```html
+@for (user in users)
+    @for (comment in user.comments)
+        @if (loop.parent.first)
+            This is the first iteration of the parent loop.
+        @endif
     @endfor
-</ul>
+@endfor
 ```
 
-**Output**
+Here is a full list of available properties on the `loop` variable.
 
-```html
-<ul>
-    <li>First item: Apple</li>
-    <li>Item 2 of 3: Banana</li>
-    <li>Last item: Cherry</li>
-</ul>
-```
-
-::: warning Missing feature
-Nested loops are not supported yet.
-:::
+| Property         |Return type| Description|
+| -------------    |-----------| ---------- |
+| `loop.index`     |`int`| The index of the current loop iteration (starts at 0).|
+| `loop.iteration` |`int`| The current loop iteration (starts at 1).|
+| `loop.first`     |`bool`| Whether this is the first iteration through the loop.|
+| `loop.last`      |`bool`| Whether this is the last iteration through the loop.|
+| `loop.count`     |`int`| The total number of iterations.|
+| `loop.remaining` |`int`| The iterations remaining in the loop.|
+| `loop.even`      |`bool`| Whether this is an even iteration through the loop.|
+| `loop.odd`       |`bool`| Whether this is an odd iteration through the loop.|
+| `loop.depth`       |`int`| The nesting level of the current loop (starts at 0).|
+| `loop.parent`       |`LoopContext`| In a nested loop, the parent's loop variable.|
 
 
 ### Skipping and ending loop iterations
@@ -399,14 +389,14 @@ def show_fruits(request):
 ```html
 <!-- fruits.html -->
 <ul>
-    @for(fruit in fruits)
-        @if(fruit == 'Banana')
+    @for (fruit in fruits)
+        @if (fruit == 'Banana')
             @continue
         @endif
 
         <li>{{ fruit }}</li>
 
-        @if(fruit == 'Date')
+        @if (fruit == 'Date')
             @break
         @endif
     @endfor
@@ -508,7 +498,7 @@ Here, we set a red color for fruits that are not favorites:
 
 ```html
 <ul>
-    @for(fruit in fruits)
+    @for (fruit in fruits)
         <li @style({"color: red;": not fruit.is_favorite})>{{ fruit.name }}</li>
     @endfor
 </ul>
@@ -635,7 +625,7 @@ A common use case is in a table, where each row should have alternating backgrou
 
 ```html
 <table>
-    @for(book in books)
+    @for (book in books)
         <tr class="@cycle('bg-gray-100', 'bg-white')">
             <td>{{ book.title }}</td>
             <td>{{ book.author }}</td>
@@ -653,7 +643,7 @@ You can also cycle through variables instead of fixed values. Suppose you have t
 
 ```html
 @with(row1='highlight', row2='normal')
-    @for(product in products)
+    @for (product in products)
         <tr class="@cycle(row1, row2)">
             <td>{{ product.name }}</td>
             <td>{{ product.price }}</td>
@@ -665,7 +655,7 @@ You can also cycle through variables instead of fixed values. Suppose you have t
 The values in the cycle will be automatically escaped for safety. However, if you need to disable auto-escaping, you can wrap it in an [`@autoescape`](displaying-data.html#the-autoescape-directive) block. 
 
 ```html
-@for(product in products)
+@for (product in products)
     <tr class="@autoescape(False) @cycle(row1, row2) @endautoescape">
         <td>{{ product.name }}</td>
         <td>{{ product.price }}</td>
@@ -676,7 +666,7 @@ The values in the cycle will be automatically escaped for safety. However, if yo
 You’re not limited to just variables or just strings — you can mix them as well:  
 
 ```html
-@for(product in products)
+@for (product in products)
     <tr class="@cycle('first', row1, 'last')">
         <td>{{ product.name }}</td>
         <td>{{ product.price }}</td>
@@ -713,7 +703,7 @@ This keyword prevents the cycle from displaying its value **at the point where i
 For example, if you're using the cycle within a loop and want to store the current value in a variable without outputting the first value right away, you can add the `silent` keyword. 
 
 ```html
-@for(item in products)
+@for (item in products)
     @cycle('row1', 'row2' as rowcolors silent)
     <tr class="{{ rowcolors }}">
         <td>{{ item.name }}</td>
@@ -784,14 +774,14 @@ In this example, the cycle for `rowcolors` won't output anything, even when call
 If needed, you can reset a cycle so that it starts from the first value again the next time it is used:  
 
 ```html
-@for(section in sections)
+@for (section in sections)
     @cycle('section-a', 'section-b' as section_class)
     <div class="{{ section_class }}">
         <h2>{{ section.title }}</h2>
         <p>{{ section.content }}</p>
     </div>
     
-    @if(loop.last)
+    @if (loop.last)
         @resetcycle(section_class)  <!-- Reset cycle to start from the first value -->
     @endif
 @endfor
@@ -815,7 +805,7 @@ For example, consider this usage:
 This is equivalent to writing:  
 
 ```html
-@if(var1)
+@if (var1)
     {{ var1 }}
 @elif(var2)
     {{ var2 }}
@@ -893,10 +883,10 @@ You can use the `@regroup` directive to group the list of cities by country. The
 @regroup(cities by country as country_list)
 
 <ul>
-@for(country in country_list)
+@for (country in country_list)
     <li>{{ country.grouper }}
     <ul>
-        @for(city in country.list)
+        @for (city in country.list)
           <li>{{ city.name }}: {{ city.population }}</li>
         @endfor
     </ul>
@@ -919,10 +909,10 @@ Because `@regroup` produces `namedtuple()` objects, you can also write the previ
 @regroup(cities by country as country_list)
 
 <ul>
-@for(country, local_cities in country_list)
+@for (country, local_cities in country_list)
     <li>{{ country }}
     <ul>
-        @for(city in local_cities)
+        @for (city in local_cities)
           <li>{{ city.name }}: {{ city.population }}</li>
         @endfor
     </ul>
@@ -995,7 +985,7 @@ When used without arguments, `@ifchanged` checks its own rendered contents again
 ```html
 <h1>Archive for {{ year }}</h1>
 
-@for(date in dates)
+@for (date in dates)
     @ifchanged
         <h3>{{ date.strftime('%B') }}</h3>
     @endifchanged
@@ -1006,7 +996,7 @@ When used without arguments, `@ifchanged` checks its own rendered contents again
 If given one or more variables as arguments to `@ifchanged` directive, it checks whether any variable has changed. For example, the following shows the date every time it changes, while showing the hour if either the hour or the date has changed:
 
 ```html
-@for(date in dates)
+@for (date in dates)
     @ifchanged (date.date)
         <strong>{{ date.date }}</strong>
     @endifchanged
@@ -1020,7 +1010,7 @@ If given one or more variables as arguments to `@ifchanged` directive, it checks
 You can use an `@else` clause inside `@ifchanged` to define an alternative output when the value has **not** changed. For example, the following alternates between `red` and `blue` colors when `ballot_id` changes, otherwise uses `gray`:  
 
 ```html
-@for(match in matches)
+@for (match in matches)
     <div style="background-color:
         @ifchanged(match.ballot_id)
             @cycle('red', 'blue')
@@ -1055,7 +1045,7 @@ Sometimes, you may need to store the output of `@now` in a variable to reuse it 
 ```html
 @now("%B" as current_month)
 
-@if(current_month == "December")
+@if (current_month == "December")
     <p>Happy holidays! It's {{ current_month }}, the festive season.</p>
 @else
     <p>Welcome to {{ current_month }}! Hope you have a great month.</p>
@@ -1153,7 +1143,7 @@ To use `@urlis`, pass the name of the route as the first argument.
 The abve code is equivalent to :
 
 ```html
-@if(request.resolver_match.url_name == 'home')
+@if (request.resolver_match.url_name == 'home')
     <!-- Display content for the home page -->
 @endif
 ```
@@ -1348,8 +1338,8 @@ In practice, you’ll use this to get a string you can use in multiple places in
   <a href="/" title="@blocktranslate Back to '{{ race }}' homepage @endblocktranslate">{{ race }}</a>
 </h1>
 <p>
-@for(stage in tour_stages)
-    @cycle(start, end): {{ stage }}@if(loop.index % 2 == 0)<br>@else, @endif
+@for (stage in tour_stages)
+    @cycle(start, end): {{ stage }}@if (loop.index % 2 == 0)<br>@else, @endif
 @endfor
 </p>
 ```
@@ -1477,7 +1467,7 @@ Retrieves a list of available languages. Each entry is a tuple:
 ```html
 @get_available_languages(as LANGUAGES)
 
-@for(lang in LANGUAGES)
+@for (lang in LANGUAGES)
     <option value="{{ lang.0 }}">{{ lang.1 }}</option>
 @endfor
 ```
@@ -1502,7 +1492,7 @@ Checks if the **current language** is a **right-to-left (RTL) language** (e.g., 
 ```html
 @get_current_language_bidi(as LANGUAGE_BIDI)
 
-@if(LANGUAGE_BIDI)
+@if (LANGUAGE_BIDI)
     <p>The current language is right-to-left (RTL).</p>
 @else
     <p>The current language is left-to-right (LTR).</p>
@@ -1520,7 +1510,7 @@ Checks if the **current language** is a **right-to-left (RTL) language** (e.g., 
 >
 >```html
 ><p>Current language code: {{ LANGUAGE_CODE }}</p>
->@if(LANGUAGE_BIDI)
+>@if (LANGUAGE_BIDI)
 >    <p>The language is bidirectional (RTL).</p>
 >@endif
 >```
@@ -1553,7 +1543,7 @@ Example: Assume your view passes `available_languages = ["en", "es", "fr"]` to t
 ```html
 @get_language_info_list(available_languages as langs)
 
-@for(lang in langs)
+@for (lang in langs)
     <p>{{ lang.name }} ({{ lang.code }})</p>
 @endfor
 ```
