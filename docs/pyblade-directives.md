@@ -362,18 +362,18 @@ Here is a full list of available properties on the `loop` variable.
 | `loop.first`     |`bool`| Whether this is the first iteration through the loop.|
 | `loop.last`      |`bool`| Whether this is the last iteration through the loop.|
 | `loop.count`     |`int`| The total number of iterations.|
-| `loop.remaining` |`int`| The iterations remaining in the loop.|
+| `loop.remaining` |`int`| The number of iterations remaining in the loop.|
 | `loop.even`      |`bool`| Whether this is an even iteration through the loop.|
 | `loop.odd`       |`bool`| Whether this is an odd iteration through the loop.|
-| `loop.depth`       |`int`| The nesting level of the current loop (starts at 0).|
-| `loop.parent`       |`LoopContext`| In a nested loop, the parent's loop variable.|
+| `loop.depth`     |`int`| The nesting level of the current loop (starts at 0).|
+| `loop.parent`    |`LoopContext`| In a nested loop, the parent's loop variable.|
 
 
 ### Skipping and ending loop iterations
 
 In PyBlade, you can use the `@continue` directive to skip the current iteration and move on to the next one, or the `@break` directive to exit the loop entirely based on a condition.
 
-**Example** with `@continue` and `@break`
+**Example**
 
 Suppose you have a list of fruits, and you want to display each fruit's name but want to skip "Banana" and stop the loop entirely once you reach "Date."
 
@@ -422,10 +422,14 @@ You can also include the condition directly within the `@continue` and `@break` 
 
 ```html
 <ul>
-    @for fruit in fruits
-        @continue(fruit == 'Banana')
+    @for (fruit in fruits)
+
+        @continue(fruit == 'Banana') // [!code highlight]
+
         <li>{{ fruit }}</li>
-        @break(fruit == 'Date')
+        
+        @break(fruit == 'Date') // [!code highlight]
+        
     @endfor
 </ul>
 ```
@@ -448,7 +452,21 @@ If there is strong demand from the community and a clear use case for `@while`, 
 
 ## Conditional Classes
 
-The `@class` directive in PyBlade lets you conditionally apply CSS classes based on specific conditions. It accepts a dictionary where `keys` represent the class or classes you wish to add, while `values` are booleans or boolean expressions. If an expression evaluates to `True`, the associated class is applied.
+The `@class` directive in PyBlade lets you conditionally apply CSS classes to an HTML element based on specific conditions. 
+
+It accepts positional and keyword-like arguments. Positional arguments are always included in the class list, while keyword arguments are included only if their condition evaluate to `True`.
+
+**Syntax**
+```html
+@class("class1 class2", "class3", "class4 class5"=boolean_expression)
+```
+
+**Behavior**
+- Each positional argument is evaluated and added as a class if it has a truthy value (not `None`, `False` or an empty string)
+- Each keyword argument maps:
+  - _key_ as class name
+  - _value_ as condition
+- Duplicate class names are automatically removed
 
 **Example**
 
@@ -472,8 +490,8 @@ def show_fruits(request):
 ```html
 <!-- fruits.html -->
 <ul>
-    @for fruit in fruits
-        <li @class({"list-item": True, "favorite": fruit.is_favorite})>{{ fruit.name }}</li>
+    @for (fruit in fruits)
+        <li @class("list-item", "favorite"=fruit.is_favorite)>{{ fruit.name }}</li>
     @endfor
 </ul>
 ```
@@ -488,9 +506,9 @@ def show_fruits(request):
 </ul>
 ```
 
-## Conditional inline Styles
+## Conditional Inline Styles
 
-The `@style` directive works similarly to `@class`, but it controls inline CSS styles. It also takes a dictionary where `keys` are CSS properties, and `values` are booleans or expressions. When an expression evaluates to `True`, the associated style is applied to the element.
+The `@style` directive works similarly to `@class`, but instead of controlling CSS class names, it works with __CSS properties__.
 
 **Example**
 
@@ -499,7 +517,7 @@ Here, we set a red color for fruits that are not favorites:
 ```html
 <ul>
     @for (fruit in fruits)
-        <li @style({"color: red;": not fruit.is_favorite})>{{ fruit.name }}</li>
+        <li @style("background-color:#000", "color: red"=not fruit.is_favorite)>{{ fruit.name }}</li>
     @endfor
 </ul>
 ```
@@ -508,9 +526,9 @@ Here, we set a red color for fruits that are not favorites:
 
 ```html
 <ul>
-    <li>Apple</li>
-    <li style="color: red;">Banana</li>
-    <li>Cherry</li>
+    <li style="backgroud-color:#000>Apple</li>
+    <li style="backgroud-color:#000; color: red">Banana</li>
+    <lis tyle="backgroud-color:#000>Cherry</li>
 </ul>
 ```
 

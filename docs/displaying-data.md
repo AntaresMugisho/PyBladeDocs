@@ -446,7 +446,7 @@ Here's a breakdown of each argument:
   - `'b'` for **plain-text paragraph blocks**: Will generate plain-text paragraphs without any HTML tags. This is the default option.
 
 - **`random`**:  
-  If the set to `True`, it will ensure that the generated content is random Latin text, instead of the usual standard "Lorem ipsum dolor sit amet..." paragraph. This adds variability in the generated text.
+  If set to `True`, it will ensure that the generated content is random Latin text, instead of the usual standard "Lorem ipsum dolor sit amet..." paragraph. This adds variability in the generated text.
   
   For example, the following will output three paragraphs, each wrapped in `<p>` tags, containing the standard "lorem ipsum" text.
 
