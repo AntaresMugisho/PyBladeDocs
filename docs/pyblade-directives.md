@@ -536,7 +536,7 @@ Here, we set a red color for fruits that are not favorites:
 
 In PyBlade, partials allow you to include smaller template sections within a template file. This modular approach is useful for reusing common components (e.g., headers, footers, or menus) across multiple templates, keeping your code organized and reducing redundancy.
 
-Use the `@include` directive to insert a partial within a template. The path to the partial is specified as a string, excluding the `.html` extension and separating direcoties using **dot notation**.
+Use the `@include` directive to insert a partial within a template. The path to the partial is specified as a string, excluding the `.html` extension and separating directories using **dot notation**.
 
 **Example**
 
@@ -564,16 +564,24 @@ PyBlade provides some useful directives for handling variables dynamically withi
 
 The `@with` directive allows you to assign a temporary variable within a block. This is useful when a value needs to be referenced multiple times within a small section of the template.  
 
-For example, in a web application where users have profiles, the display name might depend on whether they have a full name set. Instead of checking this multiple times, `@with` can be used to assign a `display_name` variable and use it throughout the block.  
+**Basic usage**
 
 ```html
-@with(display_name=user.full_name or user.username)
-    <h1>Welcome, {{ display_name }} !</h1>
-    <p>Your are logged in as {{ display_name }}</p>
+@with(variable=value)
+    ...
+    {{ variable }}
+@endwith
+```  
+
+Let's take a meaningful example: imagine a web application where customers have profiles with `first_name` and `last_name`, instead of concatenating them every time you want to display the customer's _full name_, `@with` can be used to assign a `full_name` variable to be used throughout the block.  
+
+```html
+@with(full_name=customer.first_name + ' ' + customer.last_name)
+    <h3>Welcome again, {{ full_name }} !</h3>
+
+    <p>Hey {{ full_name }}, we have a surprise for you.</p>
 @endwith
 ```
-
-Here, the `display_name` variable stores either `user.full_name` if available or falls back to `user.username`. This ensures that both the `<h1>` and `<p>` tags reference the same calculated value without repeating the logic.
 
 Another use-case way of the `@with` directive is to store the result of a complex expression in a simpler variable. This is particularly helpful when dealing with operations that require significant processing, such as querying the database multiple times.  
 
@@ -581,12 +589,12 @@ For example:
 
 ```html
 @with(total=business.employees.count)
-    {{ total }} employee{{ "s" if total > 1 else "" }}
+    <p>Number of employees : {{ total }}</p>
 @endwith
 ```
 
 >[!info] Note
->The assigned variables (like `total` in the example) are only accessible within the `@with` block and will not be available outside of it.
+>The assigned variables (like `total` in the example) are only accessible within the `@with .... @endwith` block and will not be available outside of it.
 
 
 You can also define multiple variables at once:  
@@ -670,17 +678,6 @@ You can also cycle through variables instead of fixed values. Suppose you have t
 @endwith
 ```  
 
-The values in the cycle will be automatically escaped for safety. However, if you need to disable auto-escaping, you can wrap it in an [`@autoescape`](displaying-data.html#the-autoescape-directive) block. 
-
-```html
-@for (product in products)
-    <tr class="@autoescape(False) @cycle(row1, row2) @endautoescape">
-        <td>{{ product.name }}</td>
-        <td>{{ product.price }}</td>
-    </tr>
-@endfor
-```  
-
 You’re not limited to just variables or just strings — you can mix them as well:  
 
 ```html
@@ -694,6 +691,10 @@ You’re not limited to just variables or just strings — you can mix them as w
 
 This will alternate between `"first"`, the value of `row2`, and `"last"`.  
 
+:::info Good to know
+Values in the `@cycle` will be automatically escaped for safety.
+:::
+
 #### Storing and reusing a Cycle  
 ---
 
@@ -701,7 +702,7 @@ If you need to reference the current value of a cycle without advancing it, you 
 
 ```html
 @cycle('red', 'blue' as color)
-<p style="color: {{ color }}">This text alternates between red and blue.</p>
+<p style="color: @cycle(color)">This text alternates between red and blue.</p>
 ```  
 
 Later in the template, you can use `@cycle(color)` to advance to the next value:  
@@ -721,14 +722,12 @@ This keyword prevents the cycle from displaying its value **at the point where i
 For example, if you're using the cycle within a loop and want to store the current value in a variable without outputting the first value right away, you can add the `silent` keyword. 
 
 ```html
+@cycle('row1', 'row2' as rowcolors silent) <!-- [!code highlight] -->
 @for (item in products)
-    @cycle('row1', 'row2' as rowcolors silent)
-    <tr class="{{ rowcolors }}">
+    <tr class="@cycle(rowcolors)">
         <td>{{ item.name }}</td>
         <td>{{ item.price }}</td>
     </tr>
-
-    @include('subtemplate')
 @endfor
 ```
 
@@ -737,71 +736,56 @@ In this example, the first cycle value (`'row1'`) is not output immediately up t
 For the above code, the output would look something like this:
 
 ```html
-<tr class="row1">
+<tr class="row1"> <!-- [!code highlight] -->
     <td>Product 1</td>
     <td>$10</td>
 </tr>
-<tr class="row2">
+<tr class="row2"> <!-- [!code highlight] -->
     <td>Product 2</td>
     <td>$20</td>
 </tr>
-<tr class="row1">
+<tr class="row1"> <!-- [!code highlight] -->
     <td>Product 3</td>
     <td>$30</td>
 </tr>
 ```
 
-But without the `silent` keyword, **row1** and **row2** would be output right away as normal text, outside the `<tr>` elements resulting in something like this:
+But without the `silent` keyword, **row1**  would be output right away as normal text before the loop, resulting in something like this:
 
 ```html
-row1
-<tr class="row1">
+row1 <!-- [!code highlight] -->
+<tr class="row2">
     <td>Product 1</td>
     <td>$10</td>
 </tr>
-row2
-<tr class="row2">
+<tr class="row1"> 
     <td>Product 2</td>
     <td>$20</td>
 </tr>
-row1
-<tr class="row1">
+<tr class="row2">
     <td>Product 3</td>
     <td>$30</td>
 </tr>
 ```
 ---
 
-Once the `silent` keyword is used, it will apply to all subsequent uses of the same cycle until the end of the block or template. This means that you don't need to specify `silent` in every cycle call within that scope; it's automatically implied.
-  
-
-```html
-@cycle('row1', 'row2' as rowcolors silent)
-<tr class="{{ rowcolors }}">
-    <td>{{ item.name }}</td>
-    <td>{{ item.price }}</td>
-</tr>
-
-@cycle(rowcolors)  <!-- This will not output anything because silent is active -->
-```
-
-In this example, the cycle for `rowcolors` won't output anything, even when called again later.
-
 #### Restarting a Cycle with `@resetcycle`  
 
 If needed, you can reset a cycle so that it starts from the first value again the next time it is used:  
 
 ```html
+@cycle('section-a', 'section-b' as section_class)
+
 @for (section in sections)
-    @cycle('section-a', 'section-b' as section_class)
-    <div class="{{ section_class }}">
+    @if (loop.last)
+        @resetcycle(section_class)  <!-- Reset cycle to start from the first value -->
+    @endif
+
+    <div class="@cycle(section_class)">
         <h2>{{ section.title }}</h2>
         <p>{{ section.content }}</p>
     </div>
     
-    @if (loop.last)
-        @resetcycle(section_class)  <!-- Reset cycle to start from the first value -->
-    @endif
 @endfor
 ```
 
