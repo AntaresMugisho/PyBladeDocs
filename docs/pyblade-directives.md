@@ -921,7 +921,6 @@ Because `@regroup` produces `namedtuple()` objects, you can also write the previ
     </li>
 @endfor
 </ul>
-``` -->
 
 #### Grouping on other properties
 ---
@@ -942,6 +941,7 @@ Or, if `country` is a field with choices, it will have a `get_FOO_display()` met
 
 <span v-pre>`{{ country.grouper }}`</span> will now display the value fields from the choices set rather than the keys.
 
+``` -->
 
 ---
 ### The `@ifchanged` directive
