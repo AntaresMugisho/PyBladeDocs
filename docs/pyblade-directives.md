@@ -693,6 +693,11 @@ This will alternate between `"first"`, the value of `row2`, and `"last"`.
 
 :::info Good to know
 Values in the `@cycle` will be automatically escaped for safety.
+If you want to disable escaping for certain reasons, you can use the `.safe` filter.
+
+```html
+@cycle(var1, var2.safe, var3)
+```
 :::
 
 #### Storing and reusing a Cycle  
@@ -826,20 +831,14 @@ For example, let's say you're building an online job portal. Job seekers may pro
 
 If `user.phone` is available, it will be displayed. If not, it falls back to `user.linkedin`, and if both are missing, `'support@jobportal.com'` ensures there's always a valid contact option shown.
 
->[!info] Note
->By default, PyBlade automatically escapes output to prevent security risks. If you want to disable escaping for certain reasons, you can wrap the `@firstof` block in an [`@autoescape`](displaying-data.html#the-autoescape-directive) one.  
->```html
->@autoescape(False)
->    @firstof(var1, var2, var3, "<strong>Fallback Value</strong>")
->@endautoescape
->```  
-
-<!--
-Or if only some variables should be escaped, you can use the `|safe` filter:  
+:::info Note
+By default, PyBlade automatically escapes output for safety. 
+If you want to disable escaping for certain reasons, you can use the `.safe` filter.
 
 ```html
-@firstof(var1, var2|safe, var3, "<strong>Fallback Value</strong>"|safe)
-```   -->
+@firstof(var1, var2.safe, var3, "<strong>Fallback Value</strong>".safe)
+```
+:::
 
 Sometimes, you may need to store the selected value in a variable for later use. You can assign it a name using the `as` keyword:
 
@@ -859,10 +858,10 @@ This complex directive is best illustrated by way of an example. Let's say that 
 
 ```python
 cities = [
-    {"name": "Mumbai", "population": "19,000,000", "country": "India"},
     {"name": "Calcutta", "population": "15,000,000", "country": "India"},
-    {"name": "New York", "population": "20,000,000", "country": "USA"},
     {"name": "Chicago", "population": "7,000,000", "country": "USA"},
+    {"name": "Mumbai", "population": "19,000,000", "country": "India"},
+    {"name": "New York", "population": "20,000,000", "country": "USA"},
     {"name": "Tokyo", "population": "33,000,000", "country": "Japan"},
 ]
 ```
@@ -882,10 +881,10 @@ cities = [
 You can use the `@regroup` directive to group the list of cities by country. The following snippet of template code would accomplish this:  
 
 ```html
-@regroup(cities by country as country_list)
+@regroup(cities by country as countries)
 
 <ul>
-@for (country in country_list)
+@for (country in countries)
     <li>{{ country.grouper }}
     <ul>
         @for (city in country.list)
@@ -897,65 +896,32 @@ You can use the `@regroup` directive to group the list of cities by country. The
 </ul>
 ```
 
-Let’s walk through this example. `@regroup` takes three arguments: the list you want to regroup, the attribute to group by, and the name of the resulting list. Here, we’re regrouping the `cities` list by the `country` attribute and calling the result `country_list`.  
+Let’s walk through this example. `@regroup` takes three arguments: the list you want to regroup, the attribute to group by, and the name of the resulting list. Here, we’re regrouping the `cities` list by the `country` attribute and calling the result `contries`.  
 
-`@regroup` produces a list (in this case, `country_list`) of group objects. Group objects are instances of `namedtuple()` with two fields:  
+`@regroup` produces a list (in this case, `contries`) of group objects. Group objects are instances of `namedtuple()` with two fields:  
 
 - `grouper` – the item that was grouped by (e.g., the string `"India"` or `"Japan"`).  
 - `list` – a list of all items in this group (e.g., a list of all cities with `country='India'`).  
 
+<!-- 
 Because `@regroup` produces `namedtuple()` objects, you can also write the previous example as:  
 
 
 ```html
-@regroup(cities by country as country_list)
+@regroup(cities by country as countries)
 
 <ul>
-@for (country, local_cities in country_list)
+@for (country, local_cities in countries)
     <li>{{ country }}
     <ul>
-        @for (city in local_cities)
+        @for (city in countries)
           <li>{{ city.name }}: {{ city.population }}</li>
         @endfor
     </ul>
     </li>
 @endfor
 </ul>
-```
->[!info] 💡 Note
-> The `@regroup` directive does not order its input! Our example relies on the fact that the `cities` list was ordered by `country` in the first place. If the `cities` list did not order its members by `country`, the regrouping would naively display more than one group for a single country.  
-
-
-
-For example, say the `cities` list was set to this (note that the countries are not grouped together):  
-
-```python
-cities = [
-    {"name": "Mumbai", "population": "19,000,000", "country": "India"},
-    {"name": "New York", "population": "20,000,000", "country": "USA"},
-    {"name": "Calcutta", "population": "15,000,000", "country": "India"},
-    {"name": "Chicago", "population": "7,000,000", "country": "USA"},
-    {"name": "Tokyo", "population": "33,000,000", "country": "Japan"},
-]
-```
-
-
-With this input for `cities`, the example `@regroup` template code above would result in the following output:  
-
-
-- India
-  - Mumbai: 19,000,000
-- USA
-  - New York: 20,000,000
-- India
-  - Calcutta: 15,000,000
-- USA
-  - Chicago: 7,000,000
-- Japan
-  - Tokyo: 33,000,000
-
-
-The easiest solution to this gotcha is to make sure in your view code that the data is ordered according to how you want to display it.  
+``` -->
 
 #### Grouping on other properties
 ---
