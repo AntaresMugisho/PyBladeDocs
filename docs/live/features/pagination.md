@@ -1,23 +1,23 @@
 # Pagination
 Most web frameworks like Django offers a pagination feature that allows you to query a subset of data and provides your users with the ability to navigate between *pages* of those results.
 
-Because most of these paginators were designed for static applications, in a non-Liveblade app, each page navigation triggers a full browser visit to a new URL containing the desired page (`?page=2`).
+Because most of these paginators were designed for static applications, in a non-PyBlade Live app, each page navigation triggers a full browser visit to a new URL containing the desired page (`?page=2`).
 
-However, when you use pagination inside a Liveblade component, users can navigate between pages while remaining on the same page. Liveblade will handle everything behind the scenes, including updating the URL query string with the current page.
+However, when you use pagination inside a PyBlade Live component, users can navigate between pages while remaining on the same page. PyBlade Live will handle everything behind the scenes, including updating the URL query string with the current page.
 
-All it takes to enable pagination in your component is to inherit from the `liveblade.Paginator` mixin — it's that effortless.
+All it takes to enable pagination in your component is to inherit from the `live.Paginator` mixin — it's that effortless.
 
 ## Basic usage
 
 Below is the most basic example of using pagination inside a `PostList` component to only show 25 posts per page:
 
 ```python{6,11}
-from pyblade import liveblade
+from pyblade import live
 from app.models import Post
 
 class PostList(
-    liveblade.Component,
-    liveblade.Paginator
+    live.Component,
+    live.Paginator
     ):
     
     def render(self):
@@ -61,9 +61,9 @@ users = self.paginate(User.objects.all(), 15).appends(sort="votes")
 
 ### Disabling URL query string tracking
 
-By default, Liveblade's paginator tracks the current page in the browser URL's query string like so: `?page=2`.
+By default, PyBlade Live's paginator tracks the current page in the browser URL's query string like so: `?page=2`.
 
-If you wish to still use Liveblade's pagination utility, but disable query string tracking, you can do so using the `without_query_string` method on the paginator object:
+If you wish to still use PyBlade Live's pagination utility, but disable query string tracking, you can do so using the `without_query_string` method on the paginator object:
 
 ```python
 posts = self.paginate(Post.objects.all(), 25).without_query_string()
@@ -73,7 +73,7 @@ Now, pagination will work as expected, but the current page won't show up in the
 
 ## Displaying pagination results
 
-When calling the `paginate` method, you will receive an instance of `pyblade.liveblade.Paginator`.
+When calling the `paginate` method, you will receive an instance of `pyblade.live.Paginator`.
 
 These objects provide several methods that describe the result set. In addition to these helper methods, the paginator instances are iterators and may be looped as a list. So, once you have retrieved the results, you may display the results and render the page links using PyBlade:
 
@@ -96,7 +96,7 @@ When the paginator displays pagination links, the current page number is display
 ```
 ### Customizing scroll behavior
 
-By default, Liveblade's paginator scrolls to the top of the page after every page change.
+By default, PyBlade Live's paginator scrolls to the top of the page after every page change.
 
 You can disable this behavior by passing `False` to the `scroll_to` parameter of the `links()` method like so:
 
@@ -104,7 +104,7 @@ You can disable this behavior by passing `False` to the `scroll_to` parameter of
 {{ posts.links(scroll_to=False) }}
 ```
 
-Alternatively, you can provide any CSS selector to the `scroll_to` parameter, and Liveblade will find the nearest element matching that selector and scroll to it after each navigation:
+Alternatively, you can provide any CSS selector to the `scroll_to` parameter, and PyBlade Live will find the nearest element matching that selector and scroll to it after each navigation:
 
 ```blade
 {{ posts.links(scroll_to='#paginated-posts') }}
@@ -122,7 +122,7 @@ users = self.paginate(User.objects.all(), 10, page_name="users")
 To demonstrate the problem more clearly, consider the following `ClientList` component:
 
 ```python
-from pyblade.liveblade import Component, Paginator
+from pyblade.live import Component, Paginator
 form app.models import Client
 
 class ClientList(Component, Paginator):
@@ -142,7 +142,7 @@ http://example.com/?page=2
 Suppose the page also contains a `InvoiceList` component that also uses pagination. To independently track each paginator's current page, you need to specify a name for the second paginator like so:
 
 ```python
-from pyblade.liveblade import Component, Paginator
+from pyblade.live import Component, Paginator
 from app.models import invoices
 
 class InvoiceList(Component, Paginator):
@@ -163,12 +163,12 @@ https://example.com/customers?page=2&invoices-page=2
 
 When sorting or filtering results, it is common to want to reset the page number back to `1`.
 
-For this reason, Liveblade provides the `self.reset_page()` method, allowing you to reset the page number from anywhere in your component.
+For this reason, PyBlade Live provides the `self.reset_page()` method, allowing you to reset the page number from anywhere in your component.
 
 The following component demonstrates using this method to reset the page after the search form is submitted:
 
 ```python
-from pyblade.liveblade import Component, Paginator
+from pyblade.live import Component, Paginator
 from app.models import Post
 
 class SearchPosts(Component, Paginator):
@@ -188,8 +188,8 @@ class SearchPosts(Component, Paginator):
 
 ```blade
 <div>
-    <form b-submit="search">
-        <input type="text" b-model="query">
+    <form pb-submit="search">
+        <input type="text" pb-model="query">
 
         <button type="submit">Search posts</button>
     </form>
@@ -208,7 +208,7 @@ Now, if a user was on page `5` of the results and then filtered the results furt
 
 ### Available page navigation methods
 
-In addition to `reset_page()`, Liveblade's Paginator provides other useful methods for navigating between pages programmatically from your component:
+In addition to `reset_page()`, PyBlade Live's Paginator provides other useful methods for navigating between pages programmatically from your component:
 
 | Method        | Description                               |
 |-----------------|-------------------------------------------|
@@ -220,10 +220,10 @@ In addition to `reset_page()`, Liveblade's Paginator provides other useful metho
 
 ## Hooking into page updates
 
-Liveblade allows you to execute code before and after a page is updated by defining either of the following methods inside your component:
+PyBlade Live allows you to execute code before and after a page is updated by defining either of the following methods inside your component:
 
 ```python
-from pyblade.liveblade import Component, Paginator
+from pyblade.live import Component, Paginator
 from app.models import Post
 
 class PostList(Component, Paginator):
@@ -267,14 +267,14 @@ def updating_paginators(self, page, page_name):
 
 ## Customizing the pagination UI
 
-Liveblade includes built-in support for paginated components out of the box, and it renders pagination links intelligently based on the CSS framework you’ve configured for your PyBlade project.
+PyBlade Live includes built-in support for paginated components out of the box, and it renders pagination links intelligently based on the CSS framework you’ve configured for your PyBlade project.
 
 ### Tailwind or Bootstrap-Aware pagination
 
-When rendering pagination links with Liveblade, the paginator checks the **PyBlade project configuration file** to determine which CSS framework you are using — **Tailwind** or **Bootstrap**. If one of these is configured, Liveblade will automatically render the appropriate pagination markup that matches your chosen framework.
+When rendering pagination links with PyBlade Live, the paginator checks the **PyBlade project configuration file** to determine which CSS framework you are using — **Tailwind** or **Bootstrap**. If one of these is configured, PyBlade Live will automatically render the appropriate pagination markup that matches your chosen framework.
 
 For example:
-- If your project is configured to use **Tailwind**, Liveblade will render a Tailwind-compatible pagination component.
+- If your project is configured to use **Tailwind**, PyBlade Live will render a Tailwind-compatible pagination component.
 - If you're using **Bootstrap**, the paginator will generate Bootstrap-friendly markup automatically.
 
 > [!note] 
@@ -282,7 +282,7 @@ For example:
 
 ### Using custom pagination template
 
-While Liveblade intelligently adapts to Tailwind or Bootstrap, you can still take full control over the pagination UI.
+While PyBlade Live intelligently adapts to Tailwind or Bootstrap, you can still take full control over the pagination UI.
 
 The first approach is by specifying a custom template when calling the paginator's `links()` method in your component’s template:
 
@@ -290,7 +290,7 @@ The first approach is by specifying a custom template when calling the paginator
 {{ paginator.links('pagination.custom') }}
 ```
 
-When rendering the pagination links, Liveblade will now look for a template at `templates/pagination/custom.html`.
+When rendering the pagination links, PyBlade Live will now look for a template at `templates/pagination/custom.html`.
 
 You can also pass additional data to your custom template:
 
@@ -307,10 +307,10 @@ The second approach is to pass a `template` argument to the `paginate()` method 
 posts = self.paginate(Post.objects.all(), 10, template="pagination.custom")
 ```
 
-However, if you want to tweak the default Tailwind or Bootstrap pagination templates provided by Liveblade, the recommended way is to **export the pagination templates** to your project using the `liveblade:stubs` command with the `--pagination` flag :
+However, if you want to tweak the default Tailwind or Bootstrap pagination templates provided by PyBlade Live, the recommended way is to **export the pagination templates** to your project using the `live:stubs` command with the `--pagination` flag :
 
 ```bash
-pyblade liveblade:stubs --pagination
+pyblade live:stubs --pagination
 ```
 
 After running this command, the following two files will be inserted into the `templates/stubs/pagination` directory:
@@ -320,7 +320,7 @@ After running this command, the following two files will be inserted into the `t
 | `tailwind.html`    | The standard Tailwind pagination theme |
 | `bootstrap.html`    | The standard Bootstrap pagination theme |
 
-Once the files have been generated, you have complete control over them. When rendering pagination links using the paginator instance's `links()` method inside your template, Liveblade will automatically pick them up, instead of its own, based on your framework configuration.
+Once the files have been generated, you have complete control over them. When rendering pagination links using the paginator instance's `links()` method inside your template, PyBlade Live will automatically pick them up, instead of its own, based on your framework configuration.
 
 This gives you the flexibility to adjust classes, markup, or structure to fit your design system.
 
@@ -350,7 +350,7 @@ Each paginator instance provides additional pagination information via the follo
 
 ## Sample pagination template
 
-Below is an unstyled sample of a simple Liveblade pagination view for your reference.
+Below is an unstyled sample of a simple PyBlade Live pagination view for your reference.
 
 ```blade
 <div>
@@ -360,7 +360,7 @@ Below is an unstyled sample of a simple Liveblade pagination view for your refer
                 @if (paginator.on_first_page())
                     <span>Previous</span>
                 @else
-                    <button b-click="previous_page" b-loading.attr="disabled" rel="prev">Previous</button>
+                    <button pb-click="previous_page" pb-loading.attr="disabled" rel="prev">Previous</button>
                 @endif
             </span>
 
@@ -368,7 +368,7 @@ Below is an unstyled sample of a simple Liveblade pagination view for your refer
                 @if (paginator.on_last_page())
                     <span>Next</span>
                 @else
-                    <button b-click="next_page" b-loading.attr="disabled" rel="next">Next</button>
+                    <button pb-click="next_page" pb-loading.attr="disabled" rel="next">Next</button>
                 @endif
             </span>
         </nav>
@@ -376,5 +376,5 @@ Below is an unstyled sample of a simple Liveblade pagination view for your refer
 </div>
 ```
 
-As you can see, you can use Liveblade's page navigation helpers like `self.next_page()` directly inside your template by adding `b-click="next_page"` to buttons.
+As you can see, you can use PyBlade Live's page navigation helpers like `self.next_page()` directly inside your template by adding `pb-click="next_page"` to buttons.
 

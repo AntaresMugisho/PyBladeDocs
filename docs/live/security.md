@@ -3,14 +3,14 @@ editLink: false
 next: "PyBlade CLI: Overview"
 ---
 
-# Security Concerns & Best Practices in Liveblade
+# Security Concerns & Best Practices in PyBlade Live
 
-Liveblade components offer a dynamic and reactive interface between your Python backend and frontend UI. However, because components expose properties that can be updated directly from the client side, it’s critical to follow secure development practices. Below are key guidelines to keep your Liveblade apps safe and predictable.
+PyBlade Live components offer a dynamic and reactive interface between your Python backend and frontend UI. However, because components expose properties that can be updated directly from the client side, it’s critical to follow secure development practices. Below are key guidelines to keep your PyBlade Live apps safe and predictable.
 
 
 ## 1. **Use Underscore Prefix for Private/Internal State**
 
-Properties or methods that are not meant to be exposed or mutated by the frontend **must** be prefixed with an underscore (`_`). Liveblade treats these as **private**, meaning:
+Properties or methods that are not meant to be exposed or mutated by the frontend **must** be prefixed with an underscore (`_`). PyBlade Live treats these as **private**, meaning:
 
 - They **cannot** be bound or mutated from the frontend.
 - They **cannot** be accessed via template bindings (e.g., `{{ _private_data }}` won’t work).
@@ -56,7 +56,7 @@ def updating(self, prop, value):
 
 ## 3. **Use `locked` for Read-Only Public Props**
 
-Sometimes you want a value to be visible in the template, but **not editable** by the frontend. For these cases, Liveblade supports a `@locked` or `Locked` attribute:
+Sometimes you want a value to be visible in the template, but **not editable** by the frontend. For these cases, PyBlade Live supports a `@locked` or `Locked` attribute:
 
 ```python
 from pyblade import locked
@@ -126,7 +126,7 @@ def mount(self, post_id):
 
 ## 9. **Avoid State Leakage Between Requests**
 
-Remember that Liveblade components persist state between requests, but **not all values are automatically secure**. Make sure to:
+Remember that PyBlade Live components persist state between requests, but **not all values are automatically secure**. Make sure to:
 
 - Reset sensitive state during `boot()` if needed
 - Use `_private` for temporary/unsafe values
@@ -155,4 +155,4 @@ You can even build tools to **auto-scan component properties** and flag potentia
 
 ---
 
-Following these practices helps make your Liveblade apps clean, secure, and ready for real-world production use. Let me know if you'd like a checklist version or security-linting ideas!
+Following these practices helps make your PyBlade Live apps clean, secure, and ready for real-world production use. Let me know if you'd like a checklist version or security-linting ideas!

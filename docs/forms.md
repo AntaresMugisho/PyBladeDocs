@@ -1,5 +1,5 @@
 ---
-next: "Liveblade: Reactive UIs"
+next: "PyBlade Live: Reactive UIs"
 ---
 
 
@@ -330,10 +330,10 @@ With just a field name, you can easily render the field with validation error ha
 <form method="POST" action="/submit">
     @csrf
 
-    <b-text-input :field="form.name" placeholder="Enter your name" required/>
-    <b-text-input :field="form.email" placeholder="Enter your email"/>
-    <b-text-input :field="form.subject" placeholder="Enter the subject of your message"/>
-    <b-text-input :field="form.message" class="min-h-[200px]" placeholder="Type your message here..."/>
+    <pb-text-input :field="form.name" placeholder="Enter your name" required/>
+    <pb-text-input :field="form.email" placeholder="Enter your email"/>
+    <pb-text-input :field="form.subject" placeholder="Enter the subject of your message"/>
+    <pb-text-input :field="form.message" class="min-h-[200px]" placeholder="Type your message here..."/>
 
     <button type="submit">Submit</button>
 </form>

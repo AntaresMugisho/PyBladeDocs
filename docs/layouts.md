@@ -28,11 +28,11 @@ Once the layout component is defined, we can use it in different templates. Belo
 ```html
 <!-- templates/tasks.html -->
 
-<b-layout>
+<pb-layout>
     {% for task in tasks %}
         <div>{{ task }}</div>
     {% endfor %}
-</b-layout>
+</pb-layout>
 ```
 
 Any content passed into a component will be available inside the default `slot` variable. Additionally, if a `title` slot is provided, it will replace the default title. We can customize the title using a named slot:
@@ -40,13 +40,13 @@ Any content passed into a component will be available inside the default `slot` 
 ```html
 <!-- templates/tasks.html -->
 
-<b-layout>
-    <b-slot:title>Custom Task Title</b-slot>
+<pb-layout>
+    <pb-slot:title>Custom Task Title</pb-slot>
 
     {% for task in tasks %}
         <div>{{ task }}</div>
     {% endfor %}
-</b-layout>
+</pb-layout>
 ```
 
 ### Rendering the template in Django  
@@ -117,7 +117,7 @@ For example, let’s say we have the following child view:
  
 @extends('layouts.base')
 
-<b-slot:title>Page Title</b-slot>
+<pb-slot:title>Page Title</pb-slot>
 
 @section('sidebar')
     @parent
@@ -136,7 +136,7 @@ Here, the `@extends('layouts.app')` means that this child template is inheriting
 >By using `@extends('layouts.base')`, you're telling PyBlade that this child template should inherit from the `base.html` layout, which resides in the `templates/layouts/` folder.
 
 
-Instead of using `@section` for the title, we use a **named slot**. In the child template, we define the title with `<b-slot:title>Page Title</b-slot>`. In the layout, we access this slot as a variable.
+Instead of using `@section` for the title, we use a **named slot**. In the child template, we define the title with `<pb-slot:title>Page Title</pb-slot>`. In the layout, we access this slot as a variable.
 
 For the `sidebar` section, we use the `@parent` directive. This means we’re appending new content to the layout’s original sidebar rather than replacing it completely. The `@parent` directive outputs whatever is defined in the parent layout's sidebar section (`@yield('sidebar')`), then adds the new content specified in the child template.
 

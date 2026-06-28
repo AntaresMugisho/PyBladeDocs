@@ -34,36 +34,36 @@ This command will create the file:
 
 
 >[!WARNING] 
->It is important to avoid naming your component `slot`, as this could lead to conflicts with PyBlade’s built-in `b-slot` tag used for creating new [slots](#slots-in-pyblade). Rendering a component named `slot` will interfere with the `slot` system, causing potential issues.
+>It is important to avoid naming your component `slot`, as this could lead to conflicts with PyBlade’s built-in `pb-slot` tag used for creating new [slots](#slots-in-pyblade). Rendering a component named `slot` will interfere with the `slot` system, causing potential issues.
 
 
 ## Rendering components
 
-The **preferred way** to include a component in your template is by using a **PyBlade component tag**. Component tags start with `b-`, followed by the component file name without extension.  
+The **preferred way** to include a component in your template is by using a **PyBlade component tag**. Component tags start with `pb-`, followed by the component file name without extension.  
 
 For example, if you have a component file named `alert.html`, you can include it in your template like this:  
 
 ```html
-<b-alert/>
+<pb-alert/>
 ```
 
 Similarly, for a `user-profile.html` component, you would write:  
 
 ```html
-<b-user-profile/>
+<pb-user-profile/>
 ```
 
 
 A PyBlade component tag can be **self-closing** – When the component does not need any inner content,
 ```html
-<b-alert/>
+<pb-alert/>
 ```
 or **paired** – When you need to include content inside the component.
 
 ```html
-<b-alert>
+<pb-alert>
     This is an important message!
-</b-alert>
+</pb-alert>
 ```
 
 ### The `@component` directive 
@@ -85,7 +85,7 @@ If your components are stored inside subdirectories within `templates/components
 For instance, if you have a component file located at `templates/components/inputs/button.html`, you can render it as follows:  
   
 ```html
-<b-inputs.button/>
+<pb-inputs.button/>
 ```
 
 or, alternatively:
@@ -117,7 +117,7 @@ As you can see, the component is waiting for two variables: `type` and `message`
 ```html
 <!-- templates/home.html -->
 
-<b-alert type="success" message="Operation completed successfully."/>
+<pb-alert type="success" message="Operation completed successfully."/>
 ```
 or:
 
@@ -139,7 +139,7 @@ The rendered output will look like this:
 
 ### Normal vs Bound attributes
 
-When using PyBlade’s component tags (`<b-component-name>`), you can pass data as *Normal HTML attributes* (without `:`) or *Bound attributes* (starting with `:`).
+When using PyBlade’s component tags (`<pb-component-name>`), you can pass data as *Normal HTML attributes* (without `:`) or *Bound attributes* (starting with `:`).
 Both methods serve different purposes in how data is interpreted and passed to the component.
 
 #### 1. Normal attributes (Static values)  
@@ -149,7 +149,7 @@ Normal attributes are passed as **static strings**. These values are not evaluat
 For example:
 
 ```html
-<b-alert type="success" message="Operation completed successfully." />
+<pb-alert type="success" message="Operation completed successfully." />
 ```
 
 Here, `"success"` and `"Operation completed successfully."` are passed as plain strings. The component receives them as-is, without any evaluation.  
@@ -162,7 +162,7 @@ When an attribute starts with `:`, it is treated as a **Python expression**, mea
 For example, assuming we have a variable `status` with a dynamic string value, we may pass it to the component by prefixing it with the `:` character like this:
 
 ```html
-<b-alert :type="status" message="Operation done." />
+<pb-alert :type="status" message="Operation done." />
 ```
 
 In this example, `:type="status"` passes the **value of `status`** instead of the string `"status"`.  
@@ -187,7 +187,7 @@ For example, consider the following **alert** component:
 When using this `alert` component, you can either pass a custom `type` and `message` attributes, or let the component fall back to its default values.
 
 ```html
-<b-alert type="warning" />
+<pb-alert type="warning" />
 ```
 Here, only the `type` property is provided as an attribute with the value `"warning"`, but the `message` is omitted. Because of this, the default value of `message`, (`"Default message"`) will be used.
 
@@ -209,7 +209,7 @@ We have already discussed about passing data attributes to a component. However,
 For example, let's say we want to render an alert component:  
 
 ```html
-<b-alert type="error" :message="message" class="mt-4"/>
+<pb-alert type="error" :message="message" class="mt-4"/>
 ```  
 
 All additional attributes are automatically available through the `attributes` variable inside the component. You can apply them to the component’s root element by simply outputting `attributes`:  
@@ -237,7 +237,7 @@ To do this, you can use the `merge` method available on the `attributes` variabl
 If you use the component like this:
 
 ```html
-<b-alert type="error" :message="message" class="mb-4"/>
+<pb-alert type="error" :message="message" class="mb-4"/>
 ```
 
 The final HTML rendered will be:
@@ -288,9 +288,9 @@ When merging attributes other than `class`, the values passed to the `merge` met
 If you use the component as follows:
 
 ```html
-<b-button type="submit">
+<pb-button type="submit">
     Submit
-</b-button>
+</pb-button>
 ```
 
 The rendered HTML will be:
@@ -374,9 +374,9 @@ You will often need to pass additional content to your component via **slots**. 
 You may pass content to the `slot` by injecting content inside the component tag:
 
 ```html
-<b-alert>
+<pb-alert>
     <strong>Whoops!</strong> Something went wrong!
-</b-alert>
+</pb-alert>
 ```
 
 ### Named slots
@@ -391,16 +391,16 @@ Sometimes, a component may need to render multiple different slots in different 
 </div>
 ```
 
-You may define the content of the named slot using the `<b-slot>` tag. Any content not within an explicit `<b-slot>` tag will be passed to the component in the `slot` variable:
+You may define the content of the named slot using the `<pb-slot>` tag. Any content not within an explicit `<pb-slot>` tag will be passed to the component in the `slot` variable:
 
 ```html
-<b-alert>
-    <b-slot name="title">
+<pb-alert>
+    <pb-slot name="title">
         Server Error
-    </b-slot>
+    </pb-slot>
 
     <strong>Whoops!</strong> Something went wrong !
-</b-alert>
+</pb-alert>
 ```
 
 This will render:
@@ -414,7 +414,7 @@ This will render:
 ```
 
 >[!TIP] Pro tip
->When creating a named slot, you may pass the name using the colon notation, like this : `<b-slot:title>` instead of using the attribute format `<b-slot name="title">`.
+>When creating a named slot, you may pass the name using the colon notation, like this : `<pb-slot:title>` instead of using the attribute format `<pb-slot name="title">`.
 
 ### Checking if a slot is empty
 
@@ -448,17 +448,17 @@ Additionally, you can use the `has_actual_content` method to determine if the sl
 Like Blade components, you can assign additional attributes to slots, such as CSS class names:
 
 ```html
-<b-card class="shadow-sm">
-    <b-slot name="heading" class="font-bold">
+<pb-card class="shadow-sm">
+    <pb-slot name="heading" class="font-bold">
         Heading
-    </b-slot>
+    </pb-slot>
 
     Content
 
-    <b-slot name="footer" class="text-sm">
+    <pb-slot name="footer" class="text-sm">
         Footer
-    </b-slot>
-</b-card>
+    </pb-slot>
+</pb-card>
 ```
 
 To interact with slot attributes, you can access the `attributes` property of the slot's variable:

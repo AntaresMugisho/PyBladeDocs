@@ -20,7 +20,7 @@ This command will prompt you to provide the following details:
 - **Project Name**: Choose a name for your project.
 - **Python Web Framework**: Choose the Python Web framework you want to use for your project. Only Django is supported.
 - **CSS Framework**: Choose one either Bootstrap 5 or Tailwind CSS 4 for an automatic configuration or None if you want to manually configure it later or don't want to use a CSS Framework.
-- **Use LiveBlade**: Enable or disable Liveblade configuration, which adds additional features like real-time UI updates and dynamic components.
+- **Use PyBlade Live**: Enable or disable PyBlade Live configuration, which adds additional features like real-time UI updates and dynamic components.
 
 
 #### Common Issues & Troubleshooting
@@ -154,19 +154,19 @@ This creates a new `tempalates/components/alert-box.html` file.
 
 You can visit the [PyBlade Components](/components) section of this documentation to learn more about using them. 
 
-## `pyblade make:liveblade`
+## `pyblade make:live`
 
-Creates a new Liveblade component for reactive UI rendering.
+Creates a new PyBlade Live component for reactive UI rendering.
 
 #### Usage
 ```bash
-pyblade make:liveblade <name> [OPTIONS]
+pyblade make:live <name> [OPTIONS]
 ```
 
 ### Arguments
 |Argument| Description
 |--------|------------|
-`name`| The *kebab-cased* name of the Liveblade component.
+`name`| The *kebab-cased* name of the PyBlade Live component.
 
 ### Options
 |Option| Description
@@ -176,19 +176,19 @@ pyblade make:liveblade <name> [OPTIONS]
 
 #### Examples
 ```bash
-pyblade make:liveblade counter
+pyblade make:live counter
 ```
 
 This creates two new files:
-- A `liveblade/counter.py` which holds the Python Component's class.
-- A `templates/liveblade/couter.html` file which holds the HTML Component's template.
+- A `live/counter.py` which holds the Python Component's class.
+- A `templates/live/couter.html` file which holds the HTML Component's template.
 
 
 #### Common Issues & Troubleshooting
 - **Error**: "Component already exists"  
-  **Solution**: Check the `liveblade` directory to see if a python file with the same name (*snake_cased*) already exists. Also Check the `templates/liveblade` directory to see if a HTML file with the same name (_kebab-cased_) already exists. You can either override the existing component by using the `--force` option or choose a different name.
+  **Solution**: Check the `live` directory to see if a python file with the same name (*snake_cased*) already exists. Also Check the `templates/live` directory to see if a HTML file with the same name (_kebab-cased_) already exists. You can either override the existing component by using the `--force` option or choose a different name.
 
-You can visit the [Liveblade Components](/liveblade/components) section of this documentation to learn more about using them. 
+You can visit the [PyBlade Live Components](/live/components) section of this documentation to learn more about using them. 
 
 
 ## `pyblade make:messages`

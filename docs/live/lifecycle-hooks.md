@@ -1,6 +1,6 @@
 # Lifecycle Hooks
 
-Liveblade provides various lifecycle hooks that allow you to execute code at specific points during a component's lifecycle. These hooks let you perform actions before or after certain events, such as initializing the component, updating properties, or rendering the template.
+PyBlade Live provides various lifecycle hooks that allow you to execute code at specific points during a component's lifecycle. These hooks let you perform actions before or after certain events, such as initializing the component, updating properties, or rendering the template.
 
 Here’s a list of the available lifecycle hooks:
 
@@ -16,15 +16,15 @@ Here’s a list of the available lifecycle hooks:
 
 ## Mount
 
-In a typical Python class, a constructor (`__init__()`) initializes an object’s state. However, in Liveblade components, the `mount()` method is used instead because components are _reconstructed_ on each network request, and we only want to initialize the component once when it is first created.
+In a typical Python class, a constructor (`__init__()`) initializes an object’s state. However, in PyBlade Live components, the `mount()` method is used instead because components are _reconstructed_ on each network request, and we only want to initialize the component once when it is first created.
 
 Here's an example of how to use the `mount()` method to initialize `name` and `email` in an `UpdateProfile` component:
 
 ```python
-from pyblade import liveblade
-from pyblade.liveblade import auth
+from pyblade import live
+from pyblade.live import auth
 
-class UpdateProfile(liveblade.Component):
+class UpdateProfile(live.Component):
 
     def mount(self):
         user = auth()
@@ -35,10 +35,10 @@ class UpdateProfile(liveblade.Component):
 The `mount()` method can also receive parameters when the component is initialized:
 
 ```python
-from pyblade import liveblade
+from pyblade import live
 from app.models import Post
 
-class PostUpdate(liveblade.Component):
+class PostUpdate(live.Component):
 
     def mount(self, post: Post):
         self.title = post.title
@@ -46,7 +46,7 @@ class PostUpdate(liveblade.Component):
 ```
 
 
-The `mount()` method plays a crucial role in initializing Liveblade components. Here are some common use cases:
+The `mount()` method plays a crucial role in initializing PyBlade Live components. Here are some common use cases:
 
 - Initializing properties  
 - Receiving data from parent components and templates  
@@ -56,36 +56,36 @@ The `mount()` method plays a crucial role in initializing Liveblade components. 
 
 While `mount()` is helpful, it only runs **once** when the component is first created. However, sometimes you may need to run logic at the beginning of every single request to the server for a given component
 
-For this purpose, Liveblade provides the `boot()` method where you can write component setup code that you intend to run every single time the component class is booted: both on initialization and on subsequent requests.
+For this purpose, PyBlade Live provides the `boot()` method where you can write component setup code that you intend to run every single time the component class is booted: both on initialization and on subsequent requests.
 
 The `boot()` method can be useful for things like initializing private properties, which are not persisted between requests. Below is an example of initializing a private property as a Post model:
 
 ```python
-from pyblade import liveblade
+from pyblade import live
 from app.models import Post
 
-class PostDetail(liveblade.Component):
+class PostDetail(live.Component):
     _post_id = 1  # Private property that users cannot access or change
 
     def boot(self):
         self._post = Post.objects.get(id=self._post_id)
 ```
 
-This approach allows you to have full control over initializing a property in a Liveblade component.
+This approach allows you to have full control over initializing a property in a PyBlade Live component.
 
 >[!note] Note 
 > In many cases, using a **computed property** may be a better alternative.
 
 >[!warning] Warning 
 > Always use private properties for sensitive data.
-> Since `_post_id` is used to fetch a post, it should not be modified by users. In Liveblade, public properties should be carefully validated before use.
+> Since `_post_id` is used to fetch a post, it should not be modified by users. In PyBlade Live, public properties should be carefully validated before use.
 
 
 ## Update
 
-Client-side users can update public properties in many different ways, most commonly by modifying an input with `b-model` on it.
+Client-side users can update public properties in many different ways, most commonly by modifying an input with `pb-model` on it.
 
-Liveblade provides convenient hooks to intercept the updating of a property so that you can validate or authorize a value before it's set or ensure a property is set in a given format.
+PyBlade Live provides convenient hooks to intercept the updating of a property so that you can validate or authorize a value before it's set or ensure a property is set in a given format.
 
 ### The `updating()` method
 
@@ -95,9 +95,9 @@ It's worth noting that for this particular example, in an actual application, yo
 
 
 ```python
-from pyblade import liveblade
+from pyblade import live
 
-class PostDetail(liveblade.Component):
+class PostDetail(live.Component):
     post_id = 1
     
     def updating(self, property: str, value):
@@ -118,9 +118,9 @@ Below is an example of using `updated()` to ensure a property's value stays cons
 
 
 ```python
-from pyblade import liveblade
+from pyblade import live
 
-class UserCreate(liveblade.Component):
+class UserCreate(live.Component):
     username = ""
     email = ""
     
@@ -133,16 +133,16 @@ class UserCreate(liveblade.Component):
             self.username = self.username.lower()
 ```
 
-Now, anytime the `username` property is updated client-side, Liveblade will ensure that the value remains lowercase.
+Now, anytime the `username` property is updated client-side, PyBlade Live will ensure that the value remains lowercase.
 
 ### Direct Property Hook Naming
 
-Because you are often targeting a specific property when using update hooks, Liveblade allows you to specify the property name directly as part of the method name. Here's the same example from above but rewritten utilizing this technique:
+Because you are often targeting a specific property when using update hooks, PyBlade Live allows you to specify the property name directly as part of the method name. Here's the same example from above but rewritten utilizing this technique:
 
 ```python
-from pyblade import liveblade
+from pyblade import live
 
-class UserCreate(liveblade.Component):
+class UserCreate(live.Component):
     username = ""
     email = ""
     
@@ -157,17 +157,17 @@ Of course, you can also apply this technique to the `updating` hook.
 
 Serialize and deserialize are lesser-known and lesser-utilized hooks. However, there are specific scenarios where they can be powerful.
 
-The terms "serialize" and "deserialize" refer to a Liveblade component being converted to JSON for the client-side and then converted back into a Python object on the subsequent request.
+The terms "serialize" and "deserialize" refer to a PyBlade Live component being converted to JSON for the client-side and then converted back into a Python object on the subsequent request.
 
-We often use the terms "serialize" and "deserialize" to refer to this process throughout Liveblade's codebase and documentation. 
+We often use the terms "serialize" and "deserialize" to refer to this process throughout PyBlade Live's codebase and documentation. 
 <!-- If you'd like more clarity on these terms, you can learn more by [consulting our serialization documentation](#). -->
 
 Let's look at an example that uses both `mount()`, `serialize()`, and `deserialize()` all together to support using a custom [data transfer object (DTO)](https://en.wikipedia.org/wiki/Data_transfer_object) instead of a Django model to store the Post data in the component:
 
 ```python
-from pyblade import liveblade
+from pyblade import live
 
-class PostDetail(liveblade.Component):
+class PostDetail(live.Component):
     post = None
     
     def mount(self, title, content):
@@ -197,13 +197,13 @@ The above example mainly demonstrates the abilities and nature of the `serialize
 
 ## Render
 
-If you want to hook into the process of rendering a component's Pyblade template, you can use the `rendering()` and `rendered()` hooks:
+If you want to hook into the process of rendering a component's PyBlade template, you can use the `rendering()` and `rendered()` hooks:
 
 ```python
-from pyblade import livablade
+from pyblade import live
 from app.models import Post
 
-class PostList(livablade.Component):
+class PostList(live.Component):
     def render(self):
         return self.view("show-posts", {
             "posts": Post.objects.all()
@@ -231,10 +231,10 @@ These hooks allow you to modify data before rendering and process the final outp
 Sometimes, it can be helpful to intercept and catch errors, such as customizing error messages or ignoring specific types of exceptions. The `exception()` hook allows you to do just that. You can check the error type and use the `stop_propagation()` method to prevent further execution.
 
 ```python
-from pyblade import liveblade
+from pyblade import live
 from app.models import Post
 
-class PostDetail(liveblade.Component):
+class PostDetail(live.Component):
 
     def mount(self):
         self.post = Post.objects.get(id=1)
@@ -244,4 +244,4 @@ class PostDetail(liveblade.Component):
             self.notify("Post not found")
             stop_propagation()
 ```
-This hook enables better error handling and control over exceptions in Liveblade components.
+This hook enables better error handling and control over exceptions in PyBlade Live components.

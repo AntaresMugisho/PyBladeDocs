@@ -1,16 +1,16 @@
 # Actions
 
-Liveblade actions are methods on your component that can be triggered by frontend interactions like clicking a button or submitting a form. 
+PyBlade Live actions are methods on your component that can be triggered by frontend interactions like clicking a button or submitting a form. 
 
 They provide the developer experience of being able to call a Python method directly from the browser, allowing you to focus on the logic of your application without getting bogged down writing boilerplate code connecting your application's frontend and backend.
 
 Let's explore a basic example of calling a `save` action on a `CreatePost` component:
 
 ```python
-from pyblade import liveblade
+from pyblade import live
 from app.models import Post
 
-class CreatePost(liveblade.component):
+class CreatePost(live.component):
     title = ""
     content  = ""
 
@@ -18,20 +18,20 @@ class CreatePost(liveblade.component):
         Post.objects.create(title=self.title, self.content)
 
     def render(self):
-        return self.view('liveblade.create-post');
+        return self.view('live.create-post');
 ```
 
 ```html
-<form b-submit="save"> // [!code highlight]
-    <input type="text" b-model="title">
+<form pb-submit="save"> // [!code highlight]
+    <input type="text" pb-model="title">
 
-    <textarea b-model="content"></textarea>
+    <textarea pb-model="content"></textarea>
 
     <button type="submit">Save</button>
 </form>
 ```
 
-In the above example, when a user submits the form by clicking "Save", `b-submit` intercepts the `submit` event and calls the `save()` method on the server.
+In the above example, when a user submits the form by clicking "Save", `pb-submit` intercepts the `submit` event and calls the `save()` method on the server.
 
 In essence, actions are a way to easily map user interactions to server-side functionality without the hassle of submitting and handling AJAX requests manually.
 
@@ -39,31 +39,31 @@ In essence, actions are a way to easily map user interactions to server-side fun
 
 When allowing users to perform dangerous actions — such as deleting a post from the database — you may want to show them a confirmation alert to verify that they wish to perform that action.
 
-Liveblade makes this easy by providing a simple directive called `b-confirm`:
+PyBlade Live makes this easy by providing a simple directive called `pb-confirm`:
 
 ```html{4}
 <button
     type="button"
-    b-click="delete"
-    b-confirm="Are you sure you want to delete this post?"
+    pb-click="delete"
+    pb-confirm="Are you sure you want to delete this post?"
 >
     Delete post
 </button>
 ```
 
-When `b-confirm` is added to an element containing a Liveblade action, when a user tries to trigger that action, they will be presented with a confirmation dialog containing the provided message. They can either press **"Yes"** to confirm the action, or press **"Cancel"** or hit the escape key to cancel the action.
+When `pb-confirm` is added to an element containing a PyBlade Live action, when a user tries to trigger that action, they will be presented with a confirmation dialog containing the provided message. They can either press **"Yes"** to confirm the action, or press **"Cancel"** or hit the escape key to cancel the action.
 
 ## Passing parameters
 
-Liveblade allows you to pass parameters from your PyBlade template to the actions in your component, giving you the opportunity to provide an action additional data or state from the frontend when the action is called.
+PyBlade Live allows you to pass parameters from your PyBlade template to the actions in your component, giving you the opportunity to provide an action additional data or state from the frontend when the action is called.
 
-For example, let's imagine you have a `TodoList` component that allows users to delete a task. You can pass the task's ID as a parameter to the `delete()` action in your Liveblade component. Then, the action can fetch the relevant task and delete it from the database:
+For example, let's imagine you have a `TodoList` component that allows users to delete a task. You can pass the task's ID as a parameter to the `delete()` action in your PyBlade Live component. Then, the action can fetch the relevant task and delete it from the database:
 
 ```python
-rom pyblade import liveblade
+rom pyblade import live
 from app.models import Task
 
-class TodoList(liveblade.Component):
+class TodoList(live.Component):
     
     def mount(self):
         self.tasks = Task.objects.all()
@@ -73,7 +73,7 @@ class TodoList(liveblade.Component):
         task.delete()
 
     def render(self):
-        return self.view("liveblade.todo-list")
+        return self.view("live.todo-list")
 
 ```
 
@@ -84,7 +84,7 @@ class TodoList(liveblade.Component):
             <h1>{{ task.title }}</h1>
             <span>{{ task.content }}</span>
 
-            <button b-click="delete({{ task.id }})">Delete</button> // [!code highlight]
+            <button pb-click="delete({{ task.id }})">Delete</button> // [!code highlight]
         </div>
     @endfor
 </div>
@@ -93,7 +93,7 @@ class TodoList(liveblade.Component):
 For a task with an ID of 2, the "Delete" button in the PyBlade template above will render in the browser as:
 
 ```html
-<button b-click="delete(2)">Delete</button>
+<button pb-click="delete(2)">Delete</button>
 ```
 
 When this button is clicked, the `delete()` method will be called and `id` will be passed in with a value of "2".
@@ -108,12 +108,12 @@ When this button is clicked, the `delete()` method will be called and `id` will 
 
 Everytime an action in your component is trigerred, the `render()` method is called to re-render the component.
 
-But, sometimes there might be an action in your component with no side effects that would change the rendered PyBlade template when the action is invoked. If so, you can skip the `render` portion of Liveblade's lifecycle by adding the `@renderless` decorator above the action method.
+But, sometimes there might be an action in your component with no side effects that would change the rendered PyBlade template when the action is invoked. If so, you can skip the `render` portion of PyBlade Live's lifecycle by adding the `@renderless` decorator above the action method.
 
 Let's say you want to track when a user clicks on a button, but this interaction doesn’t change any visible part of the UI.
 
 ```python
-from pyblade.liveblade import Component
+from pyblade.live import Component
 from app.models import ActivityLog
 
 class ActivityTracker(Component):
@@ -134,7 +134,7 @@ class ActivityTracker(Component):
 </button>
 ```
 
-What happens here is that when the `track_click` method is called, the `@renderless` decorator tells Liveblade not to call the `render()` method afterward.
+What happens here is that when the `track_click` method is called, the `@renderless` decorator tells PyBlade Live not to call the `render()` method afterward.
 
 This saves time and prevents an unnecessary re-render of the component.
 It’s perfect for fire-and-forget logic — like logging, silent actions, or external calls.
@@ -142,7 +142,7 @@ It’s perfect for fire-and-forget logic — like logging, silent actions, or ex
 If you prefer to not utilize method attributes or need to conditionally skip rendering, you may invoke the `skip_render()` method in your component action:
 
 ```python
-class PostDetail(liveblade.Component):
+class PostDetail(live.Component):
     ...
 
     def increment_view_count():
@@ -150,14 +150,14 @@ class PostDetail(liveblade.Component):
         self.skip_render() # [!code highlight]
 
     def render():
-        return view('liveblade.show-post');
+        return view('live.show-post');
 
 ```
 
 
 ## JavaScript actions
 
-Liveblade allows you to define JavaScript actions that run entirely on the client-side without making a server request. This is useful in two scenarios:
+PyBlade Live allows you to define JavaScript actions that run entirely on the client-side without making a server request. This is useful in two scenarios:
 
 1. When you want to perform simple UI updates that don't require server communication
 2. When you want to optimistically update the UI with JavaScript before making a server request
@@ -167,9 +167,9 @@ To define a JavaScript action, you can use the `js()` function inside a `<script
 Here's an example of bookmarking a post that uses a JavaScript action to optimistically update the UI before making a server request. The JavaScript action immediately shows the filled bookmark icon, then makes a request to persist the bookmark in the database:
 
 ```python
-from pyblade import liveblade 
+from pyblade import live 
 
-class PostDetail(liveblade.Component):
+class PostDetail(live.Component):
     
     def mount(self):
         self.bookmarked = self.post.is_bookmarked_by(request.user)
@@ -179,19 +179,19 @@ class PostDetail(liveblade.Component):
         self.bookmarked = self.post.is_bookmarked_by(request.user)
 
     def render(self):
-        return view('liveblade.post-detail')
+        return view('live.post-detail')
 ```
 
 ```html
 <div>
-    <button b-click="js.bookmark" class="flex items-center gap-1">
+    <button pb-click="js.bookmark" class="flex items-center gap-1">
         {# Outlined bookmark icon... #}
-        <svg b-show="!bookmarked" b-cloak xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+        <svg pb-show="!bookmarked" pb-cloak xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
             <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
         </svg>
 
         {# Solid bookmark icon... #}
-        <svg b-show="bookmarked" b-cloak xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+        <svg pb-show="bookmarked" pb-cloak xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
             <path fill-rule="evenodd" d="M6.32 2.577a49.255 49.255 0 0 1 11.36 0c1.497.174 2.57 1.46 2.57 2.93V21a.75.75 0 0 1-1.085.67L12 18.089l-7.165 3.583A.75.75 0 0 1 3.75 21V5.507c0-1.47 1.073-2.756 2.57-2.93Z" clip-rule="evenodd" />
         </svg>
     </button>
@@ -200,9 +200,9 @@ class PostDetail(liveblade.Component):
 @script
 <script>
     js('bookmark', () => {
-        liveblade.bookmarked = !liveblade.bookmarked
+        live.bookmarked = !live.bookmarked
 
-        liveblade.bookmark_post()
+        live.bookmark_post()
     })
 </script>
 @endscript
@@ -221,9 +221,9 @@ This provides instant visual feedback while ensuring the bookmark state is prope
 JavaScript actions can also be called using the `js()` method from Python:
 
 ```python
-from pyblade import liveblade 
+from pyblade import live 
 
-class CreatePost(liveblade.Component):
+class CreatePost(live.Component):
     
     def save(self):
         ...
@@ -234,7 +234,7 @@ class CreatePost(liveblade.Component):
 <div>
     <!-- ... -->
 
-    <button b-click="save">Save</button>
+    <button pb-click="save">Save</button>
 </div>
 
 @script
@@ -250,21 +250,21 @@ In this example, when the `save()` action is finished, the `onPostSaved` JavaScr
 
 ## Magic actions
 
-Liveblade provides a set of "magic" actions that allow you to perform common tasks in your components without defining custom methods. These magic actions can be used within event listeners defined in your PyBlade templates.
+PyBlade Live provides a set of "magic" actions that allow you to perform common tasks in your components without defining custom methods. These magic actions can be used within event listeners defined in your PyBlade templates.
 
 ### Refreshing a component
 
 Sometimes you may want to trigger a simple "refresh" of your component. For example, if you have a component checking the status of something in the database, you may want to show a button to your users allowing them to refresh the displayed results.
 
-You can do this using Liveblade's simple `refresh` action anywhere you would normally reference your own component method:
+You can do this using PyBlade Live's simple `refresh` action anywhere you would normally reference your own component method:
 
 ```html
-<button type="button" b-click="refresh">...</button>
+<button type="button" pb-click="refresh">...</button>
 ```
 
-When the `refresh` action is triggered, Liveblade will make a server-roundtrip and re-render your component without calling any methods.
+When the `refresh` action is triggered, PyBlade Live will make a server-roundtrip and re-render your component without calling any methods.
 
-It's important to note that any pending data updates in your component (for example `b-model` bindings) will be applied on the server when the component is refreshed.
+It's important to note that any pending data updates in your component (for example `pb-model` bindings) will be applied on the server when the component is refreshed.
 
 
 ### Calling parent actions
@@ -272,27 +272,27 @@ It's important to note that any pending data updates in your component (for exam
 The `parent` magic variable allows you to access parent component properties and call parent component actions from a child component:
 
 ```html
-<button b-click="parent.remove_post({{ post.id }})">Remove</button>
+<button pb-click="parent.remove_post({{ post.id }})">Remove</button>
 ```
 
 In the above example, if a parent component has a `remove_post()` action, a child can call it directly from its PyBlade template using `parent.remove_post()`.
 
 ### Updating properties
 
-The `set` magic action allows you to update a property in your Liveblade component directly from the PyBlade template. To use `set`, provide the property you want to update and the new value as arguments:
+The `set` magic action allows you to update a property in your PyBlade Live component directly from the PyBlade template. To use `set`, provide the property you want to update and the new value as arguments:
 
 ```html
-<button b-click="set('query', '')">Reset Search</button>
+<button pb-click="set('query', '')">Reset Search</button>
 ```
 
 In this example, when the button is clicked, a network request is dispatched that sets the `query` property in the component to an empty string `''`.
 
 ### Toggling Boolean values
 
-The `toggle` action is used to toggle the value of a boolean property in your Liveblade component:
+The `toggle` action is used to toggle the value of a boolean property in your PyBlade Live component:
 
 ```html
-<button b-click="toggle('sort_asc')">
+<button pb-click="toggle('sort_asc')">
     Sort {{ "Descending" if sort_asc else "Ascending" }}
 </button>
 ```
@@ -301,10 +301,10 @@ In this example, when the button is clicked, the `sort_asc` property in the comp
 
 ### Dispatching events
 
-The `emit` action allows you to dispatch a Liveblade event directly in the browser. Below is an example of a button that, when clicked, will emit the `post-deleted` event:
+The `emit` action allows you to dispatch a PyBlade Live event directly in the browser. Below is an example of a button that, when clicked, will emit the `post-deleted` event:
 
 ```html
-<button type="submit" b-click="emit('post-deleted')">Delete Post</button>
+<button type="submit" pb-click="emit('post-deleted')">Delete Post</button>
 ```
 
 >[!tip] Pro tip
@@ -312,44 +312,44 @@ The `emit` action allows you to dispatch a Liveblade event directly in the brows
 
 ### Accessing event objects
 
-The `event` action may be used within event listeners like `b-click`. This action gives you access to the actual JavaScript event that was triggered, allowing you to reference the triggering element and other relevant information:
+The `event` action may be used within event listeners like `pb-click`. This action gives you access to the actual JavaScript event that was triggered, allowing you to reference the triggering element and other relevant information:
 
 ```html
-<input type="text" b-keydown.enter="search(event.target.value)">
+<input type="text" pb-keydown.enter="search(event.target.value)">
 ```
 
 When the enter key is pressed while a user is typing in the input above, the contents of the input will be passed as a parameter to the `search()` action.
 
 ## Event listeners
 
-Liveblade supports a variety of event listeners, allowing you to respond to various types of user interactions:
+PyBlade Live supports a variety of event listeners, allowing you to respond to various types of user interactions:
 
 | Listener        | Description                               |
 |-----------------|-------------------------------------------|
-| `b-click`    | Triggered when an element is clicked      |
-| `b-submit`   | Triggered when a form is submitted        |
-| `b-change`   | Triggered when an input value changes        |
-| `b-keydown`  | Triggered when a key is pressed down      |
-| `b-keyup`  | Triggered when a key is released
-| `b-mouseenter`| Triggered when the mouse enters an element |
-| `b-*`| Whatever text follows `b-` will be used as the event name of the listener |
+| `pb-click`    | Triggered when an element is clicked      |
+| `pb-submit`   | Triggered when a form is submitted        |
+| `pb-change`   | Triggered when an input value changes        |
+| `pb-keydown`  | Triggered when a key is pressed down      |
+| `pb-keyup`  | Triggered when a key is released
+| `pb-mouseenter`| Triggered when the mouse enters an element |
+| `pb-*`| Whatever text follows `pb-` will be used as the event name of the listener |
 
-Because the event name after `b-` can be anything, Liveblade supports any browser event you might need to listen for. For example, to listen for `transitionend`, you can use `b-transitionend`.
+Because the event name after `pb-` can be anything, PyBlade Live supports any browser event you might need to listen for. For example, to listen for `transitionend`, you can use `pb-transitionend`.
 
 ### Listening for specific keys
 
-You can use one of Liveblade's convenient aliases to narrow down key press event listeners to a specific key or combination of keys.
+You can use one of PyBlade Live's convenient aliases to narrow down key press event listeners to a specific key or combination of keys.
 
-For example, to perform a search when a user hits `Enter` after typing into a search box, you can use `b-keydown.enter`:
+For example, to perform a search when a user hits `Enter` after typing into a search box, you can use `pb-keydown.enter`:
 
 ```html
-<input b-model="query" b-keydown.enter="searchPosts">
+<input pb-model="query" pb-keydown.enter="searchPosts">
 ```
 
 You can chain more key aliases after the first to listen for combinations of keys. For example, if you would like to listen for the `Enter` key only while the `Shift` key is pressed, you may write the following:
 
 ```html
-<input b-keydown.shift.enter="...">
+<input pb-keydown.shift.enter="...">
 ```
 
 Below is a list of all the available key modifiers:
@@ -376,12 +376,12 @@ Below is a list of all the available key modifiers:
 
 ### Event handler modifiers
 
-Liveblade also includes helpful modifiers to make common event-handling tasks trivial.
+PyBlade Live also includes helpful modifiers to make common event-handling tasks trivial.
 
 For example, if you need to call `event.preventDefault()` from inside an event listener, you can suffix the event name with `.prevent`:
 
 ```html
-<input b-keydown.prevent="...">
+<input pb-keydown.prevent="...">
 ```
 
 Here is a full list of all the available event listener modifiers and their functions:
@@ -399,9 +399,9 @@ Here is a full list of all the available event listener modifiers and their func
 | `.throttle`      | Throttle the handler to being called every 250ms at minimum |
 | `.throttle.100ms`| Throttle the handler at a custom duration                |
 | `.self`          | Only call listener if event originated on this element, not children |
-| `.camel`         | Converts event name to camel case (`b-custom-event` -> "customEvent") |
-| `.dot`           | Converts event name to dot notation (`b-custom-event` -> "custom.event") |
-| `.passive`       | `b-touchstart.passive` won't block scroll performance |
+| `.camel`         | Converts event name to camel case (`pb-custom-event` -> "customEvent") |
+| `.dot`           | Converts event name to dot notation (`pb-custom-event` -> "custom.event") |
+| `.passive`       | `pb-touchstart.passive` won't block scroll performance |
 | `.capture`       | Listen for event in the "capturing" phase                 |
 
 
@@ -410,47 +410,47 @@ Here is a full list of all the available event listener modifiers and their func
 Consider the `CreatePost` example we previously discussed:
 
 ```html
-<form b-submit="save">
-    <input b-model="title">
+<form pb-submit="save">
+    <input pb-model="title">
 
-    <textarea b-model="content"></textarea>
+    <textarea pb-model="content"></textarea>
 
     <button type="submit">Save</button>
 </form>
 ```
 
-When a user clicks **"Save"**, a network request is sent to the server to call the `save()` action on the Liveblade component.
+When a user clicks **"Save"**, a network request is sent to the server to call the `save()` action on the PyBlade Live component.
 
 But, let's imagine that a user is filling out this form on a slow internet connection. The user clicks "Save" and nothing happens initially because the network request takes longer than usual. They might wonder if the submission failed and attempt to click the "Save" button again while the first request is still being handled.
 
 In this case, there would be two requests for the same action being processed at the same time.
 
-To prevent this scenario, Liveblade automatically disables the submit button and all form inputs inside the `<form>` element while a `b-submit` action is being processed. This ensures that a form isn't accidentally submitted twice.
+To prevent this scenario, PyBlade Live automatically disables the submit button and all form inputs inside the `<form>` element while a `pb-submit` action is being processed. This ensures that a form isn't accidentally submitted twice.
 
 To further lessen the confusion for users on slower connections, it is often helpful to show some loading indicator such as a subtle background color change or SVG animation.
 
-Liveblade provides a `b-loading` directive that makes it trivial to show and hide loading indicators anywhere on a page. Here's a short example of using `b-loading` to show a loading message below the "Save" button:
+PyBlade Live provides a `pb-loading` directive that makes it trivial to show and hide loading indicators anywhere on a page. Here's a short example of using `pb-loading` to show a loading message below the "Save" button:
 
 ```html
-<form b-submit="save">
-    <textarea b-model="content"></textarea>
+<form pb-submit="save">
+    <textarea pb-model="content"></textarea>
 
     <button type="submit">Save</button>
 
-    <span b-loading>Saving...</span>  // [!code highlight]
+    <span pb-loading>Saving...</span>  // [!code highlight]
 </form>
 ```
 
 ## Security concerns
 
-Remember that any method in your Liveblade component can be called from the client-side, even without an associated `b-click` handler that invokes it. In these scenarios, users can still trigger the action from the browser's DevTools. So to make your application secure, read out our [Security concerns](#) before using actions.
+Remember that any method in your PyBlade Live component can be called from the client-side, even without an associated `pb-click` handler that invokes it. In these scenarios, users can still trigger the action from the browser's DevTools. So to make your application secure, read out our [Security concerns](#) before using actions.
 
 <!-- 
-Remember that any public method in your Liveblade component can be called from the client-side, even without an associated `b-click` handler that invokes it. In these scenarios, users can still trigger the action from the browser's DevTools.
+Remember that any public method in your PyBlade Live component can be called from the client-side, even without an associated `pb-click` handler that invokes it. In these scenarios, users can still trigger the action from the browser's DevTools.
 
-Below are three examples of easy-to-miss vulnerabilities in Liveblade components. Each will show the vulnerable component first and the secure component after. As an exercise, try spotting the vulnerabilities in the first example before viewing the solution.
+Below are three examples of easy-to-miss vulnerabilities in PyBlade Live components. Each will show the vulnerable component first and the secure component after. As an exercise, try spotting the vulnerabilities in the first example before viewing the solution.
 
-If you are having difficulty spotting the vulnerabilities and that makes you concerned about your ability to keep your own applications secure, remember all these vulnerabilities apply to standard web applications that use requests and controllers. If you use a component method as a proxy for a controller method, and its parameters as a proxy for request input, you should be able to apply your existing application security knowledge to your Liveblade code.
+If you are having difficulty spotting the vulnerabilities and that makes you concerned about your ability to keep your own applications secure, remember all these vulnerabilities apply to standard web applications that use requests and controllers. If you use a component method as a proxy for a controller method, and its parameters as a proxy for request input, you should be able to apply your existing application security knowledge to your PyBlade Live code.
 
 ### Always authorize action parameters
 
@@ -463,10 +463,10 @@ Here is a vulnerable version of the component:
 ```python
 <?python
 
-namespace App\Liveblade;
+namespace App\PyBlade Live;
 
 use Illuminate\Support\Facades\Auth;
-use Liveblade\Component;
+use PyBlade Live\Component;
 use App\Models\Post;
 
 class ShowPosts extends Component
@@ -480,7 +480,7 @@ class ShowPosts extends Component
 
     public function render()
     {
-        return view('liveblade.show-posts', [
+        return view('live.show-posts', [
             'posts' => Auth::user()->posts,
         ]);
     }
@@ -490,11 +490,11 @@ class ShowPosts extends Component
 ```html
 <div>
     @foreach (posts as post)
-        <div b-key="{{ post->id }}">
+        <div pb-key="{{ post->id }}">
             <h1>{{ post->title }}</h1>
             <span>{{ post->content }}</span>
 
-            <button b-click="delete({{ post->id }})">Delete</button>
+            <button pb-click="delete({{ post->id }})">Delete</button>
         </div>
     @endforeach
 </div>
@@ -507,10 +507,10 @@ To protect against this, we need to authorize that the user owns the post about 
 ```python
 <?python
 
-namespace App\Liveblade;
+namespace App\PyBlade Live;
 
 use Illuminate\Support\Facades\Auth;
-use Liveblade\Component;
+use PyBlade Live\Component;
 use App\Models\Post;
 
 class ShowPosts extends Component
@@ -526,7 +526,7 @@ class ShowPosts extends Component
 
     public function render()
     {
-        return view('liveblade.show-posts', [
+        return view('live.show-posts', [
             'posts' => Auth::user()->posts,
         ]);
     }
@@ -535,16 +535,16 @@ class ShowPosts extends Component
 
 ### Always authorize server-side
 
-Like standard Laravel controllers, Liveblade actions can be called by any user, even if there isn't an affordance for invoking the action in the UI.
+Like standard Laravel controllers, PyBlade Live actions can be called by any user, even if there isn't an affordance for invoking the action in the UI.
 
 Consider the following `BrowsePosts` component where any user can view all the posts in the application, but only administrators can delete a post:
 
 ```python
 <?python
 
-namespace App\Liveblade;
+namespace App\PyBlade Live;
 
-use Liveblade\Component;
+use PyBlade Live\Component;
 use App\Models\Post;
 
 class BrowsePosts extends Component
@@ -558,7 +558,7 @@ class BrowsePosts extends Component
 
     public function render()
     {
-        return view('liveblade.browse-posts', [
+        return view('live.browse-posts', [
             'posts' => Post::all(),
         ]);
     }
@@ -568,12 +568,12 @@ class BrowsePosts extends Component
 ```html
 <div>
     @foreach (posts as post)
-        <div b-key="{{ post->id }}">
+        <div pb-key="{{ post->id }}">
             <h1>{{ post->title }}</h1>
             <span>{{ post->content }}</span>
 
             @if (Auth::user()->isAdmin())
-                <button b-click="deletePost({{ post->id }})">Delete</button>
+                <button pb-click="deletePost({{ post->id }})">Delete</button>
             @endif
         </div>
     @endforeach
@@ -587,10 +587,10 @@ To patch this vulnerability, we need to authorize the action on the server like 
 ```python
 <?python
 
-namespace App\Liveblade;
+namespace App\PyBlade Live;
 
 use Illuminate\Support\Facades\Auth;
-use Liveblade\Component;
+use PyBlade Live\Component;
 use App\Models\Post;
 
 class BrowsePosts extends Component
@@ -608,7 +608,7 @@ class BrowsePosts extends Component
 
     public function render()
     {
-        return view('liveblade.browse-posts', [
+        return view('live.browse-posts', [
             'posts' => Post::all(),
         ]);
     }
@@ -619,7 +619,7 @@ With this change, only administrators can delete a post from this component.
 
 ### Keep dangerous methods protected or private
 
-Every public method inside your Liveblade component is callable from the client. Even methods you haven't referenced inside a `b-click` handler. To prevent a user from calling a method that isn't intended to be callable client-side, you should mark them as `protected` or `private`. By doing so, you restrict the visibility of that sensitive method to the component's class and its subclasses, ensuring they cannot be called from the client-side.
+Every public method inside your PyBlade Live component is callable from the client. Even methods you haven't referenced inside a `pb-click` handler. To prevent a user from calling a method that isn't intended to be callable client-side, you should mark them as `protected` or `private`. By doing so, you restrict the visibility of that sensitive method to the component's class and its subclasses, ensuring they cannot be called from the client-side.
 
 Consider the `BrowsePosts` example that we previously discussed, where users can view all posts in your application, but only administrators can delete posts. In the [Always authorize server-side](/docs/actions#always-authorize-server-side) section, we made the action secure by adding server-side authorization. Now imagine we refactor the actual deletion of the post into a dedicated method like you might do in order to simplify your code:
 
@@ -627,10 +627,10 @@ Consider the `BrowsePosts` example that we previously discussed, where users can
 // Warning: This snippet demonstrates what NOT to do...
 <?python
 
-namespace App\Liveblade;
+namespace App\PyBlade Live;
 
 use Illuminate\Support\Facades\Auth;
-use Liveblade\Component;
+use PyBlade Live\Component;
 use App\Models\Post;
 
 class BrowsePosts extends Component
@@ -653,7 +653,7 @@ class BrowsePosts extends Component
 
     public function render()
     {
-        return view('liveblade.browse-posts', [
+        return view('live.browse-posts', [
             'posts' => Post::all(),
         ]);
     }
@@ -663,11 +663,11 @@ class BrowsePosts extends Component
 ```html
 <div>
     @foreach (posts as post)
-        <div b-key="{{ post->id }}">
+        <div pb-key="{{ post->id }}">
             <h1>{{ post->title }}</h1>
             <span>{{ post->content }}</span>
 
-            <button b-click="deletePost({{ post->id }})">Delete</button>
+            <button pb-click="deletePost({{ post->id }})">Delete</button>
         </div>
     @endforeach
 </div>
@@ -680,10 +680,10 @@ To remedy this, we can mark the method as `protected` or `private`. Once the met
 ```python
 <?python
 
-namespace App\Liveblade;
+namespace App\PyBlade Live;
 
 use Illuminate\Support\Facades\Auth;
-use Liveblade\Component;
+use PyBlade Live\Component;
 use App\Models\Post;
 
 class BrowsePosts extends Component
@@ -706,7 +706,7 @@ class BrowsePosts extends Component
 
     public function render()
     {
-        return view('liveblade.browse-posts', [
+        return view('live.browse-posts', [
             'posts' => Post::all(),
         ]);
     }
@@ -715,7 +715,7 @@ class BrowsePosts extends Component
 
 ## Applying middleware
 
-By default, Liveblade re-applies authentication and authorization related middleware on subsequent requests if those middleware were applied on the initial page load request.
+By default, PyBlade Live re-applies authentication and authorization related middleware on subsequent requests if those middleware were applied on the initial page load request.
 
 For example, imagine your component is loaded inside a route that is assigned the `auth` middleware and a user's session ends. When the user triggers another action, the `auth` middleware will be re-applied and the user will receive an error.
 
@@ -724,10 +724,10 @@ If there are specific middleware that you would like to apply to a specific acti
 ```python
 <?python
 
-namespace App\Liveblade;
+namespace App\PyBlade Live;
 
 use App\Http\Middleware\LogPostCreation;
-use Liveblade\Component;
+use PyBlade Live\Component;
 
 class CreatePost extends Component
 {

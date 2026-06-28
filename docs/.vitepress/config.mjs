@@ -33,34 +33,34 @@ export default defineConfig({
         ]
       },
       {
-        text: 'Liveblade: Interactive UIs',
+        text: 'PyBlade Live: Interactive UIs',
         items: [
-          {text:"Prelude", link:"/liveblade/prelude"},
-          {text: "Quick start", link:"/liveblade/quickstart"},
-          {text: "Installation", link:"/liveblade/installation"},
+          {text:"Prelude", link:"/live/prelude"},
+          {text: "Quick start", link:"/live/quickstart"},
+          {text: "Installation", link:"/live/installation"},
           {text: "Essentials", 
             items: [
-              {text: "Components", link:"/liveblade/components"},
-              {text: "Properties", link:"/liveblade/properties"},
-              {text: "Actions", link:"/liveblade/actions"},
-              {text: "Lifecycle Hooks", link:"/liveblade/lifecycle-hooks"},
-              {text: "Events", link:"/liveblade/events"},
-              {text: "Liveblade Directives", link:"/liveblade/liveblade-directives"},
-              {text: "Forms", link:"/liveblade/forms"},
+              {text: "Components", link:"/live/components"},
+              {text: "Properties", link:"/live/properties"},
+              {text: "Actions", link:"/live/actions"},
+              {text: "Lifecycle Hooks", link:"/live/lifecycle-hooks"},
+              {text: "Events", link:"/live/events"},
+              {text: "PyBlade Live Directives", link:"/live/live-directives"},
+              {text: "Forms", link:"/live/forms"},
             ]
           },
           
           {text: "Features",
             items: [
-              {text: "Navigation", link:"/liveblade/features/navigation"},
-              {text: "Lazy Loading", link:"/liveblade/features/lazy-loading"},
-              {text: "Validation", link:"/liveblade/features/validation"},
-              {text: "File Uploads", link:"/liveblade/features/file-uploads"},
-              {text: "Pagination", link:"/liveblade/features/pagination"},
+              {text: "Navigation", link:"/live/features/navigation"},
+              {text: "Lazy Loading", link:"/live/features/lazy-loading"},
+              {text: "Validation", link:"/live/features/validation"},
+              {text: "File Uploads", link:"/live/features/file-uploads"},
+              {text: "Pagination", link:"/live/features/pagination"},
             ]
           },
 
-          {text: "Security", link:"/liveblade/security"},
+          {text: "Security", link:"/live/security"},
         ]
       },
       {

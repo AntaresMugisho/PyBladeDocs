@@ -88,9 +88,9 @@ Use `{# ... #}` for comments within templates. Content inside these comment bloc
 
 ---
 
-## 5. LiveBlade for Components
+## 5. PyBlade Live for Components
 
-LiveBlade is PyBlade's component system, allowing developers to build reusable UI blocks with data and logic encapsulation.
+PyBlade Live is PyBlade's component system, allowing developers to build reusable UI blocks with data and logic encapsulation.
 
 ### Defining a Component Class
 
@@ -115,7 +115,7 @@ LiveBlade is PyBlade's component system, allowing developers to build reusable U
 PyBlade supports inline components using a self-closing HTML-like syntax:
 
 ```html
-<b-button :label="'Click Me'" :type="'submit'"/>
+<pb-button :label="'Click Me'" :type="'submit'"/>
 ```
 
 This syntax allows setting attributes directly, making components cleaner and easier to use in templates.

@@ -15,7 +15,7 @@ Your feedback, bug reports, and real-world usage insights are essential to refin
 
 
 **PyBlade** is a lightweight, secure template engine for Python, designed to be both powerful and easy to use. Drawing
-inspiration from Laravel's Blade, PyBlade allows developers to build expressive, secure templates using an intuitive `@`-based syntax. While many template engines focus on backend logic, PyBlade extends into component-driven development through Liveblade, helping you create complex, reusable UI components that reduce reliance on backend rendering and enhance performance.
+inspiration from Laravel's Blade, PyBlade allows developers to build expressive, secure templates using an intuitive `@`-based syntax. While many template engines focus on backend logic, PyBlade extends into component-driven development through PyBlade Live, helping you create complex, reusable UI components that reduce reliance on backend rendering and enhance performance.
 
 Developed with flexibility in mind, PyBlade is designed to integrate with various Python web frameworks, though it currently supports Django only. Whether you're a developer familiar with Laravel Blade or simply looking for a streamlined template engine for Python, PyBlade offers a refreshing and secure approach to building dynamic applications.
 
@@ -27,9 +27,9 @@ In today’s fast-paced development environment, efficiency and security are ess
 
 PyBlade’s `@`-based directives are concise and intuitive, reducing the amount of boilerplate code you need to write. This streamlined approach enables developers to quickly build and iterate on templates, significantly improving development time and efficiency.
 
-### Dynamic UI with Liveblade
+### Dynamic UI with PyBlade Live
 
-With Liveblade, PyBlade introduces a frontend-like component architecture. Inspired by modern frontend frameworks, Liveblade enables you to create reusable components that handle both UI and logic. This approach reduces the load on server-side rendering, allowing components to manage dynamic interactions directly on the client side, enhancing the user experience and reducing server load. Liveblade allows you to write components that are augmented with dynamic functionality that would typically only be possible via frontend frameworks like React or Vue.
+With PyBlade Live, PyBlade introduces a frontend-like component architecture. Inspired by modern frontend frameworks, PyBlade Live enables you to create reusable components that handle both UI and logic. This approach reduces the load on server-side rendering, allowing components to manage dynamic interactions directly on the client side, enhancing the user experience and reducing server load. PyBlade Live allows you to write components that are augmented with dynamic functionality that would typically only be possible via frontend frameworks like React or Vue.
 
 ### Framework-agnostic design
 
@@ -62,7 +62,7 @@ PyBlade is built for developers who want to maximize efficiency and maintainabil
 2. **Laravel Developers transitioning to Python**: If you’re familiar with Laravel’s Blade syntax, PyBlade provides a
    familiar development environment within Python, making it easier to build dynamic templates without learning a new template syntax.
 
-3. **Projects that benefit from component-based frontend behavior**: By leveraging LiveBlade, PyBlade empowers
+3. **Projects that benefit from component-based frontend behavior**: By leveraging PyBlade Live, PyBlade empowers
    projects with a modern component-driven model similar to frontend frameworks, allowing you to create modular, self-contained UI pieces that reduce server rendering needs.
 
 4. **Multi-Framework Projects**: Since PyBlade’s design is framework-agnostic, it’s well-suited for applications that

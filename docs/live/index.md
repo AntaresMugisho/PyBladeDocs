@@ -1,24 +1,24 @@
-# Liveblade Documentation
+# PyBlade Live Documentation
 
-Liveblade is an extension of the PyBlade template engine, bringing real-time interactivity to Python web applications. Inspired by Laravel Livewire, Liveblade allows developers to create dynamic components using Python classes, eliminating the need for complex frontend JavaScript frameworks.
+PyBlade Live is an extension of the PyBlade template engine, bringing real-time interactivity to Python web applications. Inspired by Laravel Livewire, PyBlade Live allows developers to create dynamic components using Python classes, eliminating the need for complex frontend JavaScript frameworks.
 
 ## Installation
 
-To install Liveblade, ensure you have PyBlade installed:
+To install PyBlade Live, ensure you have PyBlade installed:
 
 ```bash
 pip install pyblade
 ```
 
-Then, install Liveblade:
+Then, install PyBlade Live:
 
 ```bash
-pip install liveblade
+pip install live
 ```
 
 ## Configuration
 
-In your Django or Flask project, configure Liveblade by updating the settings:
+In your Django or Flask project, configure PyBlade Live by updating the settings:
 
 ### Django Configuration
 
@@ -42,20 +42,20 @@ TEMPLATES = [
 
 ```python
 from flask import Flask
-from pyblade import Liveblade
+from pyblade import PyBlade Live
 
 app = Flask(__name__)
-Liveblade.init_app(app)
+PyBlade Live.init_app(app)
 ```
 
 ## Creating Components
 
-Liveblade components are Python classes that manage state and actions. Each component extends `LivebladeComponent`.
+PyBlade Live components are Python classes that manage state and actions. Each component extends `LivebladeComponent`.
 
 ### Example Component
 
 ```python
-from liveblade import LivebladeComponent
+from live import LivebladeComponent
 
 class Counter(LivebladeComponent):
     count: int = 0
@@ -80,12 +80,12 @@ Save the component's view as `counter.blade.py`:
 To include a component in a PyBlade template:
 
 ```html
-@liveblade('counter')
+@live('counter')
 ```
 
-## Live Events
+## PyBlade Live Events
 
-Liveblade provides event handling to manage interactions.
+PyBlade Live provides event handling to manage interactions.
 
 ### Listening for Events
 
@@ -100,12 +100,12 @@ class MessageHandler(LivebladeComponent):
 ### Emitting Events
 
 ```html
-<button wire:click="$emit('update_message', 'Hello Liveblade!')">Send Message</button>
+<button wire:click="$emit('update_message', 'Hello PyBlade Live!')">Send Message</button>
 ```
 
 ## Lifecycle Hooks
 
-Liveblade provides lifecycle hooks similar to Livewire:
+PyBlade Live provides lifecycle hooks similar to Livewire:
 
 - `mount(self)`: Called when the component is initialized.
 - `updated(self, property)`: Triggered when a property is updated.
@@ -116,7 +116,7 @@ Liveblade provides lifecycle hooks similar to Livewire:
 You can add validation to component properties using Python’s validation mechanisms:
 
 ```python
-from liveblade import LivebladeComponent
+from live import LivebladeComponent
 from pydantic import BaseModel, Field
 
 class FormData(BaseModel):
@@ -132,7 +132,7 @@ class UserForm(LivebladeComponent):
 
 ## File Uploads
 
-Liveblade supports file uploads:
+PyBlade Live supports file uploads:
 
 ### Component Handling Uploads
 
@@ -157,7 +157,7 @@ class UploadFile(LivebladeComponent):
 To redirect within a component:
 
 ```python
-from liveblade import redirect
+from live import redirect
 
 def go_home(self):
     return redirect('/')
@@ -165,7 +165,7 @@ def go_home(self):
 
 ## Conclusion
 
-Liveblade simplifies building interactive, real-time web applications using Python and PyBlade. It provides a Livewire-like experience for Python developers, leveraging Python classes instead of JavaScript frameworks.
+PyBlade Live simplifies building interactive, real-time web applications using Python and PyBlade. It provides a Livewire-like experience for Python developers, leveraging Python classes instead of JavaScript frameworks.
 
-For more details, visit the official Liveblade documentation.
+For more details, visit the official PyBlade Live documentation.
 

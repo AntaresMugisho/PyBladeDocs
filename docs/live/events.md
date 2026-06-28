@@ -3,20 +3,20 @@
 
 # Events
 
-Liveblade offers a robust event system that you can use to communicate between different components on the page. Because it uses browser events under the hood, you can also use Liveblade's event system to communicate even with plain vanilla JavaScript.
+PyBlade Live offers a robust event system that you can use to communicate between different components on the page. Because it uses browser events under the hood, you can also use PyBlade Live's event system to communicate even with plain vanilla JavaScript.
 
 To trigger an event, you may use the `emit()` method from anywhere inside your component and listen for that event from any other component on the page.
 
 ## Dispatching events
 
-To dispatch an event from a Liveblade component, you can call the `emit()` method, passing it the event name and any additional data you want to send along with the event.
+To dispatch an event from a PyBlade Live component, you can call the `emit()` method, passing it the event name and any additional data you want to send along with the event.
 
 Below is an example of dispatching a `post-created` event from a `PostCreate` component:
 
 ```python
-from pyblade import liveblade
+from pyblade import live
 
-class PostCreate(liveblade.Component):
+class PostCreate(live.Component):
 
     def save(self):
         ...
@@ -37,15 +37,15 @@ self.emit('post-created', title=post.title)
 
 ## Listening for events
 
-To listen for an event in a Liveblade component, add the `@on` decorator above the method you want to be called when a given event is dispatched:
+To listen for an event in a PyBlade Live component, add the `@on` decorator above the method you want to be called when a given event is dispatched:
 
 <!-- > [!warning] Warning
-> Make sure you import liveblade decorators -->
+> Make sure you import live decorators -->
 
 ```python
-from pyblade import liveblade
+from pyblade import live
 
-class Dashboard(liveblade.Component):
+class Dashboard(live.Component):
 
 	@on('post-created') # [!code highlight]
     def update_post_list(self, title: str):
@@ -63,11 +63,11 @@ Occasionally, you may want to dynamically generate event listener names at run-t
 For example, if you wanted to scope an event listener to a specific Database model, you could append the model's ID to the event name when dispatching like so:
 
 ```python
-from pyblade import liveblade
+from pyblade import live
 from app.models import Post
 
 
-class PostUpdate(liveblade.Component):
+class PostUpdate(live.Component):
     post: Post
 
     def update(self, id: int):
@@ -78,10 +78,10 @@ class PostUpdate(liveblade.Component):
 And then listen for that specific model:
 
 ```python
-from pyblade import liveblade
+from pyblade import live
 from app.models import Post
 
-class PostDetail(liveblade.Component):
+class PostDetail(live.Component):
 
     post: Post
 
@@ -95,11 +95,11 @@ If the above `post` model had an ID of `3`, the `refresh_post()` method would on
 
 ### Listening for events from specific child components
 
-Liveblade allows you to listen for events directly on individual child components in your PyBlade template like so:
+PyBlade Live allows you to listen for events directly on individual child components in your PyBlade template like so:
 
 ```html
 <div>
-    <liveblade:edit-post b-saved="refresh">
+    <live:edit-post pb-saved="refresh">
 
     <!-- ... -->
 </div>
@@ -107,16 +107,16 @@ Liveblade allows you to listen for events directly on individual child component
 
 In the above scenario, if the `edit-post` child component dispatches a `saved` event, the parent's `refresh` will be called and the parent will be refreshed.
 
-Instead of passing `refresh`, you can pass any method you normally would to something like `b-click`. Here's an example of calling a `close()` method that might do something like close a modal dialog:
+Instead of passing `refresh`, you can pass any method you normally would to something like `pb-click`. Here's an example of calling a `close()` method that might do something like close a modal dialog:
 
 ```html
-<liveblade:edit-post b-saved="close">
+<live:edit-post pb-saved="close">
 ```
 
 If the child dispatched parameters along with the request, for example `self.emit('saved', post_id=1)`, you can forward those values to the parent method using the following syntax:
 
 ```html
-<liveblade:edit-post b-saved="close(event.detail.post_id)">
+<live:edit-post pb-saved="close(event.detail.post_id)">
 ```
 
 ## Dispatching directly to another component
@@ -126,9 +126,9 @@ If you want to use events for communicating directly between two components on t
 Below is an example of the `PostCreate` component dispatching the `post-created` event directly to the `Dashboard` component, skipping any other components listening for that specific event:
 
 ```python
-from pyblade import liveblade
+from pyblade import live
 
-class postCreate(liveblade.Component):
+class postCreate(live.Component):
 
     def save(self):
 		self.emit("post-created").to("Dashboard") # [!code highlight]
@@ -140,9 +140,9 @@ class postCreate(liveblade.Component):
 Using the `emit().self()` modifier, you can restrict an event to only being intercepted by the component it was triggered from:
 
 ```python
-from pyblade import liveblade
+from pyblade import live
 
-class postCreate(liveblade.Component):
+class postCreate(live.Component):
 
     def save(self):
 		self.emit("post-created").self() # [!code highlight]
@@ -153,7 +153,7 @@ class postCreate(liveblade.Component):
 You can dispatch events directly from your PyBlade templates using the `emit()` function. This is useful when you want to trigger an event from a user interaction, such as a button click:
 
 ```html
-<button b-click="emit('show-post-modal', id={{ post.id }})">
+<button pb-click="emit('show-post-modal', id={{ post.id }})">
     EditPost
 </button>
 ```
@@ -163,7 +163,7 @@ In this example, when the button is clicked, the `show-post-modal` event will be
 If you want to dispatch an event directly to another component you can use the `emit().to()` modifier:
 
 ```html
-<button b-click="emit('show-post-modal', id={{ post.id }}).to('PostList')">
+<button pb-click="emit('show-post-modal', id={{ post.id }}).to('PostList')">
     EditPost
 </button>
 ```
@@ -172,7 +172,7 @@ In this example, when the button is clicked, the `show-post-modal` event will be
 
 ## Using JavaScript to interact with events
 
-Liveblade's event system becomes much more powerful when you interact with it from JavaScript inside your application. This unlocks the ability for any other JavaScript in your app to communicate with Liveblade components on the page.
+PyBlade Live's event system becomes much more powerful when you interact with it from JavaScript inside your application. This unlocks the ability for any other JavaScript in your app to communicate with PyBlade Live components on the page.
 
 ### Listening for events inside component scripts
 
@@ -220,12 +220,12 @@ You can pass any additional parameters to the event by passing an object as a se
 @endscript
 ```
 
-You can now access those event parameters from both your Liveblade class and also other JavaScript event listeners.
+You can now access those event parameters from both your PyBlade Live class and also other JavaScript event listeners.
 
-Here's an example of receiving the `refresh_posts` parameter within a Liveblade class:
+Here's an example of receiving the `refresh_posts` parameter within a PyBlade Live class:
 
 ```python
-from pyblade import liveblade
+from pyblade import live
 # ...
 
     @on("post-created")
@@ -248,14 +248,14 @@ You can also access the `refresh_posts` parameter from a JavaScript event listen
 ```
 
 
-### Listening for Liveblade events from global JavaScript
+### Listening for PyBlade Live events from global JavaScript
 
-Alternatively, you can listen for Liveblade events globally using `Liveblade.on` from any script in your application:
+Alternatively, you can listen for PyBlade Live events globally using `PyBlade Live.on` from any script in your application:
 
 ```html
 <script>
-    document.addEventListener('liveblade:init', () => {
-       Liveblade.on('post-created', (event) => {
+    document.addEventListener('live:init', () => {
+       PyBlade Live.on('post-created', (event) => {
            //
        });
     });
@@ -268,8 +268,8 @@ If you wish to remove this event listener for any reason, you can do so using th
 
 ```html
 <script>
-    document.addEventListener('liveblade:init', () => {
-        let cleanup = Liveblade.on('post-created', (event) => {
+    document.addEventListener('live:init', () => {
+        let cleanup = PyBlade Live.on('post-created', (event) => {
             //
         });
 

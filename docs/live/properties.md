@@ -2,19 +2,19 @@
 
 # Properties
 
-Liveblade components have properties that store data and can be easily accessed within the component's class and template. Properties are defined as attributes on component classes and can be accessed and modified on both the server and client-side. 
+PyBlade Live components have properties that store data and can be easily accessed within the component's class and template. Properties are defined as attributes on component classes and can be accessed and modified on both the server and client-side. 
 
 This section discusses the basics of adding a property to a component and using it in your application.
 
 ## Initializing properties
 
-In a standard Python class, to initialize properties or attributes, we use the `__init__()` dunder method. However, in a Liveblade's component class, you can set initial values for properties within your component's `mount()` method.
+In a standard Python class, to initialize properties or attributes, we use the `__init__()` dunder method. However, in a PyBlade Live's component class, you can set initial values for properties within your component's `mount()` method.
 
 ```python
-from pyblade import liveblade
+from pyblade import live
 from app.models import Task
 
-class TodoList(liveblade.Component):
+class TodoList(live.Component):
 
     def mount(self):
         self.tasks = Task.objects.all()
@@ -26,14 +26,14 @@ In this example, when the component renders for the first time, all the existing
 Alternatively, you may declare properties in your component class, making them what are known as "class attributes". For example, let's create a `title` property in the `TodoList` component:
 
 ```python
-from pyblade import liveblade
+from pyblade import live
 
-class TodoList(liveblade.Component):
+class TodoList(live.Component):
 
     title = "Learn PyBlade"
 
     def render(self):
-        return self.view("liveblade.todo-list")
+        return self.view("live.todo-list")
 ```
 
 ## Accessing properties in the template
@@ -61,14 +61,14 @@ In addition to accessing class properties from the template, you can explicitly 
 To pass data to the view in the `render()` method, you can add a dictionnary as second parameter to the returned `view()` method. For example, let's say you want to pass the task status to the template.
 
 ```python
-from pyblade import liveblade
+from pyblade import live
 
-class TodoList(liveblade.Component):
+class TodoList(live.Component):
 
     title = "Learn PyBlade"
 
     def render(self):
-        return self.view("liveblade.todo-list", context={"status": "In progress"}) # [!code highlight]
+        return self.view("live.todo-list", context={"status": "In progress"}) # [!code highlight]
 
 ```
 
@@ -86,44 +86,44 @@ Now you may access the `status` property from the component's template like this
 
 ## Data binding
 
-One of Liveblade's most powerful features is "data binding": the ability to automatically keep properties in-sync with form inputs on the page.
+One of PyBlade Live's most powerful features is "data binding": the ability to automatically keep properties in-sync with form inputs on the page.
 
-Liveblade supports two-way data binding through the `b-model` HTML attribute. This allows you to easily synchronize data between component properties and HTML inputs, keeping your user interface and component state in sync.
+PyBlade Live supports two-way data binding through the `pb-model` HTML attribute. This allows you to easily synchronize data between component properties and HTML inputs, keeping your user interface and component state in sync.
 
-Let's use the `b-model` directive to bind the `title` property in our `TodoList` component to a basic input element:
+Let's use the `pb-model` directive to bind the `title` property in our `TodoList` component to a basic input element:
 
 ```python
-from pyblade import liveblade
+from pyblade import live
 
-class TodoList(liveblade.Component):
+class TodoList(live.Component):
 
     title: str = ""
 
     def render(self):
-        return self.view("liveblade.todo-list")
+        return self.view("live.todo-list")
 ```
 
 ```html
 <div>
     <h1>Title : {{ title }}</h1>
-    <input type="text" b-model="title" /> // [!code highlight] 
+    <input type="text" pb-model="title" /> // [!code highlight] 
 </div>
 ```
 
-Any changes made to the text input will be automatically synchronized with the `title` property in your Liveblade component.
+Any changes made to the text input will be automatically synchronized with the `title` property in your PyBlade Live component.
 
 > [!warning] "Why isn't my component live updating as I type?"
-> If you tried this in your browser and are confused why the title isn't automatically updating, it's because Liveblade only updates a component when an "action" is submitted — like pressing a submit button — not when a user types into a field. This cuts down on network requests and improves performance.
+> If you tried this in your browser and are confused why the title isn't automatically updating, it's because PyBlade Live only updates a component when an "action" is submitted — like pressing a submit button — not when a user types into a field. This cuts down on network requests and improves performance.
 
 >[!tip] Pro tip
->To enable "live" updating as a user types, you can use `b-model.live` instead.
+>To enable "live" updating as a user types, you can use `pb-model.live` instead.
 
 Let's add a method in our component's class so that we can trigger an "action" from the browser to test it out. 
 
 ```python{7-8}
-from pyblade import liveblade
+from pyblade import live
 
-class TodoList(liveblade.Component):
+class TodoList(live.Component):
 
     title: str = ""
 
@@ -131,35 +131,35 @@ class TodoList(liveblade.Component):
         pass
 
     def render(self):
-        return self.view("liveblade.todo-list")
+        return self.view("live.todo-list")
 ```
 
-And now we will introduce `b-click` which allows you to call and execute a method defined in a Liveblade component's class right from the browser.
+And now we will introduce `pb-click` which allows you to call and execute a method defined in a PyBlade Live component's class right from the browser.
 
 ```html
 <div>
     <h1>Title : {{ title }}</h1>
-    <input type="text" b-model="title" /> 
-    <button b-click="add">Add Task</button> // [!code highlight] 
+    <input type="text" pb-model="title" /> 
+    <button pb-click="add">Add Task</button> // [!code highlight] 
 </div>
 ```
 
 This time, in the above example, the text input's value will synchronize with the `title` property on the server when the **"Add Task"** button is clicked.
 
 
-This is just scratching the surface of `b-model`. We will go deeper when we'll talk about [Forms](liveblade/forms) in Liveblade.
+This is just scratching the surface of `pb-model`. We will go deeper when we'll talk about [Forms](live/forms) in PyBlade Live.
 
 
 ## Resetting properties
 
-Sometimes, you may need to reset your properties back to their initial state after an action is performed by the user. In these cases, Liveblade provides a `reset()` method that accepts one or more property names and resets their values to their initial state.
+Sometimes, you may need to reset your properties back to their initial state after an action is performed by the user. In these cases, PyBlade Live provides a `reset()` method that accepts one or more property names and resets their values to their initial state.
 
 In the example below, we can avoid code duplication by using `self.reset()` to reset the `title` field after the "Add Todo" button is clicked:
 
 ```python
-from pyblade import liveblade
+from pyblade import live
 
-class TodoComponent(liveblade.Component):
+class TodoComponent(live.Component):
 
     title = ""
 
@@ -182,10 +182,10 @@ Alternatively, you can use the `pull()` method to both reset and retrieve the va
 Here's the same example from above, but simplified with `pull()`:
 
 ```python
-from pyblade import liveblade
+from pyblade import live
 from app.models import Task
 
-class TodoComponent(liveblade.Component):
+class TodoComponent(live.Component):
 
     title = ""
 
@@ -196,10 +196,10 @@ class TodoComponent(liveblade.Component):
 
 ## Security concerns
 
-While Liveblade properties are a powerful feature, there are a few [security considerations](#) that you should be aware of before using them.
+While PyBlade Live properties are a powerful feature, there are a few [security considerations](#) that you should be aware of before using them.
 
 <!-- 
-While Liveblade properties are a powerful feature, there are a few security considerations that you should be aware of before using them.
+While PyBlade Live properties are a powerful feature, there are a few security considerations that you should be aware of before using them.
 
 In short, always treat public properties as user input — as if they were request input from a traditional endpoint. In light of this, it's essential to validate and authorize properties before persisting them to a database — just like you would do when working with request input in a controller.
 
@@ -208,10 +208,10 @@ In short, always treat public properties as user input — as if they were reque
 To demonstrate how neglecting to authorize and validate properties can introduce security holes in your application, the following `UpdatePost` component is vulnerable to attack:
 
 ```python
-from pyblade import liveblade
+from pyblade import live
 from app.models import Post
 
-class UpdatePost(liveblade.Component)
+class UpdatePost(live.Component)
    
     def mount(self, post: Post):
         self.id = post.id
@@ -223,13 +223,13 @@ class UpdatePost(liveblade.Component)
         post.update(title=self.title, content=self.content)
 
     def render(self):
-        return self.view('liveblade.update-post')
+        return self.view('live.update-post')
 ```
 
 ```html
-<form b-submit="update">
-    <input type="text" b-model="title">
-    <input type="text" b-model="content">
+<form pb-submit="update">
+    <input type="text" pb-model="title">
+    <input type="text" pb-model="content">
 
     <button type="submit">Update</button>
 </form>
@@ -239,13 +239,13 @@ At first glance, this component may look completely fine. But, let's walk throug
 
 Because we are storing the `id` of the post as a public property on the component, it can be manipulated on the client just the same as the `title` and `content` properties.
 
-It doesn't matter that we didn't write an input with `b-model="id"`. A malicious user can easily change the template to the following using their browser DevTools:
+It doesn't matter that we didn't write an input with `pb-model="id"`. A malicious user can easily change the template to the following using their browser DevTools:
 
 ```html
-<form b-submit="update">
-    <input type="text" b-model="id"> // [!code highlight] 
-    <input type="text" b-model="title">
-    <input type="text" b-model="content">
+<form pb-submit="update">
+    <input type="text" pb-model="id"> // [!code highlight] 
+    <input type="text" pb-model="title">
+    <input type="text" pb-model="content">
 
     <button type="submit">Update</button>
 </form>
@@ -260,7 +260,7 @@ To prevent this kind of attack, we can use one or both of the following strategi
 
 #### Authorizing the input
 
-Because `id` can be manipulated client-side with something like `b-model`, just like in a controller, we can use [Django's authorization](#) to make sure the current user can update the post:
+Because `id` can be manipulated client-side with something like `pb-model`, just like in a controller, we can use [Django's authorization](#) to make sure the current user can update the post:
 
 ```python
 def update(self):
@@ -272,7 +272,7 @@ If a malicious user mutates the `id` property, the added authorization will catc
 
 #### Locking the property
 
-Liveblade also allows you to "lock" properties in order to prevent properties from being modified on the client-side. You can "lock" a property from client-side manipulation using the `@locked` decorator:
+PyBlade Live also allows you to "lock" properties in order to prevent properties from being modified on the client-side. You can "lock" a property from client-side manipulation using the `@locked` decorator:
 
 ```python
 # Snipets example of locking properties

@@ -147,15 +147,15 @@ Additionally, PyBlade requires a `pyblade.json` configuration file in the root o
 
 Once this is set up, you can start using PyBlade directives in your Django templates.
  
-### Configuring Liveblade for Django
-If you want to use Liveblade in your Django project, add it to the list of installed apps in `settings.py`.
+### Configuring PyBlade Live for Django
+If you want to use PyBlade Live in your Django project, add it to the list of installed apps in `settings.py`.
 
 ```python
 # settings.py
 
 INSTALLED_APPS = [
     ...,
-    pyblade.liveblade
+    pyblade.live
 ]
 
 ```
@@ -298,14 +298,14 @@ PyBlade provides a rich set of directives that can help you add logic and intera
 - Use [PyBlade components](#) to create reusable UI blocks with data encapsulation.
 - Understand [template inheritance and layouts](#) for creating modular templates.
 
-### 2. Liveblade : for interactive components
+### 2. PyBlade Live : for interactive components
 
-Beyond templating, PyBlade comes with Liveblade, which serves as a frontend framework by offering real-time UI updates, dynamic components, and more. With PyBlade’s Liveblade integration, you can create reusable components that can be updated dynamically—without requiring server-side rendering.
+Beyond templating, PyBlade comes with PyBlade Live, which serves as a frontend framework by offering real-time UI updates, dynamic components, and more. With PyBlade’s PyBlade Live integration, you can create reusable components that can be updated dynamically—without requiring server-side rendering.
 
 All without writing a single line of JavaScript code. You stay in the comfort of Python, and the magic happens behind the scenes.
 
 - Learn how to create live-reloading components.  
-- Use bindings like `b-click`, `b-change`, and `b-model` to handle user interactions. 
+- Use bindings like `pb-click`, `pb-change`, and `pb-model` to handle user interactions. 
 - Build real-time applications without leaving the comfort of Python.  
 
 ### 3. PyBlade CLI
@@ -319,7 +319,7 @@ PyBlade comes with a user-friendly and a powerful CLI, making project setup and 
 ### 4. Boost productivity with editor extensions
 PyBlade makes your development experience even better with editor extensions for popular IDEs like VSCode, Sublime Text, and JetBrains. These extensions bring intelligent code completion, snippets, syntax highlighting, and more to `.html` files. This ensures you can write PyBlade templates with ease and confidence, reducing the time spent on looking up syntax and improving your overall workflow.
 
-Download Pyblade IntelliSense for [VS Code](#), [Sublime Text](#), [JetBrains IDEs](#).
+Download PyBlade IntelliSense for [VS Code](#), [Sublime Text](#), [JetBrains IDEs](#).
 
 ---
 Once you have a good grasp of the basics, you’ll be able to fully leverage the power of PyBlade to create beautiful, dynamic templates that integrate seamlessly with your Django or Flask backend. So, get ready to explore the power of PyBlade’s directives, and start building more efficient, secured and maintainable web applications today !
