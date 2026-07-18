@@ -1,0 +1,24 @@
+{
+  "title": "Documentation",
+  "root": true,
+  "pages": [
+    "---Introduction---",
+    "meet-pyblade",
+    "getting-started",
+    "migration-guide",
+    "---PyBlade: Template Engine---",
+    "pyblade-prelude",
+    "displaying-data",
+    "pyblade-directives",
+    "components",
+    "layouts",
+    "forms",
+    "---PyBlade Live: Interactive UIs---",
+    "live",
+    "---PyBlade CLI---",
+    "cli",
+    "---Outro---",
+    "future-features",
+    "support-and-contribution"
+  ]
+}

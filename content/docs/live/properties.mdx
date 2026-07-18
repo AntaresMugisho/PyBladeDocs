@@ -1,0 +1,204 @@
+---
+title: "Properties"
+---
+
+PyBlade Live components have properties that store data and can be easily accessed within the component's class and template. Properties are defined as attributes on component classes and can be accessed and modified on both the server and client-side. 
+
+This section discusses the basics of adding a property to a component and using it in your application.
+
+## Initializing properties
+
+In a standard Python class, to initialize properties or attributes, we use the `__init__()` dunder method. However, in a PyBlade Live's component class, you can set initial values for properties within your component's `mount()` method.
+
+```python
+from pyblade import live
+from app.models import Task
+
+class TodoList(live.Component):
+
+    def mount(self):
+        self.tasks = Task.objects.all()
+```
+
+In this example, when the component renders for the first time, all the existing tasks in the database are made available through the `tasks` variable.
+
+
+Alternatively, you may declare properties in your component class, making them what are known as "class attributes". For example, let's create a `title` property in the `TodoList` component:
+
+```python
+from pyblade import live
+
+class TodoList(live.Component):
+
+    title = "Learn PyBlade"
+
+    def render(self):
+        return self.view("live.todo-list")
+```
+
+## Accessing properties in the template
+
+Component properties are automatically made available to the component's context. You can reference them using standard PyBlade syntax. Here we'll display the value of the `title` property:
+
+```html
+<div>
+    <h1>Title: {{ title }}</h1>
+</div>
+```
+
+The rendered output of this component would be:
+
+```html
+<div>
+    <h1>Title: Learn PyBlade</h1>
+</div>
+```
+
+## Sharing additional data with the template
+
+In addition to accessing class properties from the template, you can explicitly pass data to the template from the `render()` method, like you might typically do from a view in Django. This can be useful when you want to pass additional data without first storing it as a property — because properties have [specific security implications](#).
+
+To pass data to the view in the `render()` method, you can add a dictionnary as second parameter to the returned `view()` method. For example, let's say you want to pass the task status to the template.
+
+```python
+from pyblade import live
+
+class TodoList(live.Component):
+
+    title = "Learn PyBlade"
+
+    def render(self):
+        return self.view("live.todo-list", context={"status": "In progress"}) # [!code highlight]
+
+```
+
+
+Now you may access the `status` property from the component's template like this:
+
+```html
+<div>
+    <h1>Title: {{ title }}</h1>
+
+    <span>Status: {{ status }}</span>
+</div>
+```
+
+
+## Data binding
+
+One of PyBlade Live's most powerful features is "data binding": the ability to automatically keep properties in-sync with form inputs on the page.
+
+PyBlade Live supports two-way data binding through the `pb-model` HTML attribute. This allows you to easily synchronize data between component properties and HTML inputs, keeping your user interface and component state in sync.
+
+Let's use the `pb-model` directive to bind the `title` property in our `TodoList` component to a basic input element:
+
+```python
+from pyblade import live
+
+class TodoList(live.Component):
+
+    title: str = ""
+
+    def render(self):
+        return self.view("live.todo-list")
+```
+
+```html
+<div>
+    <h1>Title : {{ title }}</h1>
+    <input type="text" pb-model="title" /> // [!code highlight] 
+</div>
+```
+
+Any changes made to the text input will be automatically synchronized with the `title` property in your PyBlade Live component.
+
+<Callout type="warn" title={"\"Why isn't my component live updating as I type?\""}>
+If you tried this in your browser and are confused why the title isn't automatically updating, it's because PyBlade Live only updates a component when an "action" is submitted — like pressing a submit button — not when a user types into a field. This cuts down on network requests and improves performance.
+</Callout>
+
+<Callout type="info" title={"Pro tip"}>
+To enable "live" updating as a user types, you can use `pb-model.live` instead.
+</Callout>
+
+Let's add a method in our component's class so that we can trigger an "action" from the browser to test it out. 
+
+```python {7-8}
+from pyblade import live
+
+class TodoList(live.Component):
+
+    title: str = ""
+
+    def add(self):
+        pass
+
+    def render(self):
+        return self.view("live.todo-list")
+```
+
+And now we will introduce `pb-click` which allows you to call and execute a method defined in a PyBlade Live component's class right from the browser.
+
+```html
+<div>
+    <h1>Title : {{ title }}</h1>
+    <input type="text" pb-model="title" /> 
+    <button pb-click="add">Add Task</button> // [!code highlight] 
+</div>
+```
+
+This time, in the above example, the text input's value will synchronize with the `title` property on the server when the **"Add Task"** button is clicked.
+
+
+This is just scratching the surface of `pb-model`. We will go deeper when we'll talk about [Forms](/docs/live/live/forms) in PyBlade Live.
+
+
+## Resetting properties
+
+Sometimes, you may need to reset your properties back to their initial state after an action is performed by the user. In these cases, PyBlade Live provides a `reset()` method that accepts one or more property names and resets their values to their initial state.
+
+In the example below, we can avoid code duplication by using `self.reset()` to reset the `title` field after the "Add Todo" button is clicked:
+
+```python
+from pyblade import live
+
+class TodoComponent(live.Component):
+
+    title = ""
+
+    def add(self):
+        if self.title:
+            Task.objects.create(title=self.title)
+            self.reset("title") # [!code highlight]
+```
+
+In the above example, after a user clicks "Add Task", the input field holding the title that has just been added will clear, allowing the user to write a new title.
+
+<Callout type="warn" title={"Warning"}>
+`reset()` won't work on values set in `mount()`.
+`reset()` will reset a property to its state before the `mount()` method was called. If you initialized the property in `mount()` to a different value, you will need to reset the property manually.
+</Callout>
+
+## Pulling properties
+
+Alternatively, you can use the `pull()` method to both reset and retrieve the value in one operation.
+
+Here's the same example from above, but simplified with `pull()`:
+
+```python
+from pyblade import live
+from app.models import Task
+
+class TodoComponent(live.Component):
+
+    title = ""
+
+    def add(self):
+        if self.title:
+            Task.objects.create(title=self.pull("title")) # [!code highlight]
+```
+
+## Security concerns
+
+While PyBlade Live properties are a powerful feature, there are a few [security considerations](#) that you should be aware of before using them.
+
+
