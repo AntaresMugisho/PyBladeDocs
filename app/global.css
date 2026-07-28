@@ -10,3 +10,159 @@ html > body[data-scroll-locked] {
   margin-right: 0px !important;
   --removed-body-scroll-bar-size: 0px !important;
 }
+
+/* ==========================================================================
+   PyBlade landing page theme
+   Scoped to `.pb-home` so /docs keeps the neutral fumadocs theme untouched.
+   Palette ported from pyblade-cloud/framework.html.
+   ========================================================================== */
+
+/* The colours must be literal here, not `rgb(var(--channels))`: Tailwind emits these
+   on :root, and a var() inside a custom property is substituted on the element that
+   DECLARES it. Pointing at channel vars that only exist on .pb-home would resolve to
+   nothing at :root, and descendants would inherit that emptiness. So: light values are
+   the theme default, and `.dark .pb-home` re-declares the same tokens outright. */
+@theme {
+  --color-pb-bg: #eff3f6;
+  --color-pb-surface: #ffffff;
+  --color-pb-raised: #ffffff;
+  --color-pb-line: #d5e0e9;
+  --color-pb-ink: #0e1f2d;
+  --color-pb-muted: #52687b;
+  --color-pb-faint: #5e7182;
+  --color-pb-blade: #2d6088;
+  /* --color-pb-amber is text-safe per theme; --color-pb-brand is the fixed logo
+     amber, for fills only — it fails contrast as text on the light ground. */
+  --color-pb-amber: #8c6305;
+  --color-pb-brand: #f2bb30;
+  --color-pb-codebg: #f8fafc;
+
+  --font-display: var(--font-bricolage), ui-sans-serif, sans-serif;
+  --font-body: var(--font-plex-sans), ui-sans-serif, sans-serif;
+  --font-code: var(--font-plex-mono), ui-monospace, monospace;
+}
+
+.pb-home {
+  --pb-focus: #2d6088;
+  --pb-logo-blue: #34678e;
+  --pb-logo-amber: #f2bb30;
+
+  --pb-syn-dir: #855c03;
+  --pb-syn-var: #2d6088;
+  --pb-syn-str: #2f6e5d;
+  --pb-syn-punct: #607283;
+  --pb-syn-text: #1b3346;
+
+  /* Pull the fumadocs nav (rendered above our markup by HomeLayout) onto the same
+     ground as the page, without touching the global theme. */
+  --color-fd-background: var(--color-pb-bg);
+  --color-fd-foreground: var(--color-pb-ink);
+  --color-fd-muted-foreground: var(--color-pb-muted);
+  --color-fd-border: var(--color-pb-line);
+  --color-fd-card: var(--color-pb-surface);
+  --color-fd-popover: var(--color-pb-surface);
+  --color-fd-accent: color-mix(in oklab, var(--color-pb-line) 55%, transparent);
+  --color-fd-accent-foreground: var(--color-pb-ink);
+
+  background-color: var(--color-pb-bg);
+  color: var(--color-pb-ink);
+}
+
+.dark .pb-home {
+  --color-pb-bg: #0c141c;
+  --color-pb-surface: #131e29;
+  --color-pb-raised: #192633;
+  --color-pb-line: #263645;
+  --color-pb-ink: #e2ebf2;
+  --color-pb-muted: #94a8b9;
+  --color-pb-faint: #8094a6;
+  --color-pb-blade: #5c9ac9;
+  --color-pb-amber: #f2bb30;
+  --color-pb-brand: #f2bb30;
+  --color-pb-codebg: #091017;
+
+  --pb-focus: #f2bb30;
+  --pb-logo-blue: #4e8cbf;
+  --pb-logo-amber: #f2bb30;
+
+  --pb-syn-dir: #f2bb30;
+  --pb-syn-var: #7fb6e4;
+  --pb-syn-str: #86b7a8;
+  --pb-syn-punct: #7a8fa1;
+  --pb-syn-text: #c9d8e4;
+}
+
+.pb-home ::selection {
+  background: var(--pb-logo-amber);
+  color: #0c141c;
+}
+
+.pb-home a:focus-visible,
+.pb-home button:focus-visible {
+  outline: 2px solid var(--pb-focus);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+/* Terminal / code tones */
+.pb-code {
+  color: var(--pb-syn-text);
+}
+.pb-dir {
+  color: var(--pb-syn-dir);
+}
+.pb-var {
+  color: var(--pb-syn-var);
+}
+.pb-str {
+  color: var(--pb-syn-str);
+}
+.pb-pun {
+  color: var(--pb-syn-punct);
+}
+
+/* Hero load sequence — one orchestrated moment, nothing animates on scroll. */
+@keyframes pbRiseIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.pb-rise {
+  opacity: 0;
+  animation: pbRiseIn 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: var(--d, 0s);
+}
+
+@keyframes pbCaretBlink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.pb-caret {
+  display: inline-block;
+  width: 0.55em;
+  background: currentColor;
+  animation: pbCaretBlink 1.05s step-end infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pb-rise {
+    opacity: 1 !important;
+    animation: none !important;
+  }
+  .pb-caret {
+    animation: none !important;
+  }
+}
