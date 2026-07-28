@@ -5,16 +5,18 @@
     "---Introduction---",
     "meet-pyblade",
     "getting-started",
-    "migration-guide",
+
     "---PyBlade: Template Engine---",
     "pyblade-prelude",
     "displaying-data",
     "pyblade-directives",
-    "components",
     "layouts",
+    "components",
     "forms",
+
     "---PyBlade Live: Interactive UIs---",
     "live",
+    
     "---PyBlade CLI---",
     "cli",
     "---Outro---",
