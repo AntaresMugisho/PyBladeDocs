@@ -1,24 +1,22 @@
 {
-  "title": "Documentation",
+  "title": "Docs",
   "root": true,
+  "defaultOpen": true,
   "pages": [
-    "---Introduction---",
+    "---Overview---",
     "meet-pyblade",
     "getting-started",
 
     "---PyBlade: Template Engine---",
-    "pyblade-prelude",
+    "prelude",
     "displaying-data",
     "pyblade-directives",
-    "layouts",
     "components",
+    "layouts",
     "forms",
 
-    "---PyBlade Live: Interactive UIs---",
     "live",
-    
-    "---PyBlade CLI---",
-    "cli",
+
     "---Outro---",
     "future-features",
     "support-and-contribution"

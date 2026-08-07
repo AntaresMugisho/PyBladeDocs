@@ -1,0 +1,60 @@
+---
+title: "Installation"
+---
+
+<Callout type="warn" title={"Warning: Experimental Feature"}>
+PyBlade is currently in an experimental phase. Although its core features are under active development and continuous testing, you should expect potential bugs, breaking changes, or incomplete functionality.
+
+At this stage, PyBlade is best suited for testing, prototyping, and non-critical environments. If you choose to use it in production, do so with caution and ensure appropriate safeguards are in place.
+
+Your feedback, bug reports, and real-world usage insights are essential to refining the engine and moving toward a stable release. We appreciate your contribution to the evolution of PyBlade.
+</Callout>
+
+
+Before installing PyBlade, ensure you are working within a virtual environment to avoid conflicts with other Python packages. If you haven't set up a virtual environment, create a new one by typing the following command in a terminal:
+
+```bash
+python -m venv .env
+```
+
+Then, activate the virtual environment by running:
+
+**On macOS or Linux**
+```bash
+source .env/bin/activate
+```
+
+**On Windows**
+```bash
+.env\Scripts\activate
+```
+
+Once the virtual environment is activated, install PyBlade using your preferred package manager:
+
+<Tabs groupId="package-manager" items={['pip', 'poetry', 'uv']}>
+  <Tab value="pip">
+    ```bash
+    pip install pyblade
+    ```
+  </Tab>
+  <Tab value="poetry">
+    ```bash
+    poetry add pyblade
+    ```
+  </Tab>
+  <Tab value="uv">
+    ```bash
+    uv add pyblade
+    ```
+  </Tab>
+</Tabs>
+
+PyBlade ships with a powerful Command Line Interface (CLI) designed to streamline your development workflow from initializing projects and managing dev servers to generating templates and reactive components.
+
+To verify that PyBlade was installed successfully and that the CLI is ready to use, run:
+
+```bash
+pyblade -v
+```
+
+This will display the installed version of PyBlade, confirming the installation was successful. You are now ready to use PyBlade in your project.  

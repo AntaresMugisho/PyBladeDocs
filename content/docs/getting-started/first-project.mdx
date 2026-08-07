@@ -1,0 +1,155 @@
+---
+title: "First project"
+description: "Create your first PyBlade-powered project"
+---
+
+
+## Initialize a PyBlade project
+
+To start a new project, use the `pyblade init` command. This will guide you through the project setup process:
+
+```bash
+pyblade init
+```
+
+This command will prompt you to provide the following details:
+
+1. **Project Name**: Choose a name for your project. You can use `.` to use the current working directory as the project name.
+2. **Python Web Framework**: Currently, only Django is supported.
+
+PyBlade will then generate the standard project structure based on the web framework you choose, ensuring everything is set up correctly from the start. Additionally, a `pyblade.toml` file will be created in the project root folder, which is essential for PyBlade to function properly. You don't need to modify or delete this file — just leave it as is to ensure everything runs smoothly.
+
+PyBlade automatically handles the configuration for you, so you don't have to handle the setup manually. This means you can skip configuring settings like `settings.py` in Django — PyBlade takes care of it for you. You can dive straight into developing your project without any extra hassle. This allows you to focus entirely on building your project while PyBlade handles the initial configuration seamlessly.
+
+## Run the development server
+
+Once your project is initialized, you can run `pyblade serve` to start the development server.
+
+```bash
+pyblade serve
+```
+
+This will launch the Django development server, and you can view your project by navigating to http://127.0.0.1:8000 in your browser.
+
+## Rendering PyBlade Templates
+
+<Tabs groupId='framework' items={['django', 'flask']}>
+    <Tab>
+        PyBlade templates should be referenced without the `.html` extension, and folders should use dots `.` instead of slashes `/` for separation. This is consistent with PyBlade's template loading conventions.
+
+        For example, given the structure:
+        <Files>
+        <Folder name="my_django_project" defaultOpen>
+            <Folder name="my_app" defaultOpen>
+                <File name="app.py" />
+                <File name="urls.py" />
+                <File name="views.py" />
+                <Folder name="templates" defaultOpen>
+                    <Folder name="my_app" defaultOpen>
+                        <File name="index.html" />
+                        <File name="about.html" />
+                    </Folder>
+                </Folder>
+            </Folder>
+            <File name="manage.py" />
+        </Folder>
+        </Files>
+      
+        To reference `index.html` within `templates/my_app/`, use the path `"my_app.index"` in your Django view, as follows:
+
+        ```python title="views.py"
+        from django.shortcuts import render
+
+        def home_view(request):
+            context = {'title': 'Welcome to PyBlade', 'user': {'name': 'John Doe'}}
+            return render(request, 'my_app.index', context)
+        ```
+
+        This dot notation approach provides a clean way to reference templates across folders and is timeless consuming.
+
+        <Callout type="info" title={"Important"}>
+        For convenience, PyBlade can load templates referenced in the old manner using slashes-notation for folder separation and template file's extension specification. This means PyBlade can load the view referenced with
+
+        ```python title="views.py"
+        from django.shortcuts import render
+
+        def home_view(request):
+            context = {'title': 'Welcome to PyBlade', 'user': {'name': 'John Doe'}}
+            return render(request, 'my_app/index.html', context)
+        ```
+        </Callout>
+    </Tab>
+    <Tab>
+        Within your Flask project, create a `templates` folder if it doesn't already exist, and place all your `.html` templates there:
+
+        <Files>
+        <Folder name="my_flask_project" defaultOpen>
+            <File name="app.py" />
+            <Folder name="static"/>
+            <Folder name="templates" defaultOpen>
+                <File name="index.html" />
+                <File name="about.html" />
+            </Folder>
+        </Folder>
+        </Files>
+
+        <Callout type="warn" title={"Attention"}>
+        The templates system will not work if this folder structure is not exactly as described above. Your project folder can be named anything (not only my_flask_project) as well as your main app file, but the `static` and `templates` folders must be named as shown above. The static and templates folder can contain multiple folders and files. The names of files are up to you.
+        </Callout>
+    </Tab>
+</Tabs>
+
+## Best Practices
+
+Here are some best practices and tips to maximize efficiency and maintain clean code when using PyBlade:
+
+- **Keep Logic in the Backend**: Our philosophy is to avoid adding business logic in templates. Use PyBlade directives to simplify rendering, but keep calculations, data processing, and complex logic in your views or controllers.
+- **Organize Templates by Feature**: Create subdirectories within `templates` for different sections of your app. This structure keeps templates maintainable, especially in large applications.
+- **Use PyBlade's Components for Modular Code**: Components let you create reusable template sections, improving maintainability and reducing repetition across your templates.
+- **Editor Extensions**: To speed up development, you can install **PyBlade Intellisense** extensions from your editor's marketplace, enabling you to work seamlessly with PyBlade templates.
+
+These best practices will help you develop faster with PyBlade while maintaining code security, clarity, and efficiency across your Python web projects.
+
+## What is next?
+
+Now that you've successfully installed and run PyBlade for your Django project, you're ready to dive deeper into the core of PyBlade — its powerful directives and features.
+
+PyBlade is more than just a template engine — it's a complete development tool designed to enhance your workflow. With its clean and expressive syntax, writing dynamic templates becomes faster and more intuitive. You're not just writing HTML; you're writing Python code that's both secure and maintainable.
+
+Here's what you can explore next to unlock the full potential of PyBlade:
+
+### 1. PyBlade: The Template Engine
+
+PyBlade provides a rich set of directives that can help you add logic and interactivity to your HTML templates, all while keeping the code simple and readable. These directives will allow you to control the flow of your templates in a way that's both powerful and easy to follow.
+
+- Learn how to [display data](/docs/displaying-data) in your templates.
+- Learn how to use [pyblade directives](/docs/pyblade-directives) like `@if`, `@for` and `@include` in your templates.
+- Use [PyBlade components](#) to create reusable UI blocks with data encapsulation.
+- Understand [template inheritance and layouts](#) for creating modular templates.
+
+### 2. PyBlade Live : for interactive components
+
+Beyond templating, PyBlade comes with PyBlade Live, which serves as a frontend framework by offering real-time UI updates, dynamic components, and more. With PyBlade's PyBlade Live integration, you can create reusable components that can be updated dynamically—without requiring server-side rendering.
+
+All without writing a single line of JavaScript code. You stay in the comfort of Python, and the magic happens behind the scenes.
+
+- Learn how to create live-reloading components.
+- Use bindings like `pb-click`, `pb-change`, and `pb-model` to handle user interactions.
+- Build real-time applications without leaving the comfort of Python.
+
+### 3. PyBlade CLI
+
+PyBlade comes with a user-friendly and a powerful CLI, making project setup and management more efficient. It makes less time consuming for you to:
+
+- Manage your project with simple commands.
+- Migrate databases, create models, and run tests easily.
+- Install and configure third-party packages.
+
+### 4. Boost productivity with editor extensions
+
+PyBlade makes your development experience even better with editor extensions for popular IDEs like VSCode, Sublime Text, and JetBrains. These extensions bring intelligent code completion, snippets, syntax highlighting, and more to `.html` files. This ensures you can write PyBlade templates with ease and confidence, reducing the time spent on looking up syntax and improving your overall workflow.
+
+Download PyBlade IntelliSense for [VS Code](#), [Sublime Text](#), [JetBrains IDEs](#).
+
+---
+Once you have a good grasp of the basics, you'll be able to fully leverage the power of PyBlade to create beautiful, dynamic templates that integrate seamlessly with your Django or Flask backend. So, get ready to explore the power of PyBlade's directives, and start building more efficient, secured and maintainable web applications today!

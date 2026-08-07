@@ -1,0 +1,108 @@
+---
+title: "Manual configuration"
+---
+
+By default, when you start a new PyBlade project with the `pyblade init` command, all configurations are automatically handled for you. This means you can run the development server right away and begin working on your project without worrying about setup.
+
+However, if you're interested in understanding how PyBlade is configured behind the scenes or need to integrate it into an existing project, manual configuration may be essential. This section will guide you through setting up PyBlade manually for your preferred web framework.
+
+### Configuring PyBlade
+
+First, ensure your web framework project is correctly set up. If not, please refer to the official documentation for your framework.
+
+To use PyBlade, you need to modify your framework's template configuration to use PyBlade's template engine. Below are the configuration examples for different frameworks:
+
+<Tabs groupId='framework' items={['django', 'flask']}>
+  <Tab>
+    In Django, modify the `TEMPLATES` setting in `settings.py`. First, here's the default Django template configuration:
+
+    ```python title='settings.py'
+    TEMPLATES = [
+        {
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'DIRS': [],
+            'APP_DIRS': True,
+            'OPTIONS': {
+                'context_processors': [
+                    'django.template.context_processors.debug',
+                    'django.template.context_processors.request',
+                    'django.contrib.auth.context_processors.auth',
+                    'django.contrib.messages.context_processors.messages',
+                ],
+            },
+        },
+    ]
+    ```
+
+    To use PyBlade, add PyBlade's template engine to the list of `TEMPLATES` in `settings.py`:
+
+    ```python title='settings.py'
+    TEMPLATES = [
+        {
+            'BACKEND': 'pyblade.backends.django.PyBladeEngine',
+            'DIRS': [BASE_DIR / "templates"],
+            'APP_DIRS': True,
+            'OPTIONS': {
+                'context_processors': [
+                    'django.template.context_processors.debug',
+                    'django.template.context_processors.request',
+                    'django.contrib.auth.context_processors.auth',
+                    'django.contrib.messages.context_processors.messages',
+                ],
+            },
+        },
+        {
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'DIRS': []
+            'APP_DIRS': True,
+            'OPTIONS': {
+                'context_processors': [
+                    'django.template.context_processors.debug',
+                    'django.template.context_processors.request',
+                    'django.contrib.auth.context_processors.auth',
+                    'django.contrib.messages.context_processors.messages',
+                ],
+            },
+        },
+    ]
+    ```
+  </Tab>
+  <Tab>
+    <Callout type="info" title={"Coming soon"}>
+    You'll know more about Flask specific configuration in the upcoming version of PyBlade.
+    </Callout>
+  </Tab>
+</Tabs>
+
+### Configuration File
+
+PyBlade requires a configuration file in the root of your project. This file contains settings that control PyBlade's behavior. A basic example looks like this:
+
+```toml title='pyblade.toml'
+name = "my_project"
+framework = "django"
+```
+
+Once this is set up, you can start using PyBlade directives in your templates.
+
+### Configuring PyBlade Live
+
+If you want to use PyBlade Live in your project, you need to configure it in both your framework settings and the PyBlade configuration file.
+
+<Tabs groupId='framework' items={['django', 'flask']}>
+  <Tab>
+    Add PyBlade Live to the list of installed apps in `settings.py`:
+
+    ```python title='settings.py'
+    INSTALLED_APPS = [
+        ...,
+        'pyblade.live',
+    ]
+    ```
+  </Tab>
+  <Tab>
+    <Callout type="info" title={"Coming soon"}>
+    You'll know more about Flask specific configuration in the upcoming version of PyBlade.
+    </Callout>
+  </Tab>
+</Tabs>

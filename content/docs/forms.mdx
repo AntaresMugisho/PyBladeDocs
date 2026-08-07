@@ -217,8 +217,7 @@ The `@field` directive in **PyBlade** simplifies form rendering by generating HT
 
 Let's assume you have a `ContactForm` class in your Django application,
 
-```python
-# forms.py
+```python title='forms.py'
 from django import forms
 
 class ContactForm(forms.Form):
@@ -233,8 +232,7 @@ class ContactForm(forms.Form):
 ```
 ... and want to customize the rendered inputs.
 
-```python
-# view.py
+```python title='views.py'
 from django.shortcuts import render
 from .forms import ContactForm
 

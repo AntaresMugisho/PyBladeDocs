@@ -14,17 +14,29 @@ To display a variable, simply wrap it within double curly braces `{{ }}`.
 
 Assuming you have a variable named `name` passed to the template, you can display it like this:
 
-```python
-# views.py
-from django.shortcuts import render
+<Tabs groupId='framework' items={['django', 'flask']}>
+    <Tab value="django">
+    ```python title='views.py'
+    from django.shortcuts import render
 
-def show_greeting(request):
-    context = {'name': 'John Doe'}
-    return render(request, 'greeting', context)
-```
+    def show_greeting(request):
+        context = {'name': 'John Doe'}
+        return render(request, 'greeting', context)
+    ```
+    </Tab>
+    <Tab value="flask">
+    ```python title='routes.py'
+    from pyblade.flask import render
 
-```html
-<!-- greeting.html -->
+    @app.route('/greeting')
+    def show_greeting():
+        context = {'name': 'John Doe'}
+        return render('greeting', context)
+    ```
+    </Tab>
+</Tabs>
+
+```html title='greeting.html'
 <p>Hello, {{ name }} !</p>
 ```
 
@@ -32,7 +44,6 @@ def show_greeting(request):
 ```html
 <p>Hello, John Doe !</p>
 ```
----
 
 When you insert data using this syntax, PyBlade will automatically escape the content to protect against common vulnerabilities like Cross-Site Scripting (XSS) attacks. For cases where you need to render unescaped HTML, there is [another syntax](#rendering-unescaped-html).
 

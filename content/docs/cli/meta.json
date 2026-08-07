@@ -1,0 +1,9 @@
+{
+  "title": "PyBlade CLI",
+  "root": false,
+  "pages": [
+    "---Overview---",
+    "overview",
+    "Commands"
+  ]
+}
