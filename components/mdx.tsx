@@ -4,8 +4,6 @@ import * as TabsComponents from 'fumadocs-ui/components/tabs';
 import { File, Folder, Files } from 'fumadocs-ui/components/files';
 import { CodeBlock, Pre } from 'fumadocs-ui/components/codeblock';
 
-
-
 export function getMDXComponents(components?: MDXComponents) {
   return {
     ...defaultMdxComponents,

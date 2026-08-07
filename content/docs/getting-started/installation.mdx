@@ -1,60 +1,88 @@
 ---
 title: "Installation"
+description: "Before building with PyBlade, let's make sure your development environment is ready."
 ---
 
+
 <Callout type="warn" title={"Warning: Experimental Feature"}>
-PyBlade is currently in an experimental phase. Although its core features are under active development and continuous testing, you should expect potential bugs, breaking changes, or incomplete functionality.
 
-At this stage, PyBlade is best suited for testing, prototyping, and non-critical environments. If you choose to use it in production, do so with caution and ensure appropriate safeguards are in place.
+PyBlade is currently in an experimental phase. While its core features are actively developed and continuously tested, you may encounter bugs, breaking changes, or incomplete functionality.
 
-Your feedback, bug reports, and real-world usage insights are essential to refining the engine and moving toward a stable release. We appreciate your contribution to the evolution of PyBlade.
+At this stage, PyBlade is best suited for learning, experimentation, prototypes, and non-critical applications. If you decide to use it in production, proceed carefully and make sure you have appropriate testing and safeguards in place.
+
+Your feedback plays an important role in shaping PyBlade. If you encounter a bug, have a suggestion, or want to share your experience, we would love to hear from you.
+
+You can share your feedback, report issues, and suggest improvements through the PyBlade feedback platform: [feedback.pyblade.com](https://feedback.pyblade.com).
+
+Together, we can make PyBlade better for the entire Python community.
+
 </Callout>
 
 
-Before installing PyBlade, ensure you are working within a virtual environment to avoid conflicts with other Python packages. If you haven't set up a virtual environment, create a new one by typing the following command in a terminal:
+### Preparing your environment
+
+Before installing PyBlade, we recommend using a Python virtual environment. A virtual environment keeps your project dependencies isolated and prevents conflicts with other Python packages installed on your system.
+
+If you do not already have one, create a new virtual environment:
 
 ```bash
 python -m venv .env
 ```
 
-Then, activate the virtual environment by running:
+Activate it using the command corresponding to your operating system:
 
-**On macOS or Linux**
-```bash
-source .env/bin/activate
-```
-
-**On Windows**
-```bash
-.env\Scripts\activate
-```
-
-Once the virtual environment is activated, install PyBlade using your preferred package manager:
-
-<Tabs groupId="package-manager" items={['pip', 'poetry', 'uv']}>
-  <Tab value="pip">
+<Tabs groupId="os" items={["macOS", "Linux", "Windows"]}>
+  <Tab>
     ```bash
-    pip install pyblade
+    source .env/bin/activate
     ```
   </Tab>
-  <Tab value="poetry">
+  <Tab>
     ```bash
-    poetry add pyblade
+    source .env/bin/activate
     ```
   </Tab>
-  <Tab value="uv">
+  <Tab>
     ```bash
-    uv add pyblade
+    .env\Scripts\activate
     ```
   </Tab>
 </Tabs>
 
-PyBlade ships with a powerful Command Line Interface (CLI) designed to streamline your development workflow from initializing projects and managing dev servers to generating templates and reactive components.
+Once your virtual environment is active, you can install PyBlade using your preferred package manager.
 
-To verify that PyBlade was installed successfully and that the CLI is ready to use, run:
+<Tabs groupId="package-manager" items={['pip', 'poetry', 'uv']}>
+  <Tab>
+  ```bash
+  pip install pyblade
+  ```
+  </Tab>
+
+  <Tab>
+  ```bash
+  poetry add pyblade
+  ```
+  </Tab>
+
+  <Tab>
+  ```bash
+  uv add pyblade
+  ```
+  </Tab>
+</Tabs>
+
+### Verify the installation
+
+PyBlade includes a Command Line Interface (CLI) that helps you manage your development workflow. It provides tools for initializing projects, running development utilities, and generating PyBlade resources such as templates and components.
+
+To make sure PyBlade was installed correctly, run:
 
 ```bash
 pyblade -v
 ```
 
-This will display the installed version of PyBlade, confirming the installation was successful. You are now ready to use PyBlade in your project.  
+This will display the installed version of PyBlade, confirming the installation was successful.
+
+You are now ready to start building with PyBlade. Let's create your first PyBlade project.
+
+

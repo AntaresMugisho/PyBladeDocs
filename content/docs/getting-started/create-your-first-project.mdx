@@ -1,0 +1,286 @@
+---
+title: "Create your first Project"
+description: "Now that PyBlade is installed, let's create your first project and make sure everything is working correctly."
+---
+
+PyBlade comes with a built-in **Command Line Interface (CLI)** that helps you perform common development tasks. The CLI can create projects, generate templates and components, run development tools, and simplify your daily workflow.
+
+We will explore all available PyBlade CLI commands in detail later. For now, let's use the CLI to initialize your first project.
+
+## Initialize a PyBlade project
+
+To create a new PyBlade project, run:
+
+```bash
+pyblade init
+```
+
+PyBlade will guide you through the setup process and ask you a few questions:
+
+1. **Project name** — Choose a name for your project. You can use `.` to initialize PyBlade directly in the current directory.
+
+2. **Python web framework** — Select the framework your project uses. Currently, PyBlade supports Django.
+
+After answering these questions, PyBlade will initialize your project based on the selected framework and prepare everything you need to start developing.
+
+During this process, PyBlade creates the required project structure and adds a `pyblade.toml` file at the root of your project.
+
+This file contains PyBlade's configuration and allows the engine and CLI to understand your project. You can use it later to customize PyBlade's behavior, but for now, the default configuration is all you need.
+
+With the setup complete, you can start building your application without worrying about additional configuration.
+
+## Start the development server
+
+Once your project has been initialized, you can start the development server with:
+
+```bash
+pyblade serve
+```
+
+This command starts your application and launches the development environment.
+
+Open your browser and visit:
+
+```
+http://127.0.0.1:8000
+```
+
+If everything is configured correctly, you should see your PyBlade project running.
+
+## Create a PyBlade template
+
+PyBlade templates are regular `.html` files, so you can always create them manually wherever you need them.
+
+For example, you could simply create:
+
+```files
+templates
+└── welcome.html
+```
+
+However, when working on a project, creating files manually can become repetitive. For convenience, PyBlade provides a dedicated CLI command for generating templates:
+
+```bash
+pyblade make:template welcome
+```
+
+This creates a new `welcome.html` template in the appropriate templates directory with the basic HTML structure.
+
+You can also specify a path when you want to organize your templates into subdirectories:
+
+```bash
+pyblade make:template pages.welcome
+```
+
+This will create:
+
+```files
+templates
+└── pages
+    └── welcome.html
+```
+
+The CLI is designed to make common tasks like this quick and consistent. You are never required to use it, though—PyBlade templates are just HTML files, so you can create and organize them manually whenever you prefer.
+
+We'll explore the other `make:` commands and the rest of the PyBlade CLI later.
+
+
+### Where should your templates live?
+
+One important thing to understand is that PyBlade does not introduce a new project structure. It follows the conventions of the web framework you are using.
+
+Whether you're working with Django, Flask, or another supported framework, your templates are organized according to that framework's standard structure. PyBlade simply integrates with the existing template system.
+
+For example, Django gives you some flexibility: you can keep templates in a project-level `templates` directory, or organize them inside individual applications. Flask, on the other hand, conventionally looks for templates in a `templates` directory at the root of the application.
+
+<Tabs groupId="framework" items={['django', 'flask']}>
+    <Tab>
+
+    Django supports both project-level and application-level templates.
+
+    A project-level `templates` directory can be shared across your entire project:
+
+    <Files>
+    <Folder name="my_project" defaultOpen>
+        <Folder name="my_app">
+            <File name="views.py" />
+            <File name="urls.py" />
+        </Folder>
+        <Folder name="templates" defaultOpen>
+            <File name="welcome.html" />
+        </Folder>
+        <File name="manage.py" />
+        <File name="pyblade.toml" />
+    </Folder>
+    </Files>
+
+    You can also keep templates inside an individual Django app:
+
+    <Files>
+    <Folder name="my_project" defaultOpen>
+        <Folder name="my_app" defaultOpen>
+            <Folder name="templates" defaultOpen>
+                <Folder name="my_app">
+                    <File name="welcome.html" />
+                </Folder>
+            </Folder>
+            <File name="views.py" />
+            <File name="urls.py" />
+        </Folder>
+        <File name="manage.py" />
+        <File name="pyblade.toml" />
+    </Folder>
+    </Files>
+
+    Both approaches are supported. Choose the organization that makes the most sense for your project.
+    </Tab>
+
+    <Tab>
+    Flask conventionally looks for templates inside a `templates` directory at the root of your application:
+
+    <Files>
+    <Folder name="my_project" defaultOpen>
+        <Folder name="static" />
+        <Folder name="templates" defaultOpen>
+            <File name="welcome.html" />
+        </Folder>
+        <File name="app.py" />
+        <File name="pyblade.toml" />
+    </Folder>
+    </Files>
+
+    You can organize your templates into subdirectories as your application grows.
+
+    </Tab>
+</Tabs>
+
+This framework-aligned approach means you don't have to learn a completely different project structure just because you're using PyBlade. If you already know how your framework organizes templates, you already know where your PyBlade templates belong.
+
+Now, let's open the generated `welcome.html` file and replace its contents with the following:
+
+```html title="templates/welcome.html"
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My First PyBlade Template</title>
+</head>
+<body>
+    <h1>Hello from PyBlade!</h1>
+    <p>Your first PyBlade template is working.</p>
+</body>
+</html>
+```
+
+There is nothing special here yet. It is just HTML and that's exactly the point.
+
+A PyBlade template starts as regular HTML. You can use everything you already know about HTML and gradually add PyBlade's features when you need them.
+
+Now let's render it.
+
+
+## Rendering PyBlade templates
+
+Our template is ready, but there is one last step before we can see it in the browser: we need to tell our framework, which URL should display it.
+
+
+<Tabs groupId="framework" items={['django', 'flask']}>
+    <Tab>
+        First, create a view that renders the template:
+
+        ```python title="views.py"
+        from django.shortcuts import render
+
+        def welcome_view(request):
+            return render(request, "welcome")
+        ```
+
+        Then, open your project's `urls.py` and connect the `welcome/` URL to this view:
+
+        ```python title="urls.py"
+        from django.urls import path
+        from .views import welcome_view
+
+        urlpatterns = [
+            path("welcome/", welcome_view, name="welcome"),
+        ]
+        ```
+
+        To render `welcome.html` from the Django app's `my_app/templates/my_app/` directory, use the template path without the `.html` extension and use dots to separate folders:
+
+        ```python title="views.py"
+        from django.shortcuts import render
+
+        def welcome_view(request):
+            return render(request, "my_app.welcome")
+        ```
+
+        This notation keeps template references short and consistent across your project.
+
+        <Callout type="info" title={"Important"}>
+
+        For compatibility, PyBlade also supports the traditional Django template notation:
+
+        ```python title="views.py"
+        return render(request, "my_app/welcome.html")
+        ```
+
+        Both formats work, but the dot notation is the recommended approach for PyBlade projects.
+
+        </Callout>
+    </Tab>
+
+    <Tab>
+
+        Open your app's `routes.py` and connect the `/welcome` URL to this view:
+
+        ```python title="routes.py"
+        from flask import Flask
+        from pyblade.flask import render
+
+        app = Flask(__name__)
+
+        @app.route("/welcome")
+        def welcome():
+            return render("welcome")
+        ```
+    </Tab>
+</Tabs>
+
+
+
+Start your development server if it is not already running:
+
+```bash
+pyblade serve
+```
+
+Now open the following address in your browser:
+
+```text
+http://127.0.0.1:8000/welcome/
+```
+
+You should see your first PyBlade page. And that's it. You've just created and rendered your first PyBlade template.
+
+So far, there is nothing particularly magical happening: Your framework handles the request, PyBlade processes the template, and the resulting HTML is sent to the browser.
+
+
+## What's next?
+
+Congratulations! You have created your first PyBlade project and successfully prepared your development environment.
+
+Now it is time to discover what makes PyBlade unique: its expressive template system.
+
+In the next sections, you will learn how to:
+
+* Display dynamic data inside your templates.
+* Use PyBlade directives such as `@if`, `@for`, and `@include`.
+* Create reusable components.
+* Organize your pages with layouts and template inheritance.
+* Build interactive interfaces with PyBlade Live.
+
+PyBlade starts with a simple idea: write HTML, add the power of Python, and let the framework handle the complexity.
+
+Let's explore the core of PyBlade.
