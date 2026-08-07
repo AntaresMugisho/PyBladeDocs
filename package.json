@@ -11,6 +11,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@fumadocs/base-ui": "^16.14.2",
     "cnfast": "^0.0.8",
     "fumadocs-core": "16.11.5",
     "fumadocs-mdx": "15.2.0",
