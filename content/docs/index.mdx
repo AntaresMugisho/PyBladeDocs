@@ -1,0 +1,162 @@
+---
+title: "Meet PyBlade"
+description: "What is PyBlade ?"
+icon: Handshake
+---
+
+
+**PyBlade is a lightweight, reactive template engine for Python.** *It allows you to build dynamic, interactive web interfaces using pure Python and HTML, bringing modern server-driven reactivity to your web apps without requiring complex JavaScript frameworks.*
+
+
+## Introduction
+
+PyBlade brings an expressive `@`-based template syntax and seamless server-driven reactivity to the Python web ecosystem. Inspired by modern web development paradigms, PyBlade lets you build dynamic and interactive user interfaces using Python and HTML—the technologies you already know—without requiring a complex JavaScript setup.
+
+Before diving into PyBlade, it is useful to understand a few basic terms that will be used throughout this documentation.
+
+A **template engine** is a tool that takes a template containing static HTML and dynamic instructions, processes it on the server, and produces the final HTML that is sent to the browser. Templates allow you to generate dynamic pages by combining regular HTML with variables, conditions, loops, components, and other programming constructs.
+
+In PyBlade, these instructions are called **directives**. A directive is a special instruction recognized by PyBlade and written using the `@` prefix. For example, `@if`, `@for`, and `@trans` are all PyBlade directives.
+
+Some directives closely resemble Python keywords, such as `@if`, `@elif`, `@for`, `@break`, `@match`, and `@case`. Others are specific to PyBlade and provide features designed for templating, such as `@endif`, `@empty`, `@component`, and `@error`.
+
+You may notice that some directives come in pairs, such as `@if` and `@endif`, or `@for` and `@endfor`. These are **block directives**. The opening directive tells PyBlade where a block begins, while the corresponding `@end...` directive tells it where the block ends.
+
+For example:
+
+```html
+@if (user.is_authenticated)
+    <p>Welcome, {{ user.name }}!</p>
+@endif
+```
+
+Here, `@if` starts the conditional block and `@endif` explicitly closes it. Similarly:
+
+```html
+@for (user in users)
+    <p>{{ user.name }}</p>
+@endfor
+```
+
+The `@end...` syntax is intentional. Although Python uses indentation to define blocks, HTML templates have their own structure and can contain arbitrary whitespace and nested markup. Explicit closing directives make the boundaries of template blocks unambiguous and allow PyBlade to parse templates reliably, regardless of formatting or indentation.
+
+We call any HTML file that can contain PyBlade directives a **PyBlade template**. PyBlade templates use the `.html` extension and are typically stored in the `templates` directory of your application.
+
+PyBlade processes these templates before they are sent to the browser. Templates are compiled into efficient rendering instructions and can be cached for reuse, minimizing the work required on subsequent requests. The browser ultimately receives standard HTML, so PyBlade introduces no client-side runtime requirement for basic template rendering.
+
+Whether you are using Django, Flask, FastAPI, or Litestar, PyBlade fits naturally into your existing stack as a lightweight, framework-agnostic template engine focused on simplicity, security and developer productivity.
+
+Throughout this documentation, we will use terms such as **template**, **directive**, **block directive**, **component**, and **rendering**. Understanding these concepts will make the rest of the PyBlade documentation much easier to follow.
+
+## Why PyBlade? (The problem it solves)
+
+Building modern web applications with Python often means choosing between two very different approaches.
+
+On one side, you have **traditional server-side template engines** such as Django Template Engine and Jinja2. They are simple, reliable, and excellent for rendering HTML on the server. However, their template syntax can become verbose, especially when templates contain many control structures. For example, template logic is typically written using `{% ... %}` blocks:
+
+```html
+{% if user.is_authenticated %}
+    {% for item in items %}
+        ...
+    {% endfor %}
+{% endif %}
+```
+
+While this syntax works well, the repeated `{% %}` delimiters can make templates visually noisy, particularly in complex pages with deeply nested conditions and loops. PyBlade uses a more concise `@`-based syntax:
+
+```html
+@if (user.is_authenticated)
+    @for (item in items)
+        ...
+    @endfor
+@endif
+```
+
+More importantly, as a server-rendered application becomes increasingly interactive, developers often end up adding JavaScript, custom API endpoints, and client-side logic to handle things such as form submissions, UI updates, and user interactions. What started as a simple server-rendered application can gradually become a collection of disconnected pieces.
+
+On the other side, you have **full frontend frameworks** such as React and Vue. These provide powerful tools for building highly interactive interfaces, but they also introduce an additional frontend ecosystem: Node.js, npm, bundlers, build pipelines, client-side state management, and a second programming language. For many applications, this can add significant complexity for interactions that could otherwise be handled by the server.
+
+### The PyBlade approach
+
+**PyBlade bridges the gap between these two worlds.**
+
+It keeps the simplicity and productivity of server-side rendering while providing the reactive behavior developers expect from modern web applications.
+
+With PyBlade, you get:
+
+* **An expressive template syntax** — Use intuitive directives such as `@if`, `@for`, `@extends`, and `@component` to structure your templates with less visual noise and boilerplate.
+
+* **Server-driven reactivity** — Keep your application logic in Python while PyBlade handles the communication required to update the interface when state changes.
+
+* **No full-page reloads** — PyBlade can update only the parts of the page that need to change, making interactions feel fast and responsive without requiring you to build a separate client-side application.
+
+* **Python and HTML in harmony** — Build your interface using technologies you already understand. PyBlade handles template compilation, event handling, server communication, and DOM updates behind the scenes.
+
+* **A progressive approach** — You do not have to turn your entire application into a reactive application. You can use PyBlade simply as a template engine and introduce interactive components only where they provide value.
+
+The result is a development model where **the server remains the source of truth**, while the browser stays synchronized with it. You can build interfaces that feel like modern single-page applications (SPA) without having to build and maintain a separate frontend application.
+
+PyBlade is not trying to replace every frontend framework. Instead, it provides a simpler alternative when your application benefits from server-driven interfaces and you want to keep your development experience centered around Python.
+
+## The Story behind PyBlade
+
+> *Why can't template rendering in Python feel as seamless as modern full-stack frameworks?*
+
+PyBlade started with a simple frustration.
+
+After learning Python, PHP and Laravel, I became particularly fond of Django. Its architecture felt powerful, mature, and thoughtfully designed. But coming from Laravel, there was one part of the experience I kept missing: the simplicity and expressiveness of its templating system.
+
+Django's template engine worked well, but I found its syntax more verbose than I wanted, especially when templates became more complex. Jinja provided a familiar alternative, but it did not really address what I was looking for. I wanted something that felt cleaner, more expressive, and more natural to write.
+
+So I started asking myself: **What would a template engine designed around that experience look like in Python?**
+
+Instead of simply imagining the answer, I decided to find out.
+
+I began researching how template engines work internally—how templates are tokenized, parsed, represented as nodes, and eventually rendered into HTML. What started as curiosity quickly turned into experimentation, and those experiments became the first prototype of **PyBlade**.
+
+But once the foundation of the template engine started taking shape, another question became impossible to ignore:
+
+**What about reactivity?**
+
+A good template engine can render HTML, but modern applications need more than rendering. Forms need to submit without full-page reloads. Components need to respond to user interactions. Data needs to change and the interface needs to follow.
+
+At the time, tools such as HTMX already provided an elegant way to add server-driven interactions, while React, Vue, and other JavaScript frameworks had become the dominant approach to building reactive interfaces. But I was looking for something different: an experience where reactivity could live naturally alongside the server-side template and application logic.
+
+That is where Laravel Livewire became an important source of inspiration.
+
+Livewire demonstrated that it was possible to build highly interactive interfaces while keeping the application logic on the server and the developer experience centered around Blade and PHP. One quote from Laravel's creator, Taylor Otwell, captured the idea particularly well:
+
+> *Livewire takes Blade to the next level — it's basically what Blade should be by default.*
+
+That idea resonated with the direction PyBlade was already taking.
+
+What if Python developers could have that same experience?
+
+What if a template engine could start simple—just HTML and expressive directives—but also provide a natural path toward server-driven, reactive components without requiring developers to build and maintain a separate JavaScript application?
+
+That became the vision for PyBlade.
+
+As the project grew beyond a template parser, it became clear that building the reactive side would require a dedicated frontend execution and DOM manipulation layer. That's when my friend **Crespo** joined the project. He took on the frontend side of the system, working on the client-side execution and DOM manipulation, while I continued focusing on the core engine: parsing, directives, rendering, and Python integrations.
+
+Together, what started as a personal search for a better template syntax gradually became something much bigger: an attempt to bring a modern, server-driven development experience to the Python ecosystem.
+
+Today, PyBlade is built around that original idea: **keep the simplicity of server-side development, make templates expressive, and make reactivity feel like a natural part of the same application—not a separate frontend you have to build around it.**
+
+## Make It Yours
+
+PyBlade was created from a developer's desire for a better experience, but its future belongs to the community that builds with it.
+
+Open-sourcing PyBlade means more than making the code publicly available. It means creating a place where Python developers can share ideas, improve the framework, build new features, report issues, and help shape the direction of the project.
+
+Whether you use PyBlade in your applications, experiment with its internals, improve the documentation, or simply share your experience with others, every contribution helps the project grow.
+
+If you believe in the vision behind PyBlade, consider becoming part of the journey. Give the project a star on GitHub, share it with other developers, contribute code, or open discussions about how it can become better.
+
+**PyBlade started as an idea. Together, we can turn it into a framework built by and for the Python community.**
+
+## Enough theory — let's build something.
+Now that you understand why PyBlade exists and the ideas behind it, it is time to see it in action.
+
+In the next section, we will install PyBlade, create your first template, and explore the core concepts that will allow you to start building expressive and reactive interfaces with Python.
+
+Let's get started.

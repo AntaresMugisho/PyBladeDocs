@@ -4,11 +4,10 @@
   "defaultOpen": true,
   "pages": [
     "---Overview---",
-    "meet-pyblade",
+    "index",
     "getting-started",
 
     "---PyBlade: Template Engine---",
-    "prelude",
     "displaying-data",
     "pyblade-directives",
     "components",
@@ -16,6 +15,7 @@
     "forms",
 
     "live",
+    "cli",
 
     "---Outro---",
     "future-features",
