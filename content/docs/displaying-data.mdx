@@ -1,63 +1,118 @@
 ---
 title: "Displaying data in PyBlade"
+description: "Now that you have a working PyBlade project, let's make your templates dynamic."
 ---
 
-In PyBlade, displaying data inside templates is straightforward and designed to feel intuitive for developers. To display data, PyBlade uses the `{{ }}` syntax, which is both secure and simple to use.
+One of the most common things you'll do in a template is display data provided by your application.
 
-Here's how you can display data in PyBlade templates:
+So far, our template contains only static HTML. Let's make it a little more useful by passing data from our Python application into the template.
 
-## Basic variable display
+The process is simple:
 
-To display a variable, simply wrap it within double curly braces `{{ }}`.
+1. Your application creates or retrieves some data.
+2. The data is passed to the template as part of the template context.
+3. The template uses PyBlade's `{{ }}` syntax to display that data.
 
-**Example**
+## Passing data to a template
 
-Assuming you have a variable named `name` passed to the template, you can display it like this:
+The exact way you pass data to a template depends on the web framework you're using. Let's look at a simple example with Django and Flask.
 
 <Tabs groupId='framework' items={['django', 'flask']}>
-    <Tab value="django">
-    ```python title='views.py'
+    <Tab>
+    ```python
     from django.shortcuts import render
 
     def show_greeting(request):
-        context = {'name': 'John Doe'}
-        return render(request, 'greeting', context)
+        context = {
+            "name": "John Doe",
+        }
+
+        return render(request, "greeting", context)
     ```
+
+    In Django, data is passed to a template through the `context` dictionary. Here, we are passing a `name` variable containing `"John Doe"`.
+
     </Tab>
-    <Tab value="flask">
-    ```python title='routes.py'
+    <Tab>
+
+    ```python
     from pyblade.flask import render
 
-    @app.route('/greeting')
+    @app.route("/greeting")
     def show_greeting():
-        context = {'name': 'John Doe'}
-        return render('greeting', context)
+        context = {
+            "name": "John Doe",
+        }
+
+        return render("greeting", context)
     ```
+    Flask works in a similar way. We pass the data as part of the context when rendering the template.
     </Tab>
 </Tabs>
 
-```html title='greeting.html'
-<p>Hello, {{ name }} !</p>
+Once the data has been passed to the template, we can access it using PyBlade's `{{ }}` syntax.
+
+## Displaying a variable
+
+To display a value, place its name between double curly braces:
+
+```html title="templates/greeting.html"
+<p>Hello, {{ name }}!</p>
 ```
 
-**Output**
+When PyBlade renders this template, `{{ name }}` is replaced with the value of the `name` variable.
+
+Since our application passed `"John Doe"` as the value of `name`, the resulting HTML will be:
+
 ```html
-<p>Hello, John Doe !</p>
+<p>Hello, John Doe!</p>
 ```
 
-When you insert data using this syntax, PyBlade will automatically escape the content to protect against common vulnerabilities like Cross-Site Scripting (XSS) attacks. For cases where you need to render unescaped HTML, there is [another syntax](#rendering-unescaped-html).
+That's all you need to display a variable in a PyBlade template.
+
+The `{{ }}` syntax can be used to display strings, numbers, object properties, and other values available in the template context. We'll explore these possibilities throughout this section.
+
+### Automatic HTML escaping
+
+Values displayed with `{{ }}` are automatically HTML-escaped by PyBlade.
+
+For example, if `name` contains:
+
+```text
+<script>alert("Hello")</script>
+```
+
+PyBlade will escape the HTML instead of interpreting it as markup. This helps protect your application against common Cross-Site Scripting (XSS) vulnerabilities when displaying data coming from untrusted sources such as user inputs.
+
+This escaping happens automatically, so `{{ }}` should be your default syntax for displaying data.
+
+Sometimes, you may intentionally want to render HTML without escaping it. PyBlade provides a separate syntax for that use case, which we'll cover in [Rendering Unescaped HTML](#rendering-unescaped-html).
 
 ## Displaying data with default values
 
-In PyBlade, you can define fallback values directly inside `{{ ... }}` using the Python `or` operator.
-This is particularly useful when a variable may be undefined or evaluates to a falsy value (`None`, empty string, etc.).
+Sometimes, a variable may be available in the template context but empty or otherwise evaluate to a falsy value. In these cases, you can provide a fallback directly in your template using Python's `or` operator.
 
-**Example**
+For example:
 
-If you want to display `name`, but fall back to `"Guest"` when `name` is not defined or is falsy, you can write:
-```html
-<p>Hello, {{ name or 'Guest' }} !</p>
+```html id="x8k3pm"
+<p>Hello, {{ name or "Guest" }}!</p>
 ```
+
+If `name` contains `"John Doe"`, PyBlade displays it:
+
+```html id="k4z7qn"
+<p>Hello, John Doe!</p>
+```
+
+If `name` is defined but contains a falsy value, such as `None` or an empty string, PyBlade uses `"Guest"` instead:
+
+```html id="n2r6vc"
+<p>Hello, Guest!</p>
+```
+
+Keep in mind that `or` does not silently handle undefined variables. If `name` has not been defined in the template context, PyBlade raises a `NameError` and displays a detailed error page showing where the error occurred and providing a quick fix to help you resolve it.
+
+This behavior helps you catch missing data early instead of silently hiding mistakes in your templates.
 
 ## Rendering unescaped HTML
 
@@ -106,103 +161,124 @@ The browser will render
 Now the `<strong>` tag is parsed and applied correctly.
 
 <Callout type="warn">
-Rendering unescaped content is dangerous especially if the data comes from users.
+Rendering unescaped content is dangerous especially if the data comes from untrusted sources.
 Use `{!! !!}` with caution. Always ensure that the content is trusted and safe before rendering.
 </Callout>
 
-## Dictionary key access with dot notation
+## Accessing nested values
 
-In PyBlade, dictionary keys can be accessed using **dot notation** when the key is a valid identifier.
+When working with data in your templates, you will often need to access values nested inside dictionaries, lists, or tuples.
 
-This means you can write:
+PyBlade provides a convenient dot notation that makes navigating this data concise and readable. You can use it to access dictionary keys, sequence indexes, and combine both when working with nested structures.
+
+### Dictionary keys
+
+When a dictionary key is a valid Python identifier, you can access it using dot notation.
+
+For example, instead of writing:
 
 ```html
-{{ my_dict.key }}
+{{ customer["name"] }}
 ```
 
-Instead of:
+you can write:
 
 ```html
-{{ my_dict["key"] }}
+{{ customer.name }}
 ```
-Both are equivalent and will produce the same result.
 
-**Example**
+Both forms access the same value.
 
-Given:
+Suppose your application provides the following context:
 
 ```python
 context = {
-    "user": {
+    "customer": {
         "name": "Alice",
         "email": "alice@example.com",
     }
 }
 ```
 
-You can write:
+You can access the customer's name using:
 
 ```html
-{{ user.name }}
+<p>{{ customer.name }}</p>
 ```
 
-Output:
-
-```
-Alice
-```
-
-
-<Callout type="info" title={"Good to know"}>
-Dictionary key access with dot notation works only if the key is a valid alphanumeric identifier.
-
-If the key contains whitespaces or unsupported special characters, use bracket syntax:
+Which produces:
 
 ```html
-{{ my_dict.key }}           # valid  // [!code ++]
-{{ my_dict.other_key }}     # valid  // [!code ++]
-{{ my_dict.1 }}             # valid  // [!code ++]
-{{ my_dict.first-name }}    # invalid  // [!code --]
-{{ my_dict.first name }}    # invalid  // [!code --]
-{{ my_dict.user id }}       # invalid  // [!code --]
+<p>Alice</p>
 ```
-</Callout>
 
-## Index access with dot notation
+Dot notation also works with nested dictionaries:
 
-PyBlade allows convenient access to data of type `list` and `tuple` using the `.index` notation.
+```python
+context = {
+    "customer": {
+        "address": {
+            "city": "Goma",
+        }
+    }
+}
+```
 
-**Example**
+You can access the city with:
 
-Given the following context:
+```html
+<p>{{ customer.address.city }}</p>
+```
+
+Which produces:
+
+```html
+<p>Goma</p>
+```
+
+### List and tuple indexes
+
+The same notation can be used to access elements of lists and tuples.
+
+In regular Python syntax, you would access an element using brackets:
+
+```html
+{{ countries[0] }}
+```
+
+PyBlade also lets you use the index directly after a dot:
+
+```html
+{{ countries.0 }}
+```
+
+For example:
+
 ```python
 context = {
     "countries": ["France", "Germany", "Japan"],
 }
 ```
 
-Instead of writing bracket syntax:
+You can access the first country with:
 
 ```html
-{{ countries[0] }}
+<p>{{ countries.0 }}</p>
 ```
 
-You can access elements like this:
+Which produces:
 
 ```html
-{{ countries.0 }}
+<p>France</p>
 ```
 
-**Output:**
-```
-France
-```
+Both `countries[0]` and `countries.0` access the same element. The dot notation simply provides a shorter and more consistent way to navigate data in your templates.
 
-Both methods work, but the dot-index notation is more readable and less verbose.
+### Combining keys and indexes
 
-### Chained access
+You can freely combine dictionary keys and sequence indexes to navigate more complex data structures.
 
-Dot-index notation also works in nested expressions:
+For example:
 
 ```python
 context = {
@@ -214,30 +290,65 @@ context = {
 }
 ```
 
-You may combine attribute access and index access freely:
+You can access the name of the second country with:
 
 ```html
-{{ countries.1.name }}
+<p>{{ countries.1.name }}</p>
 ```
 
-**Output:**
-```
-Germany
+PyBlade first accesses index `1` of `countries`, then accesses the `name` key of the resulting dictionary.
+
+The result is:
+
+```html
+<p>Germany</p>
 ```
 
-### Negative indexing
+You can continue chaining access as deeply as your data requires:
 
-You can also use negative index to access elements from the end of a list:
+```html
+{{ customer.address.city }}
+{{ countries.0.name }}
+{{ orders.1.customer.name }}
+```
+
+### Negative indexes
+
+Negative indexes work just like they do in Python. They let you access elements from the end of a list or tuple.
+
+For example, `-1` refers to the last element:
 
 ```html
 {{ countries.-1.name }}
 ```
 
-**Output:**
-```
+With our previous example, this produces:
+
+```text
 Japan
 ```
 
+Likewise, `-2` refers to the second-to-last element, `-3` to the third-to-last element, and so on.
+
+<Callout type="info" title={"Good to know"}>
+
+Dot notation is a convenient alternative to bracket notation, not a replacement for it. You can still use regular Python-style indexing and key access whenever you need it:
+
+```html
+{{ countries[0] }}
+{{ customer["name"] }}
+{{ countries[1]["name"] }}
+```
+
+For dictionary keys, dot notation is available when the key is a valid Python identifier. Keys containing spaces, hyphens, or other unsupported characters must use bracket notation:
+
+```html
+{{ my_dict["first-name"] }}
+{{ my_dict["first name"] }}
+{{ my_dict["user id"] }}
+```
+
+</Callout>
 
 ## Using filters on variables
 
@@ -309,67 +420,144 @@ Keep template logic simple; heavy computations should occur in view code, passin
 </Callout>
 
 ## PyBlade and JavaScript Frameworks
-Since many JavaScript frameworks also use "curly" braces to indicate a given expression should be displayed in the browser, you may use the `@` symbol to inform the PyBlade rendering engine an expression should remain untouched. For example:
 
-```html
+PyBlade is designed to work well with the rest of your frontend stack. You can use it alongside JavaScript frameworks and libraries such as React, Vue, Alpine.js, or any other tool that uses its own template syntax.
+
+This can sometimes create a small problem: both PyBlade and your JavaScript framework may use curly braces to represent expressions.
+
+For example, PyBlade uses:
+
+```html id="4j8n2v"
+<p>{{ name }}</p>
+```
+
+But your JavaScript framework might also use `{{ name }}` for its own client-side expressions.
+
+When this happens, you need a way to tell PyBlade:
+
+> This expression belongs to the frontend. Leave it alone.
+
+### Escaping a PyBlade expression
+
+You can prefix the expression with `@`:
+
+```html id="8v5q1m"
 <div class="container">
     Hello, @{{ name }}.
 </div>
 ```
 
-In this example, the `@` symbol will be removed by PyBlade; however, `{{ name }}` expression will remain untouched by the PyBlade Template engine, allowing it to be rendered by your JavaScript framework.
+When PyBlade processes this template, it removes the `@` and leaves the expression untouched:
 
-If you are displaying JavaScript variables in a large portion of your template, you may wrap the HTML in the [`@verbatim`](#the-verbatim-directive) directive so that you do not have to prefix each "curly" braces statement with an `@`symbol.
+```html id="x6r9pk"
+<div class="container">
+    Hello, {{ name }}.
+</div>
+```
 
-```html
+PyBlade does not evaluate `{{ name }}` in this case. The expression is left in the generated HTML so that the JavaScript framework responsible for that syntax can process it later.
+
+This is useful when a template contains only a few expressions belonging to your frontend framework.
+
+### Ignoring PyBlade processing for a block
+
+If a larger portion of your template contains client-side expressions, prefixing every expression with `@` can quickly become repetitive.
+
+For these situations, PyBlade provides the `@verbatim` directive. Everything between `@verbatim` and `@endverbatim` is passed through without being processed by PyBlade:
+
+```html id="q3m7ws"
 @verbatim
     <div class="container">
         Hello, {{ name }}.
     </div>
 @endverbatim
 ```
-## The `@verbatim` directive
 
-The `@verbatim` directive in PyBlade prevents the engine from parsing the enclosed content, rendering it exactly as written. This is useful when working with JavaScript frameworks or when displaying raw template syntax.
+The resulting HTML will contain the original expression:
 
-**Example**
+```html id="v2k8cx"
+<div class="container">
+    Hello, {{ name }}.
+</div>
+```
 
-```html
+This allows your JavaScript framework to take full control of that section.
+
+### Choosing between the two
+
+Use `@{{ ... }}` when you only need to escape an occasional expression:
+
+```html id="m4j8sa"
+<h1>{{ title }}</h1>
+
+<!-- Handled by your JavaScript framework -->
+<div>{{ clientSideValue }}</div>
+```
+
+becomes:
+
+```html id="r8f3wp"
+<h1>{{ title }}</h1>
+
+<div>@{{ clientSideValue }}</div>
+```
+
+Use `@verbatim` when an entire section contains expressions that should not be interpreted by PyBlade:
+
+```html id="e7q2nd"
 @verbatim
-    <script>
-        let app = {
-            message: "{{ message }}"
-        }
-    </script>
-
-    @if(True)
-        This won't be processed by PyBlade.
-    @endif
+    <div>
+        {{ clientSideValue }}
+        {{ anotherValue }}
+        {{ computedValue }}
+    </div>
 @endverbatim
 ```
 
-**Output**
+This makes it easy to use PyBlade alongside JavaScript frameworks and other tools that have their own template syntax.
+
+## The `@verbatim` directive
+
+The `@verbatim` directive tells PyBlade to leave everything inside the block untouched. PyBlade will not try to evaluate expressions or process directives contained within it.
+
+This is useful when you need to include template-like syntax that belongs to another system, or when you simply want a section of your template to be passed through exactly as written.
+
+For example:
 
 ```html
-<script>
-    let app = {
-        message: "{{ message }}"
-    }
-</script>
-
-@if(True)
-    This won't be processed by PyBlade.
-@endif
+@verbatim
+    <pre>
+        <code>
+            <p>{{ user.name }}</p>
+            @if(user.is_admin)
+                <span>Administrator</span>
+            @endif
+        </code>
+    </pre>
+@endverbatim
 ```
 
-**Explaination**
+PyBlade will produce:
 
-- **Without `@verbatim`**: The template engine would try to parse `{{ message }}` and the `@if` statement, assuming it's a PyBlade directive.
-- **With `@verbatim`**: The engine ignores the enclosed content and outputs it exactly as written.
+```html
+ <pre>
+    <code>
+        <p>{{ user.name }}</p>
+        @if(user.is_admin)
+            <span>Administrator</span>
+        @endif
+    </code>
+</pre>
+
+```
+
+Notice that neither `{{ user.name }}` nor `@if` is interpreted. The entire block is treated as plain content.
+
+This is an important distinction: `@verbatim` does not only protect expressions from being evaluated. It also prevents PyBlade directives from being processed.
 
 ## The `@spaceless` directive
 
-Normally, when you write HTML, you might format it for readability, introducing extra spaces and line breaks:  
+When writing HTML, it is common to format your markup with indentation and line breaks to make the template easier to read:
 
 ```html
 <p>
@@ -377,7 +565,7 @@ Normally, when you write HTML, you might format it for readability, introducing 
 </p>
 ```
 
-While this makes the template more readable, it also adds unnecessary whitespace to the rendered HTML. Using `@spaceless`, you can remove these spaces between tags without affecting the actual content:  
+Those line breaks and spaces are also present in the rendered HTML. If you don't need that whitespace, you can use the `@spaceless` directive to remove whitespace between HTML tags.
 
 ```html
 @spaceless
@@ -387,18 +575,15 @@ While this makes the template more readable, it also adds unnecessary whitespace
 @endspaceless
 ```
 
-This will render as:  
+PyBlade will render:
 
 ```html
 <p><a href="foo/">Foo</a></p>
 ```
 
-As you can see, all spaces between the HTML tags have been removed, making the output cleaner.  
+The directive removes whitespace between HTML tags, including spaces, tabs, and line breaks. It does not remove whitespace that is part of the text content itself.
 
-The `@spaceless` directive in PyBlade removes whitespace between HTML tags. This includes tab characters and newlines.
-
-
-The directive only removes space between HTML tags — it does not strip spaces inside text content. Consider the following example:  
+For example:
 
 ```html
 @spaceless
@@ -408,11 +593,17 @@ The directive only removes space between HTML tags — it does not strip spaces 
 @endspaceless
 ```
 
-The output will still include the space around "Hello":  
+will render as:
 
 ```html
 <strong> Hello </strong>
 ```
+
+The whitespace around `Hello` remains because it is text content, not whitespace between HTML tags.
+
+`@spaceless` is therefore useful when you want to keep your templates nicely formatted while avoiding unnecessary whitespace between the tags in the generated HTML.
+
+
 ## Debugging
 
 When developing a web application, debugging plays a crucial role in identifying issues and understanding how data flows within your templates. Whether you are troubleshooting missing data, unexpected outputs, or just trying to understand what’s available in your template, PyBlade provides an easy-to-use debugging directive.
@@ -499,5 +690,11 @@ Sample usage:
 @endcomment
 ```
 
+## Congratulations!
 
-   
+You've now learned the basics of working with data in PyBlade: passing values from your Python application to a template, displaying them with `{{ }}`, providing fallback values, navigating nested data, and controlling how PyBlade processes your template.
+
+But displaying data is only the beginning. As your templates become more dynamic, you'll need to make decisions, repeat sections, include other templates, handle empty states, and perform other common tasks directly in your markup.
+
+
+Now let's take the next step. In the next section, we'll explore **PyBlade Directives** and learn how to add logic, structure, and reusable behavior to your templates.
