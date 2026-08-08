@@ -15,9 +15,8 @@ const LINES: Line[] = [
   { kind: 'ok', text: 'Successfully installed pyblade' },
   { kind: 'cmd', text: 'pyblade init' },
   { kind: 'ask', label: 'Project name', value: 'blog' },
-  { kind: 'ask', label: 'Web framework', value: 'Django' },
-  { kind: 'ask', label: 'CSS framework', value: 'Tailwind CSS' },
-  { kind: 'ok', text: 'Created blog/ and pyblade.json' },
+  { kind: 'ask', label: 'Framework', value: 'Django' },
+  { kind: 'ok', text: 'Created blog/ and pyblade.toml' },
   { kind: 'cmd', text: 'pyblade serve' },
   { kind: 'url', text: 'http://127.0.0.1:8000' },
   // Trailing prompt so the caret has somewhere to rest once the run finishes.

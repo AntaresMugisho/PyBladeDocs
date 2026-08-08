@@ -6,7 +6,7 @@ PyBlade directives are special template instructions that control rendering, loo
 
 Using the concise `@directive` syntax helps write templates faster and more efficiently, keeping your code readable and consistent.
 
-## If statements
+## Conditional statements
 
 PyBlade provides a set of intuitive and developer-friendly directives for conditional statements, allowing you to control the flow of your templates easily. These conditionals work similarly to Python’s `if`, `elif`, and `else` statements, making it simple to render content based on certain conditions.
 
@@ -167,13 +167,13 @@ The `@anonymous` directive is an alias for `@guest`, so you can use either one i
 </Callout>
 
 
-## Match Case statements
+### Match Case statements
 
 Similar to Python, PyBlde also provides support for `@match` statements, which are useful for handling multiple conditions based on the value of a single variable. This can help simplify templates by reducing the need for multiple `@elif` statements.
 
 With `@match`, you can check a variable's value and define multiple `@case` conditions. If none of the cases match, an optional `@default` can be specified as a fallback.
 
-### Basic Syntax
+#### Basic Syntax
 
 The `@match` directive takes a variable as its argument. Within the `@match` block, each condition is checked using `@case`, and the code in the matching `@case` block will execute. If no cases match, the `@default` block, if provided, will execute.
 
@@ -229,7 +229,7 @@ If `status` has a value other than `'active'`, `'pending'`, or `'inactive'`, the
 <p>Status unknown.</p>
 ```
 
-### The `@switch` directive
+#### The `@switch` directive
 
 If you are accustomed to the *switch statement* in other programming  languages, PyBlade provides the `@switch` directive which is an alias for `@match`.
 Both directives function identically.

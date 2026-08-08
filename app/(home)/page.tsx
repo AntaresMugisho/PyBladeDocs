@@ -66,18 +66,18 @@ export default function HomePage() {
               style={{ '--d': '.28s' } as React.CSSProperties}
             >
               <Link
-                href="/docs/getting-started"
+                href="/docs"
                 className="bg-pb-brand inline-flex items-center gap-2 rounded-lg px-5 py-3 font-semibold text-[#0C141C] transition-all hover:brightness-105 active:scale-[.98]"
               >
                 Read the documentation
                 <ArrowRight className="size-4" aria-hidden="true" />
               </Link>
-              <Link
-                href="/docs/meet-pyblade"
+              {/* <Link
+                href="https://feedback.pyblade.com"
                 className="border-pb-line text-pb-ink hover:bg-pb-raised inline-flex items-center gap-2 rounded-lg border px-5 py-3 font-medium transition-colors"
               >
-                What is PyBlade?
-              </Link>
+                Leave a feedback
+              </Link> */}
             </div>
 
             <div
@@ -141,17 +141,17 @@ export default function HomePage() {
 
             <div className="flex flex-wrap items-center gap-3">
               <Link
-                href="/docs/getting-started"
+                href="/docs/getting-started/installation"
                 className="bg-pb-brand inline-flex items-center gap-2 rounded-lg px-5 py-2.5 font-semibold text-[#0C141C] transition-all hover:brightness-105 active:scale-[.98]"
               >
                 Get started
                 <ArrowRight className="size-4" aria-hidden="true" />
               </Link>
               <Link
-                href="/docs/live"
+                href="/docs/live/"
                 className="border-pb-line text-pb-ink hover:bg-pb-raised inline-flex items-center rounded-lg border px-5 py-2.5 font-medium transition-colors"
               >
-                PyBlade Live
+                Live Components
               </Link>
               <a
                 href="https://github.com/antaresmugisho/pyblade"

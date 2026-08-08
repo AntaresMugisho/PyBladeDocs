@@ -667,8 +667,9 @@ To add a comment in PyBlade, wrap your comment text inside `{# #}` placeholders.
     {# This is a comment and will not appear in the rendered HTML #}
     <p>Welcome to our website!</p>
 
-    {# Temporarily hiding this section
-    <p>Check back soon for updates.</p>
+    {# 
+        Temporarily hiding this section
+        <p>Check back soon for updates.</p>
     #}
 </div>
 ```
@@ -684,6 +685,7 @@ To add a comment in PyBlade, wrap your comment text inside `{# #}` placeholders.
 For convenience, PyBlade also provide a `@comment` directive for adding comments.
 
 Sample usage:
+
 ```html
 @comment
     <p>Commented out text</p>
@@ -695,6 +697,5 @@ Sample usage:
 You've now learned the basics of working with data in PyBlade: passing values from your Python application to a template, displaying them with `{{ }}`, providing fallback values, navigating nested data, and controlling how PyBlade processes your template.
 
 But displaying data is only the beginning. As your templates become more dynamic, you'll need to make decisions, repeat sections, include other templates, handle empty states, and perform other common tasks directly in your markup.
-
 
 Now let's take the next step. In the next section, we'll explore **PyBlade Directives** and learn how to add logic, structure, and reusable behavior to your templates.
