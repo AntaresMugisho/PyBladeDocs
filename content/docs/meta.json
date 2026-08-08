@@ -3,22 +3,24 @@
   "root": true,
   "defaultOpen": true,
   "pages": [
-    "---Overview---",
+    "---OVERVIEW---",
     "index",
     "getting-started",
 
-    "---PyBlade: Template Engine---",
+    "---CORE CONCEPTS---",
     "displaying-data",
     "pyblade-directives",
     "components",
     "layouts",
     "forms",
 
-    "live",
-    "cli",
+    "---LIVE COMPONENTS---",
+    "...live",
 
-    "---Outro---",
-    "future-features",
-    "support-and-contribution"
+    "---PYBLADE CLI---",
+    "...cli",
+    
+    "---OUTRO---",
+    "...outro"
   ]
 }

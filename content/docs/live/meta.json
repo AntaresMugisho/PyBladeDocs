@@ -1,11 +1,6 @@
 {
-    "title": "PyBlade Live: Reactive UIs",
-    "defaultOpen": true,
     "pages": [
-        "index",
-        "prelude",
         "quickstart",
-        "installation",
         "live-components",
         "properties",
         "actions",

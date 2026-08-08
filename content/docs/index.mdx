@@ -16,9 +16,9 @@ Before diving into PyBlade, it is useful to understand a few basic terms that wi
 
 A **template engine** is a tool that takes a template containing static HTML and dynamic instructions, processes it on the server, and produces the final HTML that is sent to the browser. Templates allow you to generate dynamic pages by combining regular HTML with variables, conditions, loops, components, and other programming constructs.
 
-In PyBlade, these instructions are called **directives**. A directive is a special instruction recognized by PyBlade and written using the `@` prefix. For example, `@if`, `@for`, and `@trans` are all PyBlade directives.
+In PyBlade, these instructions are called **directives**. A directive is a special instruction recognized by PyBlade and written using the `@` prefix. For example, `@if`, `@for` and `@trans` are all PyBlade directives.
 
-Some directives closely resemble Python keywords, such as `@if`, `@elif`, `@for`, `@break`, `@match`, and `@case`. Others are specific to PyBlade and provide features designed for templating, such as `@endif`, `@empty`, `@component`, and `@error`.
+Some directives closely resemble Python keywords, such as `@if`, `@elif`, `@for`, `@break`, `@match` and `@case`. Others are specific to PyBlade and provide features designed for templating, such as `@endif`, `@empty`, `@component` and `@error`.
 
 You may notice that some directives come in pairs, such as `@if` and `@endif`, or `@for` and `@endfor`. These are **block directives**. The opening directive tells PyBlade where a block begins, while the corresponding `@end...` directive tells it where the block ends.
 

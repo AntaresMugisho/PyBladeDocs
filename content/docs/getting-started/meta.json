@@ -1,6 +1,6 @@
-{
+{ 
   "title": "Getting Started",
   "icon": "Power",
-  "pages": ["installation", "create-your-first-project", "manual-configuration"],
+  "pages": ["installation", "create-your-first-project"],
   "defaultOpen": true
 }

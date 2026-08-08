@@ -158,7 +158,7 @@ This framework-aligned approach means you don't have to learn a completely diffe
 
 Now, let's open the generated `welcome.html` file and replace its contents with the following:
 
-```html title="templates/welcome.html"
+```html title="templates/welcome.html" lineNumbers
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -189,7 +189,7 @@ Our template is ready, but there is one last step before we can see it in the br
     <Tab>
         First, create a view that renders the template:
 
-        ```python title="views.py"
+        ```python title="views.py" lineNumbers
         from django.shortcuts import render
 
         def welcome_view(request):
@@ -198,18 +198,18 @@ Our template is ready, but there is one last step before we can see it in the br
 
         Then, open your project's `urls.py` and connect the `welcome/` URL to this view:
 
-        ```python title="urls.py"
+        ```python title="urls.py" lineNumbers
         from django.urls import path
         from .views import welcome_view
 
         urlpatterns = [
-            path("welcome/", welcome_view, name="welcome"),
+            path("welcome/", welcome_view),
         ]
         ```
 
         To render `welcome.html` from the Django app's `my_app/templates/my_app/` directory, use the template path without the `.html` extension and use dots to separate folders:
 
-        ```python title="views.py"
+        ```python title="views.py" lineNumbers
         from django.shortcuts import render
 
         def welcome_view(request):
@@ -218,12 +218,29 @@ Our template is ready, but there is one last step before we can see it in the br
 
         This notation keeps template references short and consistent across your project.
 
+        If you prefer Django's class-based views, PyBlade works with them just as naturally. Simply set the `template_name` attribute using the same dot notation:
+
+        ```python title="views.py" lineNumbers
+        from django.views.generic import TemplateView
+        
+        class WelcomeView(TemplateView):
+            template_name = "my_app.welcome"
+        ```
+
         <Callout type="info" title={"Important"}>
 
         For compatibility, PyBlade also supports the traditional Django template notation:
 
-        ```python title="views.py"
-        return render(request, "my_app/welcome.html")
+        ```python title="views.py" lineNumbers=3
+        def welcome_view(request):
+            return render(request, "my_app/welcome.html")
+        ```
+
+        The same applies to class-based views: 
+
+        ```python title="views.py" lineNumbers=3
+        class WelcomeView(TemplateView):
+            template_name = "my_app/welcome.html" 
         ```
 
         Both formats work, but the dot notation is the recommended approach for PyBlade projects.
@@ -235,7 +252,7 @@ Our template is ready, but there is one last step before we can see it in the br
 
         Open your app's `routes.py` and connect the `/welcome` URL to this view:
 
-        ```python title="routes.py"
+        ```python title="routes.py" lineNumbers
         from flask import Flask
         from pyblade.flask import render
 
@@ -280,7 +297,5 @@ In the next sections, you will learn how to:
 * Create reusable components.
 * Organize your pages with layouts and template inheritance.
 * Build interactive interfaces with PyBlade Live.
-
-PyBlade starts with a simple idea: write HTML, add the power of Python, and let the framework handle the complexity.
 
 Let's explore the core of PyBlade.
