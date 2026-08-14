@@ -12,7 +12,6 @@
     "pyblade-directives",
     "components",
     "layouts",
-    "forms",
 
     "---LIVE COMPONENTS---",
     "...live",
