@@ -377,9 +377,9 @@ The rendered HTML contains a hidden token input as well as the input you wrote. 
 Use `@csrf` for state-changing form submissions whenever your framework expects CSRF protection. A missing or invalid token should be rejected by the server.
 </Callout>
 
-#### Sending a CSRF token with JavaScript
+Sometimes you may want to send CSRF token with JavaScript, but browsers do not automatically add a CSRF token to `fetch()` requests. 
 
-Browsers do not automatically add a CSRF token to `fetch()` requests. If your application sends JSON or another request with JavaScript, expose the token in the page and send it in the header your framework expects.
+If your application sends JSON or another request with JavaScript, expose the token in the page and send it in the header your framework expects.
 
 ```html
 <meta name="csrf-token" content="{{ csrf_token }}">
@@ -400,37 +400,13 @@ fetch('/submit-data', {
 
 Check your framework's documentation for the precise header name; `X-CSRFToken` is a common Django convention.
 
-### Choosing an HTTP method with `@method`
-
-Plain HTML forms can submit only `GET` and `POST`. Some frameworks support a hidden `_method` field to represent `PUT`, `PATCH`, or `DELETE`. Use `@method` only when your framework recognizes that convention.
-
-```html
-<form action="/profile" method="POST">
-    @csrf
-    @method("PUT")
-
-    <input type="text" name="username" value="{{ user.username }}">
-    <button type="submit">Save profile</button>
-</form>
-```
-
-PyBlade writes the hidden method field; the form itself still uses `method="POST"`.
-
-<Callout type="info">
-Some framework integrations use another way to choose an HTTP method. In that case, follow the integration's convention instead of adding `@method`.
-</Callout>
-
 ### Conditional input attributes
 
-An attribute directive adds its matching HTML attribute only when its expression is true. This keeps the decision next to the element it affects. Without parentheses, the directive is always true.
+PyBlade provides directives for conditionally adding common HTML attributes to form elements.
 
-```html
-<input type="text" name="username" @disabled>
-```
+These directives are useful when an attribute should only be present when a condition is true. Instead of wrapping an entire element in an @if block, you can place the directive directly on the element.
 
-The example above renders as `<input type="text" name="username" disabled>`.
-
-The following directives work this way: `@checked`, `@selected`, `@disabled`, `@readonly`, `@required`, `@autofocus`, `@autocomplete`, and `@multiple`.
+For example, `@checked` adds the `checked` attribute when its condition is true:
 
 ```html
 <input
@@ -439,29 +415,95 @@ The following directives work this way: `@checked`, `@selected`, `@disabled`, `@
     value="yes"
     @checked(preferences.newsletter)
 >
+```
 
+If `preferences.newsletter` is true, PyBlade renders:
+
+```html
+<input
+    type="checkbox"
+    name="newsletter"
+    value="yes"
+    checked
+>
+```
+
+When the condition is false, the `checked` attribute is omitted.
+
+The same syntax can be used with `@selected` when working with `<option>` elements:
+
+```html
 <select name="version">
     @for (version in product.versions)
-        <option value="{{ version }}" @selected(preferences.version == version)>
+        <option
+            value="{{ version }}"
+            @selected(preferences.version == version)
+        >
             v{{ version }}
         </option>
     @endfor
 </select>
-
-<button type="submit" @disabled(form.errors)>Save</button>
 ```
 
-In this example, the checkbox stays checked when the preference is enabled, the matching option stays selected, and the button is disabled while the form has errors.
+Here, PyBlade evaluates the condition for each option and adds `selected` to the matching one.
 
-Here are a few more common examples:
+PyBlade also provides directives for other common HTML attributes:
 
 ```html
-<input type="email" name="email" @readonly(user.is_not_admin())>
-<input type="text" name="title" @required(user.is_admin())>
-<input type="text" name="search" @autofocus(is_search_page)>
-<input type="email" name="email" @autocomplete(preferences.autocomplete_enabled)>
-<select name="labels" @multiple(user.can_choose_many)></select>
+<button type="submit" @disabled(form.errors)>
+    Save
+</button>
+
+<input
+    type="email"
+    name="email"
+    @readonly(user.is_not_admin())
+>
+
+<input
+    type="text"
+    name="title"
+    @required(user.is_admin())
+>
+
+<input
+    type="text"
+    name="search"
+    @autofocus(is_search_page)
+>
+
+<select
+    name="labels"
+    @multiple(user.can_choose_many)
+></select>
 ```
+
+These directives correspond directly to their HTML attributes:
+
+* `@checked` → `checked`
+* `@selected` → `selected`
+* `@disabled` → `disabled`
+* `@readonly` → `readonly`
+* `@required` → `required`
+* `@autofocus` → `autofocus`
+* `@multiple` → `multiple`
+
+You can also use these directives without a condition when the attribute should always be present:
+
+```html
+<input type="text" name="username" @disabled>
+```
+
+PyBlade renders it as:
+
+```html
+<input type="text" name="username" disabled>
+```
+
+<Callout type="info" title={"Browser attributes are not server-side validation"}>
+Attributes such as `@required` and `@disabled` affect the browser's behavior, but they are not security mechanisms. Always validate submitted data and enforce permissions in your Python application. 
+</Callout>
+
 
 ### Rendering a framework form field with `@field`
 
@@ -498,32 +540,6 @@ For example, a missing required email field can render as:
 ```html
 <input type="email" name="email" id="id_email" class="form-control">
 <small class="text-red-500">This field is required.</small>
-```
-
-### A reusable field component
-
-Once the same field-and-error pattern appears more than once, make a component. The component keeps your page templates short while still showing every error in the same helpful way.
-
-```html
-<!-- templates/components/text-input.html -->
-<div class="flex flex-col gap-2">
-    @field(field, {{ attributes.merge({"class": "form-control"}) }})
-    @error(field)
-        <small class="text-red-500">{{ message }}</small>
-    @enderror
-</div>
-```
-
-You can then use it for each field:
-
-```html
-<form method="POST" action="/contact">
-    @csrf
-
-    <pb-text-input :field="form.name" placeholder="Your name" required />
-    <pb-text-input :field="form.email" placeholder="you@example.com" />
-    <button type="submit">Send message</button>
-</form>
 ```
 
 ## HTML attributes and styling
