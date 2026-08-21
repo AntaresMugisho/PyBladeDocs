@@ -1469,11 +1469,9 @@ If the `noop` option is present, variable lookup still takes place but the trans
 <title>@translate("myvar", noop=True)</title>
 ```
 
-
 <Callout type="info">
 It’s not possible to mix a template variable inside a string within `@translate`. If your translations require strings with variables (placeholders), use [`@blocktranslate`](#the-blocktranslate-directive) instead.
 </Callout>
-
 
 If you’d like to retrieve a translated string without displaying it, you can use the following syntax:
 
@@ -1495,6 +1493,7 @@ In practice, you’ll use this to get a string you can use in multiple places in
   <a href="/" title="@blocktranslate Back to '{{ race }}' homepage @endblocktranslate">{{ race }}</a>
 </h1>
 <p>
+    
 @for (stage in tour_stages)
     @cycle(start, end): {{ stage }}@if (loop.index % 2 == 0)<br>@else, @endif
 @endfor
@@ -1614,6 +1613,33 @@ In `.po` files, this results in
 ```text
 "\n  First sentence.\n  Second paragraph.\n"
 ```
+
+### Generating translation files
+PyBlade provides CLI commands to help you manage translation files for your internationalized templates.
+
+To generate translation files for a specific locale, use the `pyblade make:messages` command with the `--locale` argument:
+
+```bash
+pyblade make:messages --locale fr
+```
+
+Or using the short form:
+
+```bash
+pyblade make:messages -l fr
+```
+
+This command will scan your templates for translatable strings and create or update `.po` files for the specified locale.
+
+### Compiling translation files
+
+After translating the strings in your `.po` files, you need to compile them into `.mo` files for use in your application. Use the `pyblade messages:compile` command:
+
+```bash
+pyblade messages:compile
+```
+
+This command compiles all `.po` files into their corresponding `.mo` files, making the translations available to your application.
 
 ### Other translation utilities
 
