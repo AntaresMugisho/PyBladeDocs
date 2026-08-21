@@ -48,7 +48,7 @@ export default function HomePage() {
               className="pb-rise font-display mt-6 text-[2.6rem] leading-[0.98] font-extrabold tracking-[-0.03em] sm:text-6xl"
               style={{ '--d': '.12s' } as React.CSSProperties}
             >
-              The frontend framework
+              The <span className="text-pb-brand">reactive</span> template engine
               <span className="text-pb-blade block">for Python.</span>
             </h1>
 
@@ -56,9 +56,7 @@ export default function HomePage() {
               className="pb-rise text-pb-muted mt-7 max-w-lg text-lg leading-relaxed"
               style={{ '--d': '.2s' } as React.CSSProperties}
             >
-              Secure, elegant and lightweight. Write templates with{' '}
-              <code className="font-code text-pb-amber text-[0.92em]">@</code> directives, and
-              build interactive components without ever leaving them.
+              Elegant. Lightweight. Secure. Build interactive, modern web interfaces with pure Python and HTML—no complex JavaScript stack required.
             </p>
 
             <div
@@ -134,7 +132,7 @@ export default function HomePage() {
             <div className="flex items-center gap-3">
               <LogoMark className="size-8 shrink-0" />
               <p className="text-pb-muted text-sm leading-relaxed">
-                Everything else — directives, layouts, components and PyBlade Live — is in the
+                Everything else — directives, layouts, components  — is in the
                 docs.
               </p>
             </div>
@@ -147,12 +145,12 @@ export default function HomePage() {
                 Get started
                 <ArrowRight className="size-4" aria-hidden="true" />
               </Link>
-              <Link
+              {/* <Link
                 href="/docs/live/"
                 className="border-pb-line text-pb-ink hover:bg-pb-raised inline-flex items-center rounded-lg border px-5 py-2.5 font-medium transition-colors"
               >
                 Live Components
-              </Link>
+              </Link> */}
               <a
                 href="https://github.com/antaresmugisho/pyblade"
                 target="_blank"

@@ -17,9 +17,9 @@ These directives follow a familiar structure, while giving you a template-orient
 
 ### `@if`, `@elif`, and `@else`
 
-Use `@if` to conditionally render a block of markup. You can optionally add one or more `@elif` branches and an `@else` fallback.
+Use `@if` to conditionally render a block of markup. You can optionally add one or more `@elif` branches and an `@else` fallback. 
 
-Every conditional block must be closed with `@endif`.
+For example, suppose in your template context you have passed a variable `status` that can hold values like `'active'`, `'pending'`, or `'inactive'`. You can display different messages based on the value of `status` using conditional directives:
 
 ```html
 @if (status == 'active')
@@ -33,7 +33,7 @@ Every conditional block must be closed with `@endif`.
 
 The expression passed to the directive is evaluated by PyBlade, and only the matching block is rendered.
 
-You can use the same expressions supported by PyBlade's expression evaluator, including comparisons and logical operators:
+You can use the same expressions supported by python, including comparisons and logical operators:
 
 ```html
 @if (user.is_authenticated and user.is_admin)
@@ -42,7 +42,7 @@ You can use the same expressions supported by PyBlade's expression evaluator, in
 ```
 
 <Callout type="info">
-`@if` can be used on its own, or combined with `@elif` and `@else`. Always close the directive with `@endif`.
+`@if` can be used on its own, or combined with `@elif` and `@else`. Always close the conditional block with `@endif`.
 </Callout>
 
 ### `@unless`
@@ -168,7 +168,7 @@ The body of an `@case` currently does not support other PyBlade directives. This
 </Callout>
 
 
-## Repeating content
+## Loops
 
 PyBlade supports looping through lists, dictionaries, and other iterable data structures using the `@for` directive. These loops are similar to Python’s `for` loops and make it easy to display repeated elements in your templates.
 
@@ -177,16 +177,20 @@ PyBlade supports looping through lists, dictionaries, and other iterable data st
 
 If you have a list of items, you can use `@for` to loop through them:
 
-```python
-# views.py
-from django.shortcuts import render
-def show_items(request):
-    context = {'fruits': ['Apple', 'Banana', 'Cherry']}
-    return render(request, 'my_app.index', context)
-```
+<Tabs groupId="framework" items={["django"]}>
+    <Tab>
+        ```python title="views.py"
+        from django.shortcuts import render
 
-```html
-<!-- In items.html -->
+        def show_fruits(request):
+            context = {'fruits': ['Apple', 'Banana', 'Cherry']}
+            return render(request, 'fruits', context)
+        ```
+    </Tab>
+</Tabs>
+
+
+```html title="fruits.html"
 <ul>
     @for (fruit in fruits)
         <li>{{ fruit }}</li>
@@ -206,29 +210,31 @@ def show_items(request):
 
 ### The `@empty` directive
 
-Somethimes, you may need to handle cases where a loop has no items to iterate over. That's why PyBlade provides an `@empty` directive that specifies a fallback to display content if the list or iterable is empty.
+Sometimes, a list or other iterable may contain no items. In that case, your loop has nothing to display.
 
-```python
-# views.py
-from django.shortcuts import render
+PyBlade provides the `@empty` directive for exactly this situation. It lets you define what should be displayed when a `@for` loop has no items to iterate over.
 
-def show_fruits(request):
-    context = {'fruits': []}  # An empty list of fruits
-    return render(request, 'fruits', context)
-```
-
-```html
-<!-- In fruits.html -->
+```html title="fruits.html"
 <ul>
     @for (fruit in fruits)
         <li>{{ fruit }}</li>
     @empty
-        <li>No fruit available.</li>
+        <li>No fruits available.</li>
     @endfor
 </ul>
 ```
 
-**Output**
+If `fruits` contains items, PyBlade renders the loop normally:
+
+```html
+<ul>
+    <li>Apple</li>
+    <li>Banana</li>
+    <li>Orange</li>
+</ul>
+```
+
+But if `fruits` is empty, the `@empty` block is rendered instead:
 
 ```html
 <ul>
@@ -236,75 +242,120 @@ def show_fruits(request):
 </ul>
 ```
 
-Using `@empty` ensures that the template provides meaningful feedback in cases where a list or iterable is empty, improving user experience.
+Think of `@empty` as a fallback for your loop: "Show these items if there are any; otherwise, show this message."
 
-### The `loop` Variable
+This is especially useful for lists such as search results, notifications, products, or users, where an empty list is a normal situation that should still give the user useful feedback.
+### The `loop` variable
 
-While iterating through a `for` loop, PyBlade provides a special `loop` variable available inside your loop. This variable holds helpful information about the current iteration like the current index, whether it’s the first or last iteration, and more.
+When you use a `@for` loop, PyBlade gives you a special `loop` variable. It contains useful information about the loop you are currently inside.
+
+For example, you can use it to know whether you are displaying the first or last item:
 
 ```html
 @for (user in users)
     @if (loop.first)
-        This is the first iteration.
+        This is the first user.
     @endif
-    
+
     @if (loop.last)
-        This is the last iteration.
+        This is the last user.
     @endif
 
     <p>This is user {{ user.name }}.</p>
 @endfor
 ```
 
-If you are in a nested loop, you may access the parent loop's `loop` variable via the `parent` property:
+You can also use `loop` to get the current position, count the remaining items, or determine whether the current iteration is even or odd.
+
+Think of `loop` as a small helper that follows you through the loop and tells you where you are.
+
+For example, `loop.index` starts at `0`, while `loop.iteration` starts at `1`:
+
+```html
+@for (user in users)
+    <p>
+        {{ loop.iteration }}. {{ user.name }}
+    </p>
+@endfor
+```
+
+If `users` contains three users, this produces:
+
+```html
+<p>1. Alice</p>
+<p>2. Bob</p>
+<p>3. Charlie</p>
+```
+
+#### Nested loops
+
+Loops can also be nested. When you are inside a nested loop, the `loop` variable refers to the innermost loop.
+
+To access the `loop` variable of the parent loop, use `loop.parent`:
 
 ```html
 @for (user in users)
     @for (comment in user.comments)
         @if (loop.parent.first)
-            This is the first iteration of the parent loop.
+            This user is the first user in the list.
         @endif
+
+        <p>{{ comment.text }}</p>
     @endfor
 @endfor
 ```
 
-Here is a full list of available properties on the `loop` variable.
+Here, `loop` refers to the comment loop, while `loop.parent` refers to the user loop.
 
-| Property         |Return type| Description|
-| -------------    |-----------| ---------- |
-| `loop.index`     |`int`| The index of the current loop iteration (starts at 0).|
-| `loop.iteration` |`int`| The current loop iteration (starts at 1).|
-| `loop.first`     |`bool`| Whether this is the first iteration through the loop.|
-| `loop.last`      |`bool`| Whether this is the last iteration through the loop.|
-| `loop.count`     |`int`| The total number of iterations.|
-| `loop.remaining` |`int`| The number of iterations remaining in the loop.|
-| `loop.even`      |`bool`| Whether this is an even iteration through the loop.|
-| `loop.odd`       |`bool`| Whether this is an odd iteration through the loop.|
-| `loop.depth`     |`int`| The nesting level of the current loop (starts at 0).|
-| `loop.parent`    |`LoopContext`| In a nested loop, the parent's loop variable.|
+#### Available properties
 
+PyBlade provides the following properties on the `loop` variable:
 
+| Property         | Return type   | Description                                                       |
+| ---------------- | ------------- | ----------------------------------------------------------------- |
+| `loop.index`     | `int`         | The index of the current iteration, starting at `0`.              |
+| `loop.iteration` | `int`         | The current iteration number, starting at `1`.                    |
+| `loop.first`     | `bool`        | `True` when this is the first iteration.                          |
+| `loop.last`      | `bool`        | `True` when this is the last iteration.                           |
+| `loop.count`     | `int`         | The total number of items in the loop.                            |
+| `loop.remaining` | `int`         | The number of items remaining after the current iteration.        |
+| `loop.even`      | `bool`        | `True` when the current iteration is even.                        |
+| `loop.odd`       | `bool`        | `True` when the current iteration is odd.                         |
+| `loop.depth`     | `int`         | The nesting depth of the current loop, starting at `0`.           |
+| `loop.parent`    | `LoopContext` | The `loop` variable of the parent loop when inside a nested loop. |
+
+<Callout type="info">
+The `loop` variable is available only inside a `@for` loop. Once the loop ends, the variable is no longer available.
+</Callout>
 ### Skipping and ending loop iterations
 
-In PyBlade, you can use the `@continue` directive to skip the current iteration and move on to the next one, or the `@break` directive to exit the loop entirely based on a condition.
+Sometimes, you don't want to process every item in a loop.
 
-**Example**
+PyBlade provides two directives for controlling a loop:
+    - `@continue` skips the current iteration and moves to the next item.
+    - `@break` stops the loop completely.
 
-Suppose you have a list of fruits, and you want to display each fruit's name but want to skip "Banana" and stop the loop entirely once you reach "Date."
+Let's see how they work with a simple example.
 
-```python
-# views.py
+Suppose you have a list of fruits, but you don't want to display `Banana`. You also want to stop displaying fruits once you reach `Date`.
+
+```python title="views.py"
 from django.shortcuts import render
 
 def show_fruits(request):
-    context = {'fruits': ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry']}
-    return render(request, 'fruits', context)
+    context = {
+        'fruits': ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry']
+    }
+
+    return render(request, 'fruits.html', context)
 ```
 
-```html
-<!-- fruits.html -->
+In your template, you can use `@continue` to skip `Banana` and `@break` to stop the loop when you reach `Date`:
+
+```html title="fruits.html"
 <ul>
     @for (fruit in fruits)
+
         @if (fruit == 'Banana')
             @continue
         @endif
@@ -314,43 +365,52 @@ def show_fruits(request):
         @if (fruit == 'Date')
             @break
         @endif
+
     @endfor
 </ul>
 ```
 
-**Output**
+The result is:
 
 ```html
 <ul>
     <li>Apple</li>
     <li>Cherry</li>
+    <li>Date</li>
 </ul>
 ```
 
-In this example:
-- The `@continue` directive skips the iteration for "Banana," so "Banana" does not appear in the list.
-- The `@break` directive stops the loop entirely when it reaches "Date," so "Elderberry" is not displayed.
+Here is what happens step by step:
 
-### Simplified `@continue` and `@break` with Conditions
+- `Apple` is displayed normally.
+- `Banana` matches the condition, so `@continue` skips the rest of that iteration. The `<li>` for `Banana` is never rendered.
+- `Cherry` is displayed normally.
+- `Date` is displayed, and then `@break` stops the loop.
 
-You can also include the condition directly within the `@continue` and `@break` directives to make your code more concise.
+Because the loop has ended, `Elderberry` is never processed.
 
-```html
+When your `@continue` or `@break` only needs a simple condition, you can put the condition directly inside the directive. This avoids writing a separate `@if` block.
+
+The previous example can therefore be shortened to:
+
+```html title="fruits.html"
 <ul>
     @for (fruit in fruits)
 
-        @continue(fruit == 'Banana') // [!code highlight]
+        @continue(fruit == 'Banana')
 
         <li>{{ fruit }}</li>
-        
-        @break(fruit == 'Date') // [!code highlight]
-        
+
+        @break(fruit == 'Date')
+
     @endfor
 </ul>
 ```
 
-This has the same output as the previous example. By including the condition directly within the `@continue` and `@break` directives, you make the code shorter and clearer.
-    
+<Callout type="warning">
+`@continue` and `@break` can only be used inside a `@for` loop. Using either directive outside of a loop will result in an error.
+</Callout>
+
 ## Building forms
 
 Forms are a friendly place to start using directives: a form is ordinary HTML, and PyBlade adds small instructions where they help. In this section, we will build a form in four small steps: protect the submission, choose its method, keep the right input state, and show validation feedback.
