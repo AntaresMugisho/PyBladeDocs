@@ -411,27 +411,156 @@ The previous example can therefore be shortened to:
 `@continue` and `@break` can only be used inside a `@for` loop. Using either directive outside of a loop will result in an error.
 </Callout>
 
+## Including partials
+
+As your templates grow, you may find yourself writing the same pieces of HTML in several places. A header, footer, navigation menu, or small section can be moved into its own template file and included wherever you need it.
+
+PyBlade calls these smaller reusable template files **partials**.
+
+Use the `@include` directive to insert a partial into your template:
+
+```html title="index.html"
+<!DOCTYPE html>
+<html>
+<head>
+    @include("header")
+</head>
+<body>
+    <main class="content">
+        The main content goes here!
+    </main>
+
+    @include("footer")
+</body>
+</html>
+```
+
+The path to the partial is written as a string, without the `.html` extension. Directories are separated using dot notation:
+
+```html
+@include("shared.header")
+@include("partials.navigation")
+```
+
+Partials are useful when you want to reuse a piece of a template without repeating its HTML in every file.
+
+
+<Callout type="info">
+Partials and components are not the same thing. Partials are simply template sections that you include where needed. We'll look at components later and see how they provide a more structured way to build reusable pieces of your UI.
+</Callout>
+
+## Conditional classes with `@class`
+
+The `@class` directive lets you conditionally apply CSS classes to an HTML element.
+
+It accepts positional and keyword-like arguments. Positional arguments are always included in the class list, while keyword arguments are included only if their condition evaluate to `True`.
+
+**Syntax**
+```html
+@class("class1 class2", "class3", "class4 class5"=boolean_expression)
+```
+
+**Behavior**
+- Each positional argument is evaluated and added as a class if it has a truthy value (not `None`, `False` or an empty string)
+- Each keyword argument maps:
+  - _key_ as class name
+  - _value_ as condition
+- Duplicate class names are automatically removed
+
+**Example**
+
+In this example, we apply the `list-item` class to each item and `favorite` class to items marked as a favorite:
+
+```python title="views.py"
+from django.shortcuts import render
+
+def show_fruits(request):
+    context = {
+        'fruits': [
+            {'name': 'Apple', 'is_favorite': True},
+            {'name': 'Banana', 'is_favorite': False},
+            {'name': 'Cherry', 'is_favorite': True},
+        ]
+    }
+    return render(request, 'fruits', context)
+```
+
+```html title="fruits.html"
+<ul>
+    @for (fruit in fruits)
+        <li @class("list-item", "favorite"=fruit.is_favorite)>{{ fruit.name }}</li>
+    @endfor
+</ul>
+```
+
+**Output**
+
+```html
+<ul>
+    <li class="list-item favorite">Apple</li>
+    <li class="list-item">Banana</li>
+    <li class="list-item favorite">Cherry</li>
+</ul>
+```
+
+## Conditional inline styles with `@style`
+
+The `@style` directive works similarly to `@class`, but instead of controlling CSS class names, it works with __CSS properties__.
+
+**Example**
+
+Here, we set a red color for fruits that are not favorites:
+
+```html
+<ul>
+    @for (fruit in fruits)
+        <li @style("background-color:#000", "color: red"=not fruit.is_favorite)>{{ fruit.name }}</li>
+    @endfor
+</ul>
+```
+
+**Output**
+
+```html
+<ul>
+    <li style="backgroud-color:#000>Apple</li>
+    <li style="backgroud-color:#000; color: red">Banana</li>
+    <lis tyle="backgroud-color:#000>Cherry</li>
+</ul>
+```
+
 ## Building forms
 
-Forms are a friendly place to start using directives: a form is ordinary HTML, and PyBlade adds small instructions where they help. In this section, we will build a form in four small steps: protect the submission, choose its method, keep the right input state, and show validation feedback.
+Forms are a common part of almost every web application, but keeping them clean and user-friendly can require a lot of small details.
+
+PyBlade provides a few directives that make working with forms simpler. They help you connect your HTML form to the data and validation handled by your backend, while keeping the template easy to read.
+
+Let's see how these directives can make a form easier to build and maintain.
 
 ### Protecting submissions with `@csrf`
 
-For a form that changes data, put `@csrf` just inside the opening `<form>` tag. PyBlade turns it into the hidden CSRF token expected by your backend. The token lets the server check that the request came from a page it trusts.
+When a form sends data that changes something on the server, your backend may require a CSRF token to protect the request.
 
-```html
+PyBlade provides the `@csrf` directive to add this token to your form:
+
+```html title="subscribe.html"
 <form action="/subscribe" method="POST">
+
     @csrf
 
     <label>
         Email
         <input type="email" name="email">
     </label>
+
     <button type="submit">Subscribe</button>
+
 </form>
 ```
 
-The rendered HTML contains a hidden token input as well as the input you wrote. The exact token name and value come from the framework integration, so you should let PyBlade generate it rather than typing one yourself.
+When PyBlade renders the template, `@csrf` becomes the hidden token expected by your backend. You don't need to create the hidden input yourself.
+
+The exact token name and value depend on the framework you are using. PyBlade handles this through its framework integration.
 
 <Callout type="warn" title={"Keep the token with the form"}>
 Use `@csrf` for state-changing form submissions whenever your framework expects CSRF protection. A missing or invalid token should be rejected by the server.
@@ -462,9 +591,9 @@ Check your framework's documentation for the precise header name; `X-CSRFToken` 
 
 ### Conditional input attributes
 
-PyBlade provides directives for conditionally adding common HTML attributes to form elements.
+HTML has many attributes that are only needed in certain situations. A checkbox might need `checked`, a button might need `disabled`, or an input might need `required`.
 
-These directives are useful when an attribute should only be present when a condition is true. Instead of wrapping an entire element in an @if block, you can place the directive directly on the element.
+You could use an `@if` block to decide whether to render each attribute, but that quickly becomes cumbersome. PyBlade provides attribute directives that let you put the condition directly on the element.
 
 For example, `@checked` adds the `checked` attribute when its condition is true:
 
@@ -488,9 +617,9 @@ If `preferences.newsletter` is true, PyBlade renders:
 >
 ```
 
-When the condition is false, the `checked` attribute is omitted.
+When the condition is `False`, the `checked` attribute is omitted.
 
-The same syntax can be used with `@selected` when working with `<option>` elements:
+The same idea works with other attributes. For example, `@selected` can be used to select the appropriate `<option>`:
 
 ```html
 <select name="version">
@@ -507,7 +636,7 @@ The same syntax can be used with `@selected` when working with `<option>` elemen
 
 Here, PyBlade evaluates the condition for each option and adds `selected` to the matching one.
 
-PyBlade also provides directives for other common HTML attributes:
+You can use the same pattern with other common boolean HTML attributes:
 
 ```html
 <button type="submit" @disabled(form.errors)>
@@ -538,15 +667,17 @@ PyBlade also provides directives for other common HTML attributes:
 ></select>
 ```
 
-These directives correspond directly to their HTML attributes:
+Each directive corresponds to the HTML attribute with the same name:
 
-* `@checked` → `checked`
-* `@selected` → `selected`
-* `@disabled` → `disabled`
-* `@readonly` → `readonly`
-* `@required` → `required`
-* `@autofocus` → `autofocus`
-* `@multiple` → `multiple`
+| Pyblade Directive | HTML Attribute |
+|-------------------|----------------|
+| `@checked`        | `checked`      |
+| `@selected`       | `selected`     |
+| `@disabled`       | `disabled`     |
+| `@readonly`       | `readonly`     |
+| `@required`       | `required`     |
+| `@autofocus`      | `autofocus`    |
+| `@multiple`       | `multiple`     |
 
 You can also use these directives without a condition when the attribute should always be present:
 
@@ -560,14 +691,16 @@ PyBlade renders it as:
 <input type="text" name="username" disabled>
 ```
 
-<Callout type="info" title={"Browser attributes are not server-side validation"}>
+<Callout type="warn" title={"Browser attributes are not server-side validation"}>
 Attributes such as `@required` and `@disabled` affect the browser's behavior, but they are not security mechanisms. Always validate submitted data and enforce permissions in your Python application. 
 </Callout>
-
-
 ### Rendering a framework form field with `@field`
 
-If your framework gives you a form-field object, `@field` renders its HTML input for you. You can still provide the attributes that make the field fit your page. Attributes passed to `@field` override attributes already defined by the form.
+Some frameworks provide form objects that can render their fields as HTML. These fields often come with sensible default attributes, but you may still want to customize the resulting HTML from your template.
+
+This is where PyBlade's `@field` directive comes in.
+
+Pass the framework field to `@field`, then provide any additional HTML attributes you need:
 
 ```html
 <form method="POST">
@@ -578,139 +711,76 @@ If your framework gives you a form-field object, `@field` renders its HTML input
 </form>
 ```
 
-For a Django `CharField` called `name`, the first line produces an input similar to this:
+PyBlade keeps the HTML generated by the framework and adds your custom attributes to it.
+
+For example, a Django `CharField` named `name` might normally produce:
 
 ```html
-<input type="text" name="name" id="id_name" class="form-control" placeholder="Your name" required>
+<input type="text" name="name" id="id_name">
 ```
 
-### Showing a field error with `@error`
+With `@field`, you can customize it directly:
 
-Validation errors are useful only when people can see them. Wrap the message you want to display in `@error` and `@enderror`. When the field has an error, PyBlade renders the block and makes its text available as `message`; when it has no error, it renders nothing.
+```html id="f3p9s2"
+@field(
+    form.name,
+    class="form-control"
+    placeholder="Your name"
+    required
+)
+```
+
+Which produces:
 
 ```html
+<input
+    type="text"
+    name="name"
+    id="id_name"
+    class="form-control"
+    placeholder="Your name"
+    required
+>
+```
+
+Attributes passed to `@field` take priority over attributes already defined by the framework.
+
+This gives you the best of both worlds: the framework can generate the field, while your template remains in control of its HTML attributes.
+
+### Showing field errors with `@error`
+
+When a form is submitted with invalid data, you usually want to show the user what went wrong.
+
+The `@error` directive lets you display a field's validation error:
+
+```html id="z8c4mv"
 @field(form.email, class="form-control")
+
 @error(form.email)
     <small class="text-red-500">{{ message }}</small>
 @enderror
 ```
 
-For example, a missing required email field can render as:
+If the field has an error, PyBlade renders the `@error` block and makes the error message available through the `message` variable.
+
+If there is no error, nothing is rendered.
+
+For example, if the email field is required but the user leaves it empty:
 
 ```html
-<input type="email" name="email" id="id_email" class="form-control">
-<small class="text-red-500">This field is required.</small>
+<input
+    type="email"
+    name="email"
+    id="id_email"
+    class="form-control"
+>
+
+<small class="text-red-500">
+    This field is required.
+</small>
 ```
 
-## HTML attributes and styling
-
-### Conditional classes with `@class`
-
-The `@class` directive lets you conditionally apply CSS classes to an HTML element.
-
-It accepts positional and keyword-like arguments. Positional arguments are always included in the class list, while keyword arguments are included only if their condition evaluate to `True`.
-
-**Syntax**
-```html
-@class("class1 class2", "class3", "class4 class5"=boolean_expression)
-```
-
-**Behavior**
-- Each positional argument is evaluated and added as a class if it has a truthy value (not `None`, `False` or an empty string)
-- Each keyword argument maps:
-  - _key_ as class name
-  - _value_ as condition
-- Duplicate class names are automatically removed
-
-**Example**
-
-In this example, we apply the `list-item` class to each item and `favorite` class to items marked as a favorite:
-
-```python
-# views.py
-from django.shortcuts import render
-
-def show_fruits(request):
-    context = {
-        'fruits': [
-            {'name': 'Apple', 'is_favorite': True},
-            {'name': 'Banana', 'is_favorite': False},
-            {'name': 'Cherry', 'is_favorite': True},
-        ]
-    }
-    return render(request, 'fruits', context)
-```
-
-```html
-<!-- fruits.html -->
-<ul>
-    @for (fruit in fruits)
-        <li @class("list-item", "favorite"=fruit.is_favorite)>{{ fruit.name }}</li>
-    @endfor
-</ul>
-```
-
-**Output**
-
-```html
-<ul>
-    <li class="list-item favorite">Apple</li>
-    <li class="list-item">Banana</li>
-    <li class="list-item favorite">Cherry</li>
-</ul>
-```
-
-### Conditional inline styles with `@style`
-
-The `@style` directive works similarly to `@class`, but instead of controlling CSS class names, it works with __CSS properties__.
-
-**Example**
-
-Here, we set a red color for fruits that are not favorites:
-
-```html
-<ul>
-    @for (fruit in fruits)
-        <li @style("background-color:#000", "color: red"=not fruit.is_favorite)>{{ fruit.name }}</li>
-    @endfor
-</ul>
-```
-
-**Output**
-
-```html
-<ul>
-    <li style="backgroud-color:#000>Apple</li>
-    <li style="backgroud-color:#000; color: red">Banana</li>
-    <lis tyle="backgroud-color:#000>Cherry</li>
-</ul>
-```
-
-## Reusing template pieces
-
-### Including partials
-
-In PyBlade, partials allow you to include smaller template sections within a template file. This modular approach is useful for reusing common components (e.g., headers, footers, or menus) across multiple templates, keeping your code organized and reducing redundancy.
-
-Use the `@include` directive to insert a partial within a template. The path to the partial is specified as a string, excluding the `.html` extension and separating directories using **dot notation**.
-
-**Example**
-
-```html
-<!-- base.html -->
-<!DOCTYPE html>
-<html>
-<head>
-    @include("header")
-</head>
-<body>
-    <main class="content">
-        The main content goes here !
-    </main>
-    @include("footer")
-</body>
-</html>
-```
+This lets you keep the field and its validation feedback together without having to manually check whether an error exists.
 
 ## Working with values
 
@@ -821,7 +891,7 @@ A common use case is in a table, where each row should have alternating backgrou
 In this example, each row will alternate between `bg-gray-100` and `bg-white`, so, the first row gets the class `bg-gray-100`, the second gets `bg-white`, the third gets `bg-gray-100` again, and so on.  
 
 #### Using variables in `@cycle`  
----
+
 
 You can also cycle through variables instead of fixed values. Suppose you have two CSS classes stored in variables:  
 
@@ -859,7 +929,6 @@ If you want to disable escaping for certain reasons, you can use the `.safe` fil
 </Callout>
 
 #### Storing and reusing a Cycle  
----
 
 If you need to reference the current value of a cycle without advancing it, you can assign it a name using the `as` keyword:  
 
@@ -875,7 +944,6 @@ Later in the template, you can use `@cycle(color)` to advance to the next value:
 ```  
 
 #### Using `silent` to define a Cycle without output  
----
 
 When using the `@cycle` directive with the `as` keyword, the cycle automatically produces the first value from the list of provided values. However, this behavior might not always be desirable, especially if you want to store the cycle's value for later use but don’t want it to be output immediately. That's where the `silent` keywork comes into play.
 
@@ -930,7 +998,7 @@ row1 <!-- [!code highlight] -->
     <td>$30</td>
 </tr>
 ```
----
+
 
 #### Restarting a Cycle with `@resetcycle`  
 
@@ -952,7 +1020,7 @@ If needed, you can reset a cycle so that it starts from the first value again th
 @endfor
 ```
 
----
+
 ### The `@firstof` directive
 
 Data often comes from different sources, and sometimes, multiple fields might store the same type of information with different levels of availability.
@@ -1007,7 +1075,7 @@ Sometimes, you may need to store the selected value in a variable for later use.
 
 This will make the `chosen_value` variable available in the context and you may use it later in the template.
 
----
+
 ### The `@regroup` directive  
 
 When dealing with categorized data, grouping is often necessary for clarity and organization. The `@regroup` directive is used to categorize a list of similar objects based on a shared attribute. Instead of manually organizing the data, this directive automatically groups related items together for easier presentation.
@@ -1062,7 +1130,7 @@ Let’s walk through this example. `@regroup` takes three arguments: the list yo
 - `list` – a list of all items in this group (e.g., a list of all cities with `country='India'`).  
 
 
----
+
 ### The `@ifchanged` directive
 
 The `@ifchanged` directive in PyBlade is used **only inside loops** and helps you detect when a value changes between iterations. You might find it very useful to conditionally render content based on whether a variable has changed compared to its previous state.  
@@ -1110,7 +1178,7 @@ You can use an `@else` clause inside `@ifchanged` to define an alternative outpu
 @endfor
 ```
 
----
+
 ### Capturing the present with `@now`
 
 The `@now` directive is used to display the current date and time in a template. It takes a string format time based on Python’s standard [datetime module syntax](https://docs.python.org/3/library/datetime.html#strftime-strptime-behavior).  
@@ -1190,8 +1258,7 @@ It is important to note that positional and keyword arguments cannot be mixed wi
 
 Consider a view function `client()` inside the `views.py` file, which requires a client ID as a parameter. Its corresponding route might look like this:  
 
-```python
-# urls.py
+```python title="urls.py"
 path("client/<int:id>/", views.client, name="client-detail")
 ``` 
 
@@ -1207,12 +1274,12 @@ If `client.id` is `123`, the generated URL would be:
 /client/123/
 ```
 
-<Callout type="warn" title={"Warning"}>
+<Callout type="warn">
 If the **URL** you’re reversing doesn’t exist, you’ll get an `NoReverseMatch` exception raised, which will cause your site to display an error page.
 </Callout>
  
 
-When workiing with Django, if you’d like to retrieve a namespaced URL, specify the fully qualified name:
+When working with Django, if you’d like to retrieve a namespaced URL, specify the fully qualified name:
 
 ```html
 <a href="@url('myapp:view-name')">Visit MyApp</a>
@@ -1220,8 +1287,7 @@ When workiing with Django, if you’d like to retrieve a namespaced URL, specify
 This will follow the normal namespaced URL resolution strategy, including using any hints provided by the context as to the current application. 
 
 
-### Checking the active URL with `@urlis`
---- 
+### Checking the active URL with `@urlis` 
 
 The `@urlis` directive checks whether the current URL matches a given named route and returns `True` if it does, or `False` otherwise. This can be particularly useful for defining active states in navigation menus or conditionally rendering elements based on the active page.  
 
@@ -1257,7 +1323,7 @@ A common use case is applying an `active` class to navigation links. You can ach
 If the current page is dashboard, `@urlis('dashboard', 'active')` returns "active", making the `<li>` element have the class `active`. Else, nothing is returned, meaning no additional class is applied.
 
 ### The `@querystring` directive 
----
+
 
 PyBlade provides an intuitive way to generate and manipulate query strings dynamically. 
 
@@ -1319,7 +1385,7 @@ Then use it multiple times in your template:
 ```
 
 ### The `@static` directive
----
+
 
 In PyBlade, the `@static` directive provides a convenient way to link to static files such as images, stylesheets, JavaScript files, and other resources that are served from a **static** folder.  
 
@@ -1380,16 +1446,15 @@ For example, you can use `@get_media_prefix` to set a data attribute for media U
 <body data-media-url="@get_media_prefix">
 ```
 
-## Translating template text
+## Internationalization in templates
 
 Internationalization within PyBlade templates are performed by the use of two directives and a slightly different syntax than in Python code to translate some parts of rendered text. 
 
-<Callout type="warn" title={"⚠ Warning"}>
+<Callout type="warn">
 Translated strings will not be escaped when rendered in a template. This allows you to include HTML in translations, for example for emphasis, but potentially dangerous characters (e.g., `"` ) will also be rendered unchanged.
 </Callout>
 
 ### The `@translate` directive
----
 
 The `@translate` directive allows you to translate either a constant string (enclosed in single or double quotes) or variable content:
 
@@ -1447,7 +1512,6 @@ You may use the `@trans` directive which is a shorthand of the `@translate` dire
 </Callout>
 
 ### The `@blocktranslate` directive
----
 
 Unlike `@translate`, the `@blocktranslate` directive allows marking complex sentences that include both literals and variable content by using placeholders:
 
@@ -1480,7 +1544,6 @@ Other PyBlade directives like `@for` or `@if` are **not** allowed inside `@block
 </Callout>
 
 ### Pluralization in `@blocktranslate`
----
 
 To use pluralization:
 
@@ -1546,7 +1609,6 @@ In `.po` files, this results in
 "First sentence. Second paragraph."
 ```
 
-
  rather than:
 
 ```text
@@ -1555,99 +1617,64 @@ In `.po` files, this results in
 
 ### Other translation utilities
 
-#### **1. `@get_available_languages`**
-Retrieves a list of available languages. Each entry is a tuple:  
-`(language_code, translated_language_name)`
+PyBlade also provides a few small utilities that can be useful when working with translations.
 
-```html
-@get_available_languages(as LANGUAGES)
+#### `@lang`
 
-@for (lang in LANGUAGES)
-    <option value="{{ lang.0 }}">{{ lang.1 }}</option>
-@endfor
+The `@lang` directive gives you the **current language code**. You can store it in a template variable and use it wherever you need it.
+
+A common use case is setting the `lang` attribute of your HTML document:
+
+```html id="7w3k1p"
+
+<!DOCTYPE html>
+<html lang="@lang">
+<head>
+...
+</head>
+<body>
+...
+</body>
+</html>
 ```
 
-#### **2. `@get_current_language`**
-Retrieves the **current user’s preferred language** as a string (e.g., `en-us`).
+If the current language is `en-us`, PyBlade renders:
 
 ```html
-@get_current_language(as LANGUAGE_CODE)
-
-<p>Current Language: {{ LANGUAGE_CODE }}</p>
+<html lang="en-us">
 ```
 
----
-
-#### **3. `@get_current_language_bidi`**
-Checks if the **current language** is a **right-to-left (RTL) language** (e.g., Arabic, Hebrew).  
-
-- Returns `True` for RTL languages.
-- Returns `False` for LTR languages.
+You can also use the language code anywhere else in your template:
 
 ```html
-@get_current_language_bidi(as LANGUAGE_BIDI)
-
-@if (LANGUAGE_BIDI)
-    <p>The current language is right-to-left (RTL).</p>
-@else
-    <p>The current language is left-to-right (LTR).</p>
-@endif
+<p>Current language: @lang</p>
 ```
 
-<Callout type="info" title={"Note"}>
-For Django projects, if `django.template.context_processors.i18n` is enabled, these variables are automatically available in the template:
+#### `@languages`
 
-- `LANGUAGES`
-- `LANGUAGE_CODE`
-- `LANGUAGE_BIDI`
-
-You can access them directly:
+The `@languages` directive gives you the languages configured for your application. This is particularly useful when building a language selector.
 
 ```html
-<p>Current language code: {{ LANGUAGE_CODE }}</p>
-@if (LANGUAGE_BIDI)
-   <p>The language is bidirectional (RTL).</p>
-@endif
+@lang(as CURRENT_LANGUAGE)
+@languages(as LANGUAGES)
+
+<select name="language">
+    @for (language in LANGUAGES)
+    <option value="{{ language.code }}" @selected(language.code == CURRENT_LANGUAGE)>
+    {{ language.name }}
+    </option>
+    @endfor
+</select>
 ```
+
+Each language provides information such as its `code` and display `name`. The exact languages available depend on your application's translation configuration.
+
+This keeps language selection framework-agnostic: whether your application uses Django, Flask, Quart, or another supported framework, `@languages` provides the same PyBlade interface.
+
+<Callout type="info" title="Django projects">
+
+In Django projects, if the `django.template.context_processors.i18n` context processor is enabled, Django already provides `LANGUAGE_CODE`, `LANGUAGES`, and `LANGUAGE_BIDI` in the template context.
+
+You can therefore access them directly without using `@lang` or `@languages`.
+
 </Callout>
-
-
-#### **5. `@get_language_info`**
-Retrieves detailed **language metadata** for a given language code.
-
-```html
-@get_language_info(LANGUAGE_CODE  as lang)
-
-@get_language_info("pl" as lang)
-```
-
-You can the access information
-
-```html
-<p>Language Code: {{ lang.code }}</p>
-<p>Name (Local): {{ lang.name_local }}</p>
-<p>Name (English): {{ lang.name }}</p>
-<p>Bidirectional: {{ lang.bidi }}</p>
-<p>Name in Active Language: {{ lang.name_translated }}</p>
-```
-
-#### **6. `@get_language_info_list`**
-Retrieves **language information** for a list of languages.
-    
-Example: Assume your view passes `available_languages = ["en", "es", "fr"]` to the template.
-
-```html
-@get_language_info_list(available_languages as langs)
-
-@for (lang in langs)
-    <p>{{ lang.name }} ({{ lang.code }})</p>
-@endfor
-```
-
-## Keep Python in Python files
-
-In PyBlade, the focus is on maintaining a clear separation between logic and presentation, which is why we've opted not to include raw Python code execution within templates. Although technically possible, embedding raw Python can quickly lead to complex, hard-to-maintain templates, reducing readability and performance.
-
-However, we understand that in some cases, direct Python code might seem useful. If there is strong demand from the community, we would consider adding a `@python` directive. This directive could allow developers to execute Python code within templates, but we encourage handling complex logic in the view layer or controller instead.
-
-If you feel strongly about adding raw Python capabilities in PyBlade, please reach out! We are open to suggestions and would love to hear more about how this feature might help your projects.
