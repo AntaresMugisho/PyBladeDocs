@@ -1651,7 +1651,7 @@ The `@lang` directive gives you the **current language code**. You can store it 
 
 A common use case is setting the `lang` attribute of your HTML document:
 
-```html id="7w3k1p"
+```html
 
 <!DOCTYPE html>
 <html lang="@lang">
@@ -1698,9 +1698,7 @@ Each language provides information such as its `code` and display `name`. The ex
 This keeps language selection framework-agnostic: whether your application uses Django, Flask, Quart, or another supported framework, `@languages` provides the same PyBlade interface.
 
 <Callout type="info" title="Django projects">
-
 In Django projects, if the `django.template.context_processors.i18n` context processor is enabled, Django already provides `LANGUAGE_CODE`, `LANGUAGES`, and `LANGUAGE_BIDI` in the template context.
 
 You can therefore access them directly without using `@lang` or `@languages`.
-
 </Callout>
