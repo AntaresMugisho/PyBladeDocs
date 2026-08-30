@@ -3,65 +3,66 @@ title: "Components"
 ---
 
 PyBlade provides a powerful component system that allows developers to create reusable UI elements.
-Components and slots provide similar benefits to sections, layouts, and includes; however, some may find the mental model of components and slots easier to understand. 
+Components and slots provide similar benefits to layouts and includes; however, some may find the mental model of components and slots easier to understand.
+
+## Creating a component
+
+A component is simply a `.html` file that can be created manually, but for convenience, PyBlade provides the `pyblade make:component` command to generate a new component automatically.
+
+By default, components must be stored inside the `components` folder, located within your project root directory:
+
+<Files>
+<Folder name="my_project" defaultOpen>
+    <Folder name="components" defaultOpen>
+        <File name="alert.html" />
+        <File name="card.html" />
+        <File name="..." />
+    </Folder>
+    <Folder name="static" />
+    <Folder name="templates" />
+    <File name="pyblade.toml" />
+</Folder>
+</Files>
 
 
-## Creating a component  
-A component is simply a `.html` file that can be created manually, but for convenience, PyBlade provides the `pyblade make:component` command to generate a new component automatically.  
-
-By default, components must be stored inside the `components` folder, located within your `templates` directory:
-
-```
-/templates
-  ├── /components
-  │     ├── alert.html
-  │     ├── card.html
-  │     └── ...
-  ├── base.html
-  ├── home.html
-  └── ...
-```
-
-You can manually create a component inside the `components` folder, or use the provided command to generate one:  
+You can manually create a component inside the `components` folder, or use the provided command to generate one:
 
 ```bash
 pyblade make:component alert
 ```
 
-This command will create the file:  
+This command will create the file: `components/alert.html`
+<Files>
+<Folder name="components" defaultOpen>
+    <File name="alert.html" />
+</Folder>
+</Files>
 
-```
-/templates/components/alert.html
-```
-
-
-<Callout type="warn">
-It is important to avoid naming your component `slot`, as this could lead to conflicts with PyBlade’s built-in `pb-slot` tag used for creating new [slots](#slots-in-pyblade). Rendering a component named `slot` will interfere with the `slot` system, causing potential issues.
-</Callout>
-
+It is important to avoid naming your component `slot`, as this could lead to conflicts with PyBlade's built-in `pb-slot` tag used for creating new [slots](#slots). Rendering a component named `slot` will interfere with the `slot` system, causing potential issues.
 
 ## Rendering components
 
-The **preferred way** to include a component in your template is by using a **PyBlade component tag**. Component tags start with `pb-`, followed by the component file name without extension.  
+The **preferred way** to include a component in your template is by using a **PyBlade component tag**. Component tags start with `pb-`, followed by the component file name without extension.
 
-For example, if you have a component file named `alert.html`, you can include it in your template like this:  
-
-```html
-<pb-alert/>
-```
-
-Similarly, for a `user-profile.html` component, you would write:  
+For example, if you have a component file named `alert.html`, you can include it in your template like this:
 
 ```html
-<pb-user-profile/>
+<pb-alert />
 ```
 
+Similarly, for a `user-profile.html` or `user_profile.html` component, you would write:
 
-A PyBlade component tag can be **self-closing** – When the component does not need any inner content,
 ```html
-<pb-alert/>
+<pb-user-profile />
 ```
-or **paired** – When you need to include content inside the component.
+
+A PyBlade component tag can be **self-closing** — when the component does not need any inner content:
+
+```html
+<pb-alert />
+```
+
+or **paired** — when you need to include content inside the component:
 
 ```html
 <pb-alert>
@@ -69,37 +70,40 @@ or **paired** – When you need to include content inside the component.
 </pb-alert>
 ```
 
-### The `@component` directive 
-PyBlade also provides an alternative way to render components using the `@component` directive:  
+### The `@component` directive
 
-```html
+PyBlade also provides an alternative way to render components using the `@component` directive:
+
+```
 @component("alert")
 ```
 
-```html
+```
 @component("user-profile")
 ```
 
-While this method works, **it is not as intuitive as using component tags**. The tag-based syntax is visually clearer and aligns with HTML syntax.  
+While this method works, **it is not as intuitive as using component tags**. The tag-based syntax is visually clearer and aligns with HTML syntax.
 
-### Handling nested components  
-If your components are stored inside subdirectories within `templates/components`, you can indicate this hierarchy using a **dot notation** in both approaches.  
+### Handling nested components
 
-For instance, if you have a component file located at `templates/components/inputs/button.html`, you can render it as follows:  
-  
+If your components are stored inside subdirectories within `templates/components`, you can indicate this hierarchy using a **dot notation** in both approaches.
+
+For instance, if you have a component file located at `templates/components/inputs/button.html`, you can render it as follows:
+
 ```html
-<pb-inputs.button/>
+<pb-inputs.password />
 ```
 
 or, alternatively:
 
-```html
-@component('inputs.button')
+```
+@component('inputs.password')
 ```
 
 ## Passing data to components
+
 When creating a component, it often expects certain values (variables) to be passed in when used.
-You can pass data to PyBlade components using HTML attributes. Hard-coded, primitive values may be passed to the component using simple HTML attribute strings. Python expressions and variables should be passed to the component via attributes that use the `:` character as a prefix. 
+You can pass data to PyBlade components using HTML attributes. Hard-coded, primitive values may be passed to the component using simple HTML attribute strings. Python expressions and variables should be passed to the component via attributes that use the `:` character as a prefix.
 
 If you're using the `@component` directive to render a component, you may pass data as the second parameter, in the form of a dictionary.
 
@@ -107,34 +111,28 @@ If you're using the `@component` directive to render a component, you may pass d
 
 Let's assume we have the following component:
 
-```html
-<!-- templates/components/alert.html -->
+```html title="components/alert.html"
 
 <div class="alert alert-{{ type }}">
     {{ message }}
 </div>
 ```
 
-As you can see, the component is waiting for two variables: `type` and `message`. We can provide them in the template where we want to use it  like this:
+As you can see, the component is waiting for two variables: `type` and `message`. We can provide them in the template where we want to use it like this:
 
-```html
-<!-- templates/home.html -->
-
+```html title="templates/home.html"
 <pb-alert type="success" message="Operation completed successfully."/>
 ```
+
 or:
 
-```html
-<!-- templates/home.html -->
-
+```html title="templates/home.html"
 @component('alert', {'type':'success', 'message':'Operation completed successfully.'})
 ```
 
 The rendered output will look like this:
 
 ```html
-<!-- templates/home.html -->
-
 <div class="alert alert-success">
     Operation completed successfully.
 </div>
@@ -142,12 +140,12 @@ The rendered output will look like this:
 
 ### Normal vs Bound attributes
 
-When using PyBlade’s component tags (`<pb-component-name>`), you can pass data as *Normal HTML attributes* (without `:`) or *Bound attributes* (starting with `:`).
+When using PyBlade's component tags (`<pb-component-name>`), you can pass data as *Normal HTML attributes* (without `:`) or *Bound attributes* (starting with `:`).
 Both methods serve different purposes in how data is interpreted and passed to the component.
 
-#### 1. Normal attributes (Static values)  
+#### 1. Normal attributes (Static values)
 
-Normal attributes are passed as **static strings**. These values are not evaluated as Python expressions but are used as they are.  
+Normal attributes are passed as **static strings**. These values are not evaluated as Python expressions but are used as they are.
 
 For example:
 
@@ -155,12 +153,11 @@ For example:
 <pb-alert type="success" message="Operation completed successfully." />
 ```
 
-Here, `"success"` and `"Operation completed successfully."` are passed as plain strings. The component receives them as-is, without any evaluation.  
+Here, `"success"` and `"Operation completed successfully."` are passed as plain strings. The component receives them as-is, without any evaluation.
 
+#### 2. Bound Attributes (`:` Prefix for dynamic values)
 
-#### 2. Bound Attributes (`:` Prefix for dynamic values)  
-
-When an attribute starts with `:`, it is treated as a **Python expression**, meaning it is evaluated before being passed to the component.  
+When an attribute starts with `:`, it is treated as a **Python expression**, meaning it is evaluated before being passed to the component.
 
 For example, assuming we have a variable `status` with a dynamic string value, we may pass it to the component by prefixing it with the `:` character like this:
 
@@ -168,31 +165,31 @@ For example, assuming we have a variable `status` with a dynamic string value, w
 <pb-alert :type="status" message="Operation done." />
 ```
 
-In this example, `:type="status"` passes the **value of `status`** instead of the string `"status"`.  
+In this example, `:type="status"` passes the **value of `status`** instead of the string `"status"`.
 
-## The `@props` Directive  
+## The `@props` Directive
 
-The `@props` directive in PyBlade allows you to define default values for properties (variables) within a component. This is particularly useful when creating reusable components where some properties might be optional. If a value is not provided when the component is used, it will automatically fallback to the default value specified in the `@props` directive.  
+The `@props` directive in PyBlade allows you to define default values for properties (variables) within a component. This is particularly useful when creating reusable components where some properties might be optional. If a value is not provided when the component is used, it will automatically fallback to the default value specified in the `@props` directive.
 
-The `@props` directive accepts a dictionary where he `keys` represent the names of the properties (variables) that the component expects, while the `values` represent the default values that will be used if no explicit value is provided when using the component.  
-
+The `@props` directive accepts a dictionary where the `keys` represent the names of the properties (variables) that the component expects, while the `values` represent the default values that will be used if no explicit value is provided when using the component.
 
 For example, consider the following **alert** component:
 
 ```html
-@props({'type':'info', 'message':'Default message'}) 
+@props({'type':'info', 'message':'Default message'})
 
 <div class="alert alert-{{ type }}">
     {{ message }}
 </div>
-```  
+```
 
 When using this `alert` component, you can either pass a custom `type` and `message` attributes, or let the component fall back to its default values.
 
 ```html
 <pb-alert type="warning" />
 ```
-Here, only the `type` property is provided as an attribute with the value `"warning"`, but the `message` is omitted. Because of this, the default value of `message`, (`"Default message"`) will be used.
+
+Here, only the `type` property is provided as an attribute with the value `"warning"`, but the `message` is omitted. Because of this, the default value of `message` (`"Default message"`) will be used.
 
 The final rendered HTML will look like this:
 
@@ -202,37 +199,36 @@ The final rendered HTML will look like this:
 </div>
 ```
 
-Since only `type` was specified, the `alert-warning` class is applied, but the message remains the default `"Default message"`.  
+Since only `type` was specified, the `alert-warning` class is applied, but the message remains the default `"Default message"`.
 
+## Component attributes
 
-## Component attributes  
+We've already discussed passing declared data (props) to a component. But sometimes the caller needs to pass **extra HTML attributes** — like `class`, `id`, `data-*`, `type`, `href` — that aren't part of the component's declared props, but that should still land on the component's root element.
 
-We have already discussed about passing data attributes to a component. However, sometimes you may need to include additional HTML attributes — such as `class` — that are not directly related to the component’s logic but are useful for styling or behavior. These extra attributes should be applied to the root element of the component template.  
-
-For example, let's say we want to render an alert component:  
-
-```html
-<pb-alert type="error" :message="message" class="mt-4"/>
-```  
-
-All additional attributes are automatically available through the `attributes` variable inside the component. You can apply them to the component’s root element by simply outputting `attributes`:  
+Any attribute passed on a component tag that isn't consumed by `@props` (or an expected variable) is automatically collected into a variable called `attributes`, available inside the component. Write it directly on the root element to apply all of it at once:
 
 ```html
 <div {{ attributes }}>
     <!-- Component content -->
 </div>
-```  
+```
 
-This ensures that any extra attributes passed to the component are seamlessly integrated without requiring manual handling.
-
-### Default and Merged attributes
-
-In some cases, you might want to define default values for attributes or merge additional values into certain attributes of your component. For instance, this is useful when setting default CSS classes that should always be applied to a component, while also allowing flexibility to add or override them during component usage.
-
-To do this, you can use the `merge` method available on the `attributes` variable. Here's an example of how to set a default class and merge it with an additional class passed to the component:
+For example, if you render:
 
 ```html
-<div {{ attributes.merge({'class': 'alert alert-' + type}) }}>
+<pb-alert type="error" :message="message" class="mt-4"/>
+```
+
+the `class="mt-4"` attribute isn't declared anywhere by the component, so it flows straight into `attributes` and gets printed on the root `<div>`.
+
+`attributes` behaves like a plain, dict-like collection of whatever extra attributes were passed — you interact with it the same way you'd interact with any HTML attribute or any Python mapping.
+
+### Default values and automatic merging
+
+Declare the attribute the way you normally would in HTML, alongside `{{ attributes }}`, and PyBlade treats your literal value as the **default**, merging or overriding it with whatever the caller passed — depending on the attribute.
+
+```html
+<div class="alert alert-{{ type }}" {{ attributes }}>
     {{ message }}
 </div>
 ```
@@ -251,29 +247,18 @@ The final HTML rendered will be:
 </div>
 ```
 
-This approach allows you to seamlessly merge default attributes with those passed to the component.
+You wrote `class="..."` exactly like you would on any HTML element, and PyBlade combined it with the caller's `class` automatically.
 
-### Conditionally merging classes
+### Why `class` is special
 
-Sometimes, you may want to merge classes only under certain conditions. The `class_` method can help achieve this. It takes a dictionary where the `key` is the class you want to add, and the `value` is a boolean expression. If the expression evaluates to `True`, the class will be included. 
+`class` always **combines** rather than replaces, because that's what you almost always want with CSS classes: the component's base styling stays, and the caller's classes are appended. This happens automatically any time a literal `class` attribute sits on the same tag as `{{ attributes }}`.
 
-Here's how to conditionally merge classes:
+### Non-class attributes
 
-```html
-<div {{ attributes.class_({'p-4': True, 'bg-red': has_error}) }}>
-    {{ message }}
-</div>
-```
-
-In this example, the class `p-4` will always be applied, and the class `bg-red` will only be applied if the `has_error` condition is `True`.
-
-
-### Non-Class attribute merging
-
-When merging attributes other than `class`, the values passed to the `merge` method will be treated as "default" values for the attribute. Unlike the `class` attribute, these values will overwrite any injected values. Here's an example of merging a `type` attribute:
+For every other attribute, your literal value is a genuine default: the caller's value wins if they passed one, otherwise your literal stays as-is.
 
 ```html
-<button {{ attributes.merge({'type': 'button'}) }}>
+<button type="button" {{ attributes }}>
     {{ slot }}
 </button>
 ```
@@ -294,62 +279,93 @@ The rendered HTML will be:
 </button>
 ```
 
+Had the caller not passed `type` at all, the button would have kept `type="button"`.
 
-### Retrieving and filtering attributes
-You may need to retrieve a specific attribute’s value, or filter attributes based on their keys. To retrieve a specific attribute’s value, you can use the `get` method:
+### Conditional classes
+
+Write the condition inline, the same way you'd write any conditional expression inside an attribute in PyBlade:
 
 ```html
-{{ attributes.get('class') }}
+<div class="p-4 {{ 'bg-red' if has_error else '' }}" {{ attributes }}>
+    {{ message }}
+</div>
 ```
 
-You may pass a default value to the `get` method. The default value will be returned if the attribute is not found:
+`{{ attributes }}` still merges on top of whatever that expression produces, exactly as described above.
+
+### Reading a specific attribute
+
+Since `attributes` is a mapping, read a value the same way you'd read any attribute or dict entry:
 
 ```html
-{{ attributes.get('class', 'default-class') }}
+{{ attributes.class }}
 ```
 
-To retrieve all attributes whose keys start with a certain string, you can use the `where_starts_with` method:
+Fall back to a default the same way you would with any Python value:
 
 ```html
-{{ attributes.where_starts_with('data-') }}
+{{ attributes.class or 'default-class' }}
 ```
 
-On the other hand, if you want to exclude attributes starting with a particular string, use the `where_does_not_start_with` method:
+For attribute names that aren't valid Python identifiers (containing `-`, `:`, etc.), use item access instead of dot access:
 
 ```html
-{{ attributes.where_does_not_start_with('data-') }}
+{{ attributes['data-toggle'] }}
 ```
 
+### Checking if an attribute is present
 
-### Checking if attributes exist
-
-You may check if an attribute is present using the `has` method. It returns `True` if the attribute exists:
+Use plain truthiness or the `in` operator:
 
 ```html
-@if (attributes.has('class'))
+@if('class' in attributes)
     <div>Class attribute is present</div>
 @endif
 ```
 
-You can also check for multiple attributes by separating them with a comma:
+Checking for several attributes at once reads just like ordinary Python:
 
 ```html
-@if (attributes.has('name', 'class'))
+@if('name' in attributes and 'class' in attributes)
     <div>Both 'name' and 'class' attributes are present</div>
 @endif
 ```
 
-To check if at least one of the some specific attributes exists, you can use the `has_any` method:
+Checking that at least one of a few attributes exists:
 
 ```html
-@if (attributes.has_any('href', ':href'))
+@if('href' in attributes or ':href' in attributes)
     <div>One of the attributes is present</div>
 @endif
 ```
 
-## Slots in PyBlade
+### Filtering attributes by prefix
 
-You will often need to pass additional content to your component via **slots**. Component slots are rendered by echoing the `slot` variable. To explore this concept, let's imagine that an `alert` component has the following markup:
+`attributes` supports the same iteration you'd use on any dictionary, so filtering by prefix is a loop with a condition:
+
+```html
+@for key, value in attributes.items() if key.startswith('data-')
+    {{ key }}="{{ value }}"
+@endfor
+```
+
+To exclude a prefix instead, flip the condition:
+
+```html
+@for key, value in attributes.items() if not key.startswith('data-')
+    {{ key }}="{{ value }}"
+@endfor
+```
+
+## Slots
+
+Props let you pass **data** into a component — strings, numbers, booleans. But often what you want to hand a component isn't a value, it's **markup**: a paragraph, an icon, a button, a whole block of HTML built by the caller. That's what slots are for.
+
+Picture a component's template as having one or more open spots reserved for the caller to fill in, the way a picture frame has an empty space waiting for a photo. The component decides where each spot sits and what surrounds it; the caller decides what goes inside it. Inside the component, a spot is just a variable you echo — `slot` for the main, unnamed content area, or a chosen name for any additional spot. Outside, whoever uses the component fills that spot simply by placing content between the component's opening and closing tags.
+
+### The default slot
+
+Let's imagine an `alert` component with the following markup:
 
 ```html
 <div class="alert alert-danger">
@@ -357,7 +373,7 @@ You will often need to pass additional content to your component via **slots**. 
 </div>
 ```
 
-You may pass content to the `slot` by injecting content inside the component tag:
+Here, `{{ slot }}` is the single, unnamed spot in this component. You fill it by placing content between the component tags:
 
 ```html
 <pb-alert>
@@ -365,9 +381,11 @@ You may pass content to the `slot` by injecting content inside the component tag
 </pb-alert>
 ```
 
+Whatever sits between `<pb-alert>` and `</pb-alert>` becomes the value of `slot` inside the component.
+
 ### Named slots
 
-Sometimes, a component may need to render multiple different slots in different locations within the component. Let's modify our alert component to allow for the injection of a `title` slot:
+A component can offer more than one spot. Let's give our alert component a second spot for a title, in addition to its main content area:
 
 ```html
 <span class="alert-title">{{ title }}</span>
@@ -377,7 +395,7 @@ Sometimes, a component may need to render multiple different slots in different 
 </div>
 ```
 
-You may define the content of the named slot using the `<pb-slot>` tag. Any content not within an explicit `<pb-slot>` tag will be passed to the component in the `slot` variable:
+Fill a named spot using the `<pb-slot>` tag, matched by name. Anything left outside an explicit `<pb-slot>` tag still falls into the default, unnamed `slot`:
 
 ```html
 <pb-alert>
@@ -389,7 +407,7 @@ You may define the content of the named slot using the `<pb-slot>` tag. Any cont
 </pb-alert>
 ```
 
-This will render:
+This renders:
 
 ```html
 <span class="alert-title">Server Error</span>
@@ -399,9 +417,8 @@ This will render:
 </div>
 ```
 
-<Callout type="info" title={"Pro tip"}>
-When creating a named slot, you may pass the name using the colon notation, like this : `<pb-slot:title>` instead of using the attribute format `<pb-slot name="title">`.
-</Callout>
+> **Pro tip**
+> When creating a named slot, you may pass the name using the colon notation, like this: `<pb-slot:title>` instead of using the attribute format `<pb-slot name="title">`.
 
 ### Checking if a slot is empty
 
@@ -419,7 +436,7 @@ You can check if a slot contains content by using an `@if` statement with the `i
 </div>
 ```
 
-### Checking if slot has actual content
+### Checking if a slot has actual content
 
 Additionally, you can use the `has_actual_content` method to determine if the slot contains any "actual" content that is not an HTML comment:
 
@@ -429,10 +446,9 @@ Additionally, you can use the `has_actual_content` method to determine if the sl
 @endif
 ```
 
-
 ### Slot attributes
 
-Like Blade components, you can assign additional attributes to slots, such as CSS class names:
+Just like the component's root element, a slot can receive its own extra attributes, such as CSS class names:
 
 ```html
 <pb-card class="shadow-sm">
@@ -448,4 +464,4 @@ Like Blade components, you can assign additional attributes to slots, such as CS
 </pb-card>
 ```
 
-To interact with slot attributes, you can access the `attributes` property of the slot's variable:
+These are available through the `attributes` property of the slot's variable, and behave exactly like the component `attributes` described above.

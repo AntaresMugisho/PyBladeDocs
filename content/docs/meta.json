@@ -12,8 +12,8 @@
     "pyblade-directives",
     "components",
     "layouts",
-
-    "---LIVE COMPONENTS---",
+    
+    "---COMPONENTS---",
     "...live",
 
     "---PYBLADE CLI---",
