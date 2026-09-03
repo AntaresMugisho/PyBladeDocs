@@ -2,8 +2,6 @@
 title: "Template Inheritence"
 ---
 
-## Layouts
-
 Most web applications have a common structure shared by many pages, such as a navigation bar, a header, a footer, and a main content area.
 
 Repeating this structure in every template makes your code harder to maintain. If you need to change the navigation, for example, you would have to update every page that contains it.
@@ -73,19 +71,11 @@ Once you have a layout, a child template can inherit it using the `@extends` dir
 @extends("layouts.base")
 ```
 
-The value passed to `@extends` uses **dot notation** to identify the layout file. So `layouts.base` refers to:
+The value passed to `@extends` uses **dot notation** to identify the layout file. So `layouts.base` refers to `templates/layouts/base.html`.
 
-<Files>
-    <Folder name="templates" defaultOpen>
-        <Folder name="layouts" defaultOpen>
-            <File name="base.html"/>
-        </Folder>
-    </Folder>
-</Files>
+PyBlade also supports regular file paths, meaning you could write `@extends("layouts/base.html")` instead.
 
-After extending a layout, the child template can provide content for the blocks defined by the parent.
-
-In PyBlade, child templates use the `@block` directive to override a block:
+After extending a layout, the child template can provide content for the blocks defined by the parent. Child templates use the `@block` directive to override a block:
 
 ```html title="templates/home.html" lineNumbers
 @extends("layouts.base")
@@ -141,7 +131,7 @@ the child can keep that content and add more:
 
 Not all content in a child template needs to be inside a block.
 
-Any content in the child template that is **not inside an `@block` directive** is automatically collected into a default slot named `slot`.
+Any content in the child template that is **not inside a `@block` directive** is automatically collected into a default slot named `slot`.
 
 For example:
 
@@ -185,6 +175,7 @@ The parent layout can then access it as a variable:
 This allows each child template to provide its own title while keeping the `<title>` element in the layout.
 
 Named slots are not limited to titles. You can create as many named slots as your layout requires.
+
 {/* 
 ### Using `@yield`
 
