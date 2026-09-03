@@ -2,8 +2,13 @@
 title: "Components"
 ---
 
-PyBlade provides a powerful component system that allows developers to create reusable UI elements.
-Components and slots provide similar benefits to layouts and includes; however, some may find the mental model of components and slots easier to understand.
+As your application grows, you will often have UI elements that appear in many places: buttons, cards, alerts, navigation items, and more.
+
+You could create these elements as partials and include them wherever needed. However, some UI elements also need their own data, configuration, or behavior. This is where **components** become useful.
+
+Instead of writing the same HTML again and again, PyBlade components let you define a reusable piece of UI once and use it throughout your application with a simple, consistent syntax.
+
+Let's see how to create components, pass data to them, and customize their content.
 
 ## Creating a component
 
@@ -38,7 +43,9 @@ This command will create the file: `components/alert.html`
 </Folder>
 </Files>
 
-It is important to avoid naming your component `slot`, as this could lead to conflicts with PyBlade's built-in `pb-slot` tag used for creating new [slots](#slots). Rendering a component named `slot` will interfere with the `slot` system, causing potential issues.
+<Callout type="warn">
+    It is important to avoid naming your component `slot`, as this could lead to conflicts with PyBlade's built-in `pb-slot` tag used for creating new [slots](#slots). Rendering a component named `slot` will interfere with the `slot` system, causing potential issues.
+</Callout>
 
 ## Rendering components
 
@@ -86,18 +93,18 @@ While this method works, **it is not as intuitive as using component tags**. The
 
 ### Handling nested components
 
-If your components are stored inside subdirectories within `templates/components`, you can indicate this hierarchy using a **dot notation** in both approaches.
+If your components are stored inside subdirectories within `components/`, you can indicate this hierarchy using a **dot notation** in both approaches.
 
-For instance, if you have a component file located at `templates/components/inputs/button.html`, you can render it as follows:
+For instance, if you have a component file located at `components/forms/dropdown.html`, you can render it as follows:
 
 ```html
-<pb-inputs.password />
+<pb-forms.dropdown />
 ```
 
 or, alternatively:
 
 ```
-@component('inputs.password')
+@component('forms.dropdown')
 ```
 
 ## Passing data to components
@@ -105,14 +112,11 @@ or, alternatively:
 When creating a component, it often expects certain values (variables) to be passed in when used.
 You can pass data to PyBlade components using HTML attributes. Hard-coded, primitive values may be passed to the component using simple HTML attribute strings. Python expressions and variables should be passed to the component via attributes that use the `:` character as a prefix.
 
-If you're using the `@component` directive to render a component, you may pass data as the second parameter, in the form of a dictionary.
+If you're using the `@component` directive to render a component, you may pass data as the second parameter, in the form of python a dictionary.
 
-**Example**
-
-Let's assume we have the following component:
+To make it clear, let's assume we have the following component:
 
 ```html title="components/alert.html"
-
 <div class="alert alert-{{ type }}">
     {{ message }}
 </div>
@@ -175,7 +179,7 @@ The `@props` directive accepts a dictionary where the `keys` represent the names
 
 For example, consider the following **alert** component:
 
-```html
+```html title="components/alert.html"
 @props({'type':'info', 'message':'Default message'})
 
 <div class="alert alert-{{ type }}">
@@ -185,21 +189,21 @@ For example, consider the following **alert** component:
 
 When using this `alert` component, you can either pass a custom `type` and `message` attributes, or let the component fall back to its default values.
 
-```html
-<pb-alert type="warning" />
+```html title="templates/home.html"
+<pb-alert message="User created successfully" />
 ```
 
-Here, only the `type` property is provided as an attribute with the value `"warning"`, but the `message` is omitted. Because of this, the default value of `message` (`"Default message"`) will be used.
+Here, only the `message` property is provided as an attribute with the value `"User created successfully"`, but the `type` is omitted. Because of this, the default value of `type` (`"info"`) will be used.
 
 The final rendered HTML will look like this:
 
 ```html
-<div class="alert alert-warning">
-    Default message
+<div class="alert alert-info">
+    User created successfully
 </div>
 ```
 
-Since only `type` was specified, the `alert-warning` class is applied, but the message remains the default `"Default message"`.
+Since only `message` was specified, only the message text changed, but the type remains `info` resulting in the class name `alert-info` being applied.
 
 ## Component attributes
 
@@ -207,7 +211,7 @@ We've already discussed passing declared data (props) to a component. But someti
 
 Any attribute passed on a component tag that isn't consumed by `@props` (or an expected variable) is automatically collected into a variable called `attributes`, available inside the component. Write it directly on the root element to apply all of it at once:
 
-```html
+```html title="components/card.html"
 <div {{ attributes }}>
     <!-- Component content -->
 </div>
@@ -215,8 +219,8 @@ Any attribute passed on a component tag that isn't consumed by `@props` (or an e
 
 For example, if you render:
 
-```html
-<pb-alert type="error" :message="message" class="mt-4"/>
+```html title="templates/home.html"
+<pb-card class="mt-4" :user="user"/>
 ```
 
 the `class="mt-4"` attribute isn't declared anywhere by the component, so it flows straight into `attributes` and gets printed on the root `<div>`.
@@ -227,22 +231,22 @@ the `class="mt-4"` attribute isn't declared anywhere by the component, so it flo
 
 Declare the attribute the way you normally would in HTML, alongside `{{ attributes }}`, and PyBlade treats your literal value as the **default**, merging or overriding it with whatever the caller passed — depending on the attribute.
 
-```html
-<div class="alert alert-{{ type }}" {{ attributes }}>
-    {{ message }}
+```html title="components/card.html"
+<div class="card-item rounded-full" {{ attributes }}>
+    {{ user.name }}
 </div>
 ```
 
 If you use the component like this:
 
-```html
-<pb-alert type="error" :message="message" class="mb-4"/>
+```html title="templates/home.html"
+<pb-card class="mb-4" :user="user"/>
 ```
 
 The final HTML rendered will be:
 
 ```html
-<div class="alert alert-error mb-4">
+<div class="card-item rounded-full mb-4">
     <!-- Contents of the message variable -->
 </div>
 ```
