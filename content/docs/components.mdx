@@ -261,41 +261,27 @@ You wrote `class="..."` exactly like you would on any HTML element, and PyBlade 
 
 For every other attribute, your literal value is a genuine default: the caller's value wins if they passed one, otherwise your literal stays as-is.
 
-```html
+```html title="components/button.html"
 <button type="button" {{ attributes }}>
-    {{ slot }}
+    Click Me
 </button>
 ```
 
 If you use the component as follows:
 
-```html
-<pb-button type="submit">
-    Submit
-</pb-button>
+```html title="templates/form.html"
+<pb-button type="submit" />
 ```
 
 The rendered HTML will be:
 
 ```html
 <button type="submit">
-    Submit
+    Click Me
 </button>
 ```
 
 Had the caller not passed `type` at all, the button would have kept `type="button"`.
-
-### Conditional classes
-
-Write the condition inline, the same way you'd write any conditional expression inside an attribute in PyBlade:
-
-```html
-<div class="p-4 {{ 'bg-red' if has_error else '' }}" {{ attributes }}>
-    {{ message }}
-</div>
-```
-
-`{{ attributes }}` still merges on top of whatever that expression produces, exactly as described above.
 
 ### Reading a specific attribute
 
@@ -317,155 +303,87 @@ For attribute names that aren't valid Python identifiers (containing `-`, `:`, e
 {{ attributes['data-toggle'] }}
 ```
 
-### Checking if an attribute is present
-
-Use plain truthiness or the `in` operator:
-
-```html
-@if('class' in attributes)
-    <div>Class attribute is present</div>
-@endif
-```
-
-Checking for several attributes at once reads just like ordinary Python:
-
-```html
-@if('name' in attributes and 'class' in attributes)
-    <div>Both 'name' and 'class' attributes are present</div>
-@endif
-```
-
-Checking that at least one of a few attributes exists:
-
-```html
-@if('href' in attributes or ':href' in attributes)
-    <div>One of the attributes is present</div>
-@endif
-```
-
-### Filtering attributes by prefix
-
-`attributes` supports the same iteration you'd use on any dictionary, so filtering by prefix is a loop with a condition:
-
-```html
-@for key, value in attributes.items() if key.startswith('data-')
-    {{ key }}="{{ value }}"
-@endfor
-```
-
-To exclude a prefix instead, flip the condition:
-
-```html
-@for key, value in attributes.items() if not key.startswith('data-')
-    {{ key }}="{{ value }}"
-@endfor
-```
-
 ## Slots
 
-Props let you pass **data** into a component — strings, numbers, booleans. But often what you want to hand a component isn't a value, it's **markup**: a paragraph, an icon, a button, a whole block of HTML built by the caller. That's what slots are for.
+Props let you pass **data** to a component, such as strings, numbers, or booleans. But sometimes you want to pass **content** instead: a paragraph, an icon, a button, or even a whole block of HTML. That's what **slots** are for.
 
-Picture a component's template as having one or more open spots reserved for the caller to fill in, the way a picture frame has an empty space waiting for a photo. The component decides where each spot sits and what surrounds it; the caller decides what goes inside it. Inside the component, a spot is just a variable you echo — `slot` for the main, unnamed content area, or a chosen name for any additional spot. Outside, whoever uses the component fills that spot simply by placing content between the component's opening and closing tags.
+Think of a component as a template with one or more spaces that the caller can fill with content. The component decides where these spaces appear and what surrounds them, while the caller provides what goes inside.
+
+Inside the component, each space is accessed through a variable: `slot` for the main, unnamed content, or a custom name for additional slots. When using the component, the caller fills these slots by placing content between the component's opening and closing tags.
 
 ### The default slot
 
-Let's imagine an `alert` component with the following markup:
+Let's imagine a `card` component with the following template:
 
-```html
-<div class="alert alert-danger">
-    {{ slot }}
-</div>
-```
+```html title="components/card.html"
+<div class="card">
+    <h2>{{ title }}</h2>
 
-Here, `{{ slot }}` is the single, unnamed spot in this component. You fill it by placing content between the component tags:
-
-```html
-<pb-alert>
-    <strong>Whoops!</strong> Something went wrong!
-</pb-alert>
-```
-
-Whatever sits between `<pb-alert>` and `</pb-alert>` becomes the value of `slot` inside the component.
-
-### Named slots
-
-A component can offer more than one spot. Let's give our alert component a second spot for a title, in addition to its main content area:
-
-```html
-<span class="alert-title">{{ title }}</span>
-
-<div class="alert alert-danger">
-    {{ slot }}
-</div>
-```
-
-Fill a named spot using the `<pb-slot>` tag, matched by name. Anything left outside an explicit `<pb-slot>` tag still falls into the default, unnamed `slot`:
-
-```html
-<pb-alert>
-    <pb-slot name="title">
-        Server Error
-    </pb-slot>
-
-    <strong>Whoops!</strong> Something went wrong !
-</pb-alert>
-```
-
-This renders:
-
-```html
-<span class="alert-title">Server Error</span>
-
-<div class="alert alert-danger">
-    <strong>Whoops!</strong> Something went wrong!
-</div>
-```
-
-> **Pro tip**
-> When creating a named slot, you may pass the name using the colon notation, like this: `<pb-slot:title>` instead of using the attribute format `<pb-slot name="title">`.
-
-### Checking if a slot is empty
-
-You can check if a slot contains content by using an `@if` statement with the `is_empty` method available on any slot object:
-
-```html
-<span class="alert-title">{{ title }}</span>
-
-<div class="alert alert-danger">
-    @if(slot.is_empty())
-        This is default content if the slot is empty.
-    @else
+    <div class="card-content">
         {{ slot }}
-    @endif
+    </div>
 </div>
 ```
 
-### Checking if a slot has actual content
+Here, `{{ slot }}` is the component's default, unnamed slot. It represents the content provided by whoever uses the component.
 
-Additionally, you can use the `has_actual_content` method to determine if the slot contains any "actual" content that is not an HTML comment:
+You fill the default slot by placing content between the component's opening and closing tags:
 
-```html
-@if(slot.has_actual_content())
-    The scope has non-comment content.
-@endif
-```
-
-### Slot attributes
-
-Just like the component's root element, a slot can receive its own extra attributes, such as CSS class names:
-
-```html
-<pb-card class="shadow-sm">
-    <pb-slot name="heading" class="font-bold">
-        Heading
-    </pb-slot>
-
-    Content
-
-    <pb-slot name="footer" class="text-sm">
-        Footer
-    </pb-slot>
+```html title="templates/index.html"
+<pb-card title="Welcome">
+    <p>This is the content of the card.</p>
 </pb-card>
 ```
 
-These are available through the `attributes` property of the slot's variable, and behave exactly like the component `attributes` described above.
+Everything between `<pb-card>` and `</pb-card>` becomes the value of `slot` inside the component. PyBlade then renders that content wherever `{{ slot }}` appears in the component template.
+
+<Callout type="warn">
+    The `slot` variable is **not escaped by default** because it is intended to contain rendered HTML. Only use slots with trusted or properly sanitized content. Passing untrusted user input directly into a slot can introduce **cross-site scripting (XSS)** vulnerabilities.
+</Callout>
+
+### Named slots
+
+A component can have more than one slot when it needs to accept different pieces of content.
+
+For example, we can give our `alert` component a named `title` slot in addition to its default slot:
+
+```html title="components/alert.html"
+<div class="alert alert-{{ type }}">
+    <h2>{{ title }}</h2>
+    
+    <div>
+        {{ slot }}
+    </div>
+</div>
+```
+
+The `title` variable represents the named slot, while `slot` remains the default, unnamed slot.
+
+To fill a named slot, use the `<pb-slot>` tag with the corresponding `name` attribute:
+
+```html title="templates/home.html"
+<pb-alert type="danger">
+    <pb-slot name="title">Server Error</pb-slot> <!-- [!code highlight] -->
+
+    <strong>Whoops!</strong> Something went wrong!
+</pb-alert>
+```
+
+The content inside `<pb-slot name="title">` is assigned to the `title` slot. Any content outside an explicit `<pb-slot>` remains part of the default `slot`.
+
+The result is:
+
+```html
+<div class="alert alert-danger">
+    <h2>Server Error</h2>
+    
+    <div>
+        <strong>Whoops!</strong> Something went wrong!
+    </div>
+</div>
+```
+
+
+<Callout type="tip" title="Pro Tip">
+You can use the shorthand syntax `<pb-slot:title> ... </pb-slot>` instead of `<pb-slot name="title"> ... </pb-slot>` when defining a named slot.
+</Callout>
