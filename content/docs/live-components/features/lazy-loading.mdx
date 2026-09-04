@@ -8,10 +8,10 @@ For example, imagine you have a `Revenue` component which contains a slow databa
 
 ```python
 from django.db.models import Sum
-from pyblade import live
+from pyblade import LiveComponent
 from app.models import Transaction
 
-class Revenue(live.Component):
+class Revenue(LiveComponent):
 
     amount: float
 
@@ -58,10 +58,10 @@ To signal to your users that the component is being loaded, you can define a `pl
 
 ```python
 from django.db.models import Sum
-from pyblade import live
+from pyblade import LiveComponent
 from app.models import Transaction
 
-class Revenue(live.Component):
+class Revenue(LiveComponent):
 
     amount: float
 
@@ -132,10 +132,10 @@ If you want to enforce that all usages of a component will be lazy-loaded, you c
 
 ```python
 
-from pyblade import live
+from pyblade import LiveComponent
 
 @lazy
-class Revenue(live.Component):
+class Revenue(LiveComponent):
     ...
 ```
 
@@ -143,7 +143,7 @@ class Revenue(live.Component):
 You may enable [lazy loading outside of the viewport](#lazy-loading-outside-of-the-viewport) with the `on_load=True` parameter:
 ```python
 @lazy(on_load=True)
-class Revenue(live.Component):
+class Revenue(LiveComponent):
    ...
 ```
 </Callout>
@@ -169,10 +169,10 @@ If you want to disable this isolation behavior and instead bundle all updates to
 
 ```python
 
-from pyblade import live
+from pyblade import LiveComponent
 
 @lazy(isolate=False)
-class Revenue(live.Component):
+class Revenue(LiveComponent):
     ...
 ```
 
@@ -196,10 +196,10 @@ You can accept this data in `mount()` just like any other component:
 
 ```python
 from django.db.models import Sum
-from pyblade import live
+from pyblade import LiveComponent
 from app.models import Transaction
 
-class Revenue(live.Component):
+class Revenue(LiveComponent):
 
     amount: float
 

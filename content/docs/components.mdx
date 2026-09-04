@@ -142,14 +142,14 @@ The rendered output will look like this:
 </div>
 ```
 
-### Normal vs Bound attributes
+### Regular vs Bound attributes
 
-When using PyBlade's component tags (`<pb-component-name>`), you can pass data as *Normal HTML attributes* (without `:`) or *Bound attributes* (starting with `:`).
+When using PyBlade's component tags (`<pb-component-name>`), you can pass data as *Regular HTML attributes* (without `:`) or *Bound attributes* (starting with `:`).
 Both methods serve different purposes in how data is interpreted and passed to the component.
 
-#### 1. Normal attributes (Static values)
+#### Regular attributes
 
-Normal attributes are passed as **static strings**. These values are not evaluated as Python expressions but are used as they are.
+Regular attributes are passed as **static strings**. These values are not evaluated as Python expressions but are used as they are.
 
 For example:
 
@@ -159,7 +159,7 @@ For example:
 
 Here, `"success"` and `"Operation completed successfully."` are passed as plain strings. The component receives them as-is, without any evaluation.
 
-#### 2. Bound Attributes (`:` Prefix for dynamic values)
+#### Bound Attributes
 
 When an attribute starts with `:`, it is treated as a **Python expression**, meaning it is evaluated before being passed to the component.
 

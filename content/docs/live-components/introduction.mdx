@@ -1,0 +1,60 @@
+---
+title: "Introduction"
+---
+
+Live components allow you  to build dynamic, interactive interfaces using Python and PyBlade templates, without having to write JavaScript for every interaction.
+
+Instead of manually connecting your user interface to JavaScript code, you define a Python component that contains your data and behavior, then use a PyBlade template to describe what it should look like.
+
+PyBlade takes care of the communication between the component and the page, so when the component's state changes, the interface can react accordingly.
+
+This gives you a simple way to build interactive features while keeping your application logic close to the Python code that controls it.
+
+## What is a Live Component?
+
+A Live Component is a special kind of PyBlade component that can **respond to user interactions**.
+
+A regular component is mainly used to display content. A Live Component goes one step further: it can perform an action when the user interacts with it and update its content without requiring you to manually write JavaScript.
+
+For example, a Live Component can be used to build:
+
+* A counter that changes when a button is clicked.
+* A search field that updates results as the user types.
+* A form that can be validated in real-time and submitted without writing custom JavaScript.
+* A list that can be filtered or sorted by the user.
+* A dropdown or other interactive UI element.
+
+The logic behind these interactions is written in **Python**, while the interface is defined in a **PyBlade template**, which is just an HTML file where you can use the PyBlade syntax and features you're already familiar with.
+
+## Why use Live Components?
+
+Building an interactive page traditionally means writing JavaScript to listen for user interactions, send AJAX requests to the server, process the response, and update the page.
+
+For simple interactions, this can quickly become more code than the actual feature requires.
+
+Live Components let PyBlade handle this communication for you.
+
+You describe what should happen in your Python component, and PyBlade takes care of communicating with the server and updating the corresponding part of the page.
+
+This allows you to build dynamic interfaces while keeping your application logic in Python, the programming language you already know and love.
+
+## Live Components vs. regular PyBlade components
+
+A regular PyBlade component is primarily a reusable piece of your interface.
+
+For example, you might create a `button`, `card`, or `alert` component and pass data to it when rendering the page.
+
+A Live Component is also a reusable piece of your interface, but it can **perform actions and react to user interactions**.
+
+Think of it this way:
+
+| Regular component                                  | Live Component                              |
+| -------------------------------------------------- | ------------------------------------------- |
+| Displays content                                   | Displays content and reacts to interactions |
+| Mainly receives data                               | Can perform actions                         |
+| Used for reusable UI                               | Used for interactive UI                     |
+| Does not need server communication after rendering | Can communicate with the server when needed |
+
+So, you don't need to turn every PyBlade component into a Live Component. Use a regular component when you simply need to reuse part of your interface, and use a Live Component when that part needs to **do something** in response to the user.
+
+In the next section, we'll build our first Live Component and see how it works.

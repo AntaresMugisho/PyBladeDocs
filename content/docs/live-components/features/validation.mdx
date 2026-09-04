@@ -7,10 +7,10 @@ PyBlade Live provides a flexible and intuitive validation system that can be use
 Here’s an example `PostCreate` component that demonstrates the most basic validation workflow in PyBlade Live:
 
 ```python
-from pyblade import live
+from pyblade import LiveComponent
 from app.models import Post
 
-class PostCreate(live.Component):
+class PostCreate(LiveComponent):
 	title: str = ""
 	content: str = ""
 
@@ -53,10 +53,10 @@ By attaching validation rules directly to component properties using `@validator
 However, when you're about to **persist data** (e.g., saving to a database), it's important to still call `self.validate()` manually. This ensures that **all** properties are validated — including those that haven't changed during the current interaction.
 
 ```python
-from pyblade import live
+from pyblade import LiveComponent
 from app.models import Post
 
-class PostCreate(live.Component):
+class PostCreate(LiveComponent):
 
     @property
     @validators("required|string|min:3")
@@ -89,10 +89,10 @@ You can omit the `@property` decorator. When using `@validators`, PyBlade Live a
 If you want **full control** over when validation happens, you can disable the automatic validation behavior by setting `on_update=False` in the `@validators` decorator. This tells PyBlade Live not to validate the property on every update—you’ll handle validation manually instead, typically using `self.validate()` in your action methods:
 
 ```python
-from pyblade import live
+from pyblade import LiveComponent
 from app.models import Post
 
-class PostCreate(live.Component):
+class PostCreate(LiveComponent):
 
     @validators("required|string|min:3", on_update=False)
     def title(self): pass
@@ -116,7 +116,7 @@ By default, PyBlade will localize validation messages using your framework's tra
 To disable automatic translation and keep messages exactly as defined, set `translate=False` in the decorator:
 
 ```python
-class PostCreate(live.Component):
+class PostCreate(LiveComponent):
 
     @validators("required", message="Please provide a post title", translate=False)
     def title(self): pass
@@ -151,7 +151,7 @@ Sometimes, customizing the property name isn't enough. You may need to customize
 To override the default validation message provided by PyBlade, you can use the `message` parameter inside the `@validators` decorator:
 
 ```python
-class PostCreate(live.Component):
+class PostCreate(LiveComponent):
 
     @validators("required", message="Please provide a post title")
     def title(self): pass
@@ -162,7 +162,7 @@ Now, if validation fails, the message will be: _"Please provide a post title"_ i
 You can also define different messages for different rules by passing a diactionnary to the `message` parametter :
 
 ```python
-class PostCreate(live.Component):
+class PostCreate(LiveComponent):
 
     @validators("required|min", message={"required": "Please provide a post title", "min": "This title is too short"})
     def title(self): pass
@@ -182,10 +182,10 @@ These rules will then be applied when you run `self.validate()` inside the compo
 Here's an example:
 
 ```python
-from pyblade import live
+from pyblade import LiveComponent
 from app.models import Post
 
-class PostCreate(live.Component):
+class PostCreate(LiveComponent):
 
     def validators(self): # [!code highlight:5]
         return {
@@ -234,10 +234,10 @@ class PostForm(forms.Form):
 The `PostForm` above can now be defined as a property on the `CreatePost` component:
 
 ```python {6,9,10}
-from pyblade import live
+from pyblade import LiveComponent
 from .forms import PostForm
 
-class PostCreate(live.Component):
+class PostCreate(LiveComponent):
 
     form: PostForm
 

@@ -11,10 +11,10 @@ This section discusses the basics of adding a property to a component and using 
 In a standard Python class, to initialize properties or attributes, we use the `__init__()` dunder method. However, in a PyBlade Live's component class, you can set initial values for properties within your component's `mount()` method.
 
 ```python
-from pyblade import live
+from pyblade import LiveComponent
 from app.models import Task
 
-class TodoList(live.Component):
+class TodoList(LiveComponent):
 
     def mount(self):
         self.tasks = Task.objects.all()
@@ -26,9 +26,9 @@ In this example, when the component renders for the first time, all the existing
 Alternatively, you may declare properties in your component class, making them what are known as "class attributes". For example, let's create a `title` property in the `TodoList` component:
 
 ```python
-from pyblade import live
+from pyblade import LiveComponent
 
-class TodoList(live.Component):
+class TodoList(LiveComponent):
 
     title = "Learn PyBlade"
 
@@ -61,9 +61,9 @@ In addition to accessing class properties from the template, you can explicitly 
 To pass data to the view in the `render()` method, you can add a dictionnary as second parameter to the returned `view()` method. For example, let's say you want to pass the task status to the template.
 
 ```python
-from pyblade import live
+from pyblade import LiveComponent
 
-class TodoList(live.Component):
+class TodoList(LiveComponent):
 
     title = "Learn PyBlade"
 
@@ -93,9 +93,9 @@ PyBlade Live supports two-way data binding through the `pb-model` HTML attribute
 Let's use the `pb-model` directive to bind the `title` property in our `TodoList` component to a basic input element:
 
 ```python
-from pyblade import live
+from pyblade import LiveComponent
 
-class TodoList(live.Component):
+class TodoList(LiveComponent):
 
     title: str = ""
 
@@ -123,9 +123,9 @@ To enable "live" updating as a user types, you can use `pb-model.live` instead.
 Let's add a method in our component's class so that we can trigger an "action" from the browser to test it out. 
 
 ```python {7-8}
-from pyblade import live
+from pyblade import LiveComponent
 
-class TodoList(live.Component):
+class TodoList(LiveComponent):
 
     title: str = ""
 
@@ -159,9 +159,9 @@ Sometimes, you may need to reset your properties back to their initial state aft
 In the example below, we can avoid code duplication by using `self.reset()` to reset the `title` field after the "Add Todo" button is clicked:
 
 ```python
-from pyblade import live
+from pyblade import LiveComponent
 
-class TodoComponent(live.Component):
+class TodoComponent(LiveComponent):
 
     title = ""
 
@@ -185,10 +185,10 @@ Alternatively, you can use the `pull()` method to both reset and retrieve the va
 Here's the same example from above, but simplified with `pull()`:
 
 ```python
-from pyblade import live
+from pyblade import LiveComponent
 from app.models import Task
 
-class TodoComponent(live.Component):
+class TodoComponent(LiveComponent):
 
     title = ""
 

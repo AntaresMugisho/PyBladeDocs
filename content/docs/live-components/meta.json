@@ -1,5 +1,6 @@
 {
     "pages": [
+        "introduction",
         "quickstart",
         "live-components",
         "properties",

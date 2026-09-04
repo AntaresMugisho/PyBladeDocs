@@ -15,11 +15,11 @@ All it takes to enable pagination in your component is to inherit from the `live
 Below is the most basic example of using pagination inside a `PostList` component to only show 25 posts per page:
 
 ```python {6,11}
-from pyblade import live
+from pyblade import LiveComponent
 from app.models import Post
 
 class PostList(
-    live.Component,
+    LiveComponent,
     live.Paginator
     ):
     

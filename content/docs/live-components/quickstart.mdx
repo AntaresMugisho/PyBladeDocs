@@ -1,0 +1,278 @@
+---
+title: "Quick Start"
+---
+
+To begin your journey with Live Components, let's build something simple: a **counter**.
+
+This is a great first example because it demonstrates the main idea behind Live Components without introducing too many concepts at once. We'll create a component that displays a number and provides two buttons to increase or decrease it.
+
+By the end of this guide, you'll have a small interactive component running in your browser, and you'll see how PyBlade can make a page come alive with Python.
+
+## Create a Live Component
+
+PyBlade CLI provides a convenient command for generating Live Components.
+
+Run the following command to create a component named `counter`:
+
+```bash
+pyblade make:livecomponent counter
+```
+
+This command creates the following files in your project:
+
+```files
+components
+└── counter
+    ├── counter.py
+    └── counter.html
+```
+
+The Python file will contain the component's logic, while the HTML file will contain its interface.
+
+## Write the component class
+
+Open `components/counter/counter.py` and replace its contents with:
+
+```python title="components/counter/counter.py"
+from pyblade import LiveComponent
+
+
+class Counter(LiveComponent):
+
+    count = 0
+
+    def increment(self):
+        self.count += 1
+
+    def decrement(self):
+        self.count -= 1
+
+    def render(self):
+        return self.render_template()
+```
+
+Let's look at what each part does.
+
+* `count = 0` — Defines a `count` property and gives it an initial value of `0`.
+* `increment()` — Increases `count` by `1` each time the method is called.
+* `decrement()` — Decreases `count` by `1` each time the method is called.
+* `render()` — Tells PyBlade to render the component's template.
+
+The `increment()` and `decrement()` methods are ordinary Python methods. Later, we'll connect them to actions performed by the user in the browser.
+
+For now, the important thing to understand is that the component contains the Python logic, while its template will describe what the user sees.
+
+## Write the component template
+
+Now open `components/counter/counter.html` and replace its contents with:
+
+```html title="components/counter/counter.html"
+<div>
+    <h1>{{ count }}</h1>
+
+    <button pb:click="decrement">-</button>
+    <button pb:click="increment">+</button>
+</div>
+```
+
+This is a regular PyBlade template, so you can use the same template syntax you've already learned.
+
+The `{{ count }}` expression displays the current value of the `count` property.
+
+The two buttons use the `pb:click` attribute to connect a browser click to a Python method:
+
+* Clicking `-` calls `decrement()`.
+* Clicking `+` calls `increment()`.
+
+That's all we need for our counter.
+
+<Callout type="warn">
+
+A Live Component must have **exactly one root element**.
+
+In the example above, the `<div>` is the component's root element, and everything else is inside it.
+
+If PyBlade detects multiple root elements, it will raise an exception. PyBlade and HTML comments do not count as root elements, so you can safely use comments inside your component.
+
+</Callout>
+
+## Configure Live Components
+
+Before rendering a Live Component, your project needs a small amount of framework-specific configuration.
+
+<Tabs groupId='framework' items={["django", "flask"]}> 
+    <Tab>
+    If you're using Django, there are two things you need to configure.
+
+    First, add `pyblade.live` to `INSTALLED_APPS` in your Django `settings.py`:
+
+    ```python title="settings.py" id="d3xq7m"
+    INSTALLED_APPS = [
+        # ...
+
+        "pyblade.live",
+    ]
+    ```
+
+    Then, include PyBlade Live's URLs in your project's `urls.py`:
+
+    ```python title="urls.py" id="j8q2vn"
+    from django.urls import include, path
+
+
+    urlpatterns = [
+        # ...
+
+        path("", include("pyblade.live.urls")),
+    ]
+    ```
+
+    That's all. Your Django project is now ready to use Live Components.
+
+    </Tab>
+
+    <Tab>
+
+    Coming soon.
+
+    </Tab>
+</Tabs>
+
+
+## Render the component
+
+We've created our Live Component, but it still needs a page where it can be displayed.
+
+Let's create a simple PyBlade template for our page:
+
+```bash
+pyblade make:template index
+```
+
+This creates:
+
+```text
+templates/index.html
+```
+
+Open the file and add:
+
+```html title="templates/index.html"
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Counter</title>
+</head>
+
+<body>
+
+    <pb-counter /> <!-- [!code highlight] -->
+
+    @pbscripts <!-- [!code highlight] -->
+
+</body>
+
+</html>
+```
+
+The `<pb-counter />` tag tells PyBlade to render our `counter` Live Component at that location.
+
+You may also have noticed the `@pbscripts` directive. Live Components need a small amount of JavaScript in the browser to communicate with the server and update the component when the user interacts with it.
+
+You don't need to write or manage that JavaScript yourself. The `@pbscripts` directive simply includes the scripts required by PyBlade Live Components.
+
+## Create the view
+
+Now we need a view that renders our `index.html` template.
+
+Open your `views.py` file and add:
+
+<Tabs groupId='framework' items={["django", "flask"]}> <Tab>
+
+```python title="views.py"
+from django.shortcuts import render
+
+
+def index(request):
+    return render(request, "index")
+```
+
+</Tab>
+
+<Tab>
+
+Coming soon
+
+</Tab>
+</Tabs>
+
+The `index()` view simply renders the PyBlade template we created above.
+
+## Register a route
+
+Finally, we need to make the page accessible through a URL.
+
+Open your Django application's `urls.py` file and add:
+
+<Tabs groupId='framework' items={["django", "flask"]}> <Tab>
+
+```python title="urls.py"
+from django.urls import path
+
+from .views import index
+
+
+urlpatterns = [
+    path("homepage/", index),
+]
+```
+
+</Tab>
+
+<Tab>
+
+Coming soon
+
+</Tab>
+</Tabs>
+
+<Callout type="warn">
+
+Make sure that `views.py` and `urls.py` are located in the appropriate Django application directory so that the import shown above works correctly.
+
+</Callout>
+
+Now everything is connected.
+
+When a user visits the page's URL, your framework calls the corresponding view and renders `index.html`. PyBlade then processes the template, encounters the `<pb-counter />` tag, and renders our `Counter` Live Component in its place.
+
+
+## Test it out
+
+Our Live Component is ready!
+
+Start your development server:
+
+```bash
+pyblade serve
+```
+
+Then open the URL shown in your terminal and navigate to:
+
+```text
+/homepage/
+```
+
+You should see the counter with its current value and two buttons.
+
+Try clicking the buttons.
+
+The number should change immediately, without a full page reload.
+
+And that's your first Live Component!
+
+You wrote the component's behavior in **Python**, described its interface with a **PyBlade template**, and PyBlade took care of the communication required to make the component interactive.
+
+We've only scratched the surface of what Live Components can do. In the following sections, we'll explore how to build more powerful components, handle user input, work with forms, respond to events, and much more.

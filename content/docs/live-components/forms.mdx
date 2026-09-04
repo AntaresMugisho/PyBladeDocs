@@ -11,10 +11,10 @@ Let's dive in.
 Let's start by looking at a very simple form in a `PostCreate` component. This form will have two simple text inputs and a submit button, as well as some code on the backend to manage the form's state and submission:
 
 ```python
-from pyblade import live
+from pyblade import LiveComponent
 from app.models import Post
 
-class PostCreate(live.Component):
+class PostCreate(LiveComponent):
 
     title: str = ""
     content: str = ""
@@ -106,10 +106,10 @@ Once a method has a `@validators` decorator attached to it, the validation rule 
 Let's add some basic validation rules to the `title` and `content` properties in our `CreatePost` component:
 
 ```python
-from pyblade import live
+from pyblade import LiveComponent
 from app.models import Post
 
-class PostCreate(live.Component):
+class PostCreate(LiveComponent):
 
     @validators("required") # [!code highlight]
     def title(self): pass
@@ -154,10 +154,10 @@ Validation rules may be a list of strings, or a string of `|` (pipe) separated v
 
 You may also use the `validators()` method within your component to define validation rules. The method must return a `dictionary` where `keys` represent the names of properties you want to validate and `values` are the validation rules to apply, either a string of pipe-separated values or a list.
 ```python
-from pyblade import live
+from pyblade import LiveComponent
 from app.models import Post
 
-class PostCreate(live.Component):
+class PostCreate(LiveComponent):
 
     title: str = ""
     content: str = ""
@@ -193,7 +193,7 @@ PyBlade Live handles this sort of thing automatically. By using `.live` or `.blu
 ```
 
 ```python
-from pyblade import live
+from pyblade import LiveComponent
 ...
     @validators('required|min:5')
     def title(self)
@@ -234,10 +234,10 @@ You can learn more about the `pb-loading` directive and other PyBlade Live direc
 If you want to automatically save a form as the user fills it out rather than wait until the user clicks "submit", you can do so using PyBlade Live's `updated()` hook:
 
 ```python
-from pyblade import live
+from pyblade import LiveComponent
 from app.models import Post
 
-class PostUpdate(live.Component):
+class PostUpdate(LiveComponent):
 
     post: Post
 
@@ -335,10 +335,10 @@ class PostForm(forms.Form):
 ```
 
 ```python
-from pyblade import live
+from pyblade import LiveComponent
 from components.forms import PostForm
 
-class CreatePost(live.Component)
+class CreatePost(LiveComponent)
 
     form: PostForm # [!code highlight]
 
@@ -388,10 +388,10 @@ Now, from the component, you can call the `save()` method on the form which firs
 
 
 ```python
-from pyblade import live
+from pyblade import LiveComponent
 from components.forms import PostForm
 
-class CreatePost(live.Component)
+class CreatePost(LiveComponent)
 
     form: PostForm
 

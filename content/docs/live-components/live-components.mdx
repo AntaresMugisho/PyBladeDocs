@@ -1,0 +1,529 @@
+---
+title: "Live Components"
+---
+
+Live Components are reusable UI elements that combine **Python logic** with a **PyBlade template**. Unlike regular PyBlade components, they can respond to user interactions and update their content without requiring a full page reload.
+
+If you already know how PyBlade components work, Live Components should feel familiar. They are rendered using the same component syntax you have already seen. The main difference is what happens behind the scenes when PyBlade finds the component.
+
+<Callout type="info" title={"PyBlade Components vs. Live Components"}>
+
+Regular PyBlade components are reusable pieces of HTML that are rendered when the page is generated.
+
+Live Components can do everything regular components can do, but they can also respond to interactions and update themselves dynamically without requiring a full page reload.
+
+In simple terms:
+
+* Regular component: reusable UI.
+* Live Component: reusable UI + Python behavior + live updates.
+
+</Callout>
+
+## Creating a Live Component
+
+A Live Component consists of two parts:
+
+* A **Python class** that inherits from `LiveComponent` and contains the component's logic.
+* A **PyBlade template** that defines what the component looks like.
+
+PyBlade CLI provides a command to generate both files for you:
+
+```bash
+pyblade make:livecomponent TodoList
+```
+
+You can also use kebab-case names:
+
+```bash
+pyblade make:livecomponent todo-list
+```
+
+By default, PyBlade creates the component inside its own folder:
+
+```files
+components
+└── todo_list
+    ├── todo_list.py
+    └── todo_list.html
+```
+
+The Python file contains the Live Component class:
+
+```python title="components/todo_list/todo_list.py"
+from pyblade import LiveComponent
+
+
+class TodoList(LiveComponent):
+
+    def render(self):
+        return self.render_template(context={})
+```
+
+And the HTML file contains its PyBlade template:
+
+```html title="components/todo_list/todo_list.html"
+<div>
+    {# Your component content goes here #}
+</div>
+```
+
+You can also create these files manually if you prefer.
+
+<Callout type="info" title={"Naming convention"}>
+Generated files and folders use *snake_case*, while component classes use *PascalCase*.
+
+For example, a component named `TodoList` is generated as `todo_list`, while its Python class remains `TodoList`.
+</Callout>
+
+## Understanding component folders
+
+You may notice that the Python class and template are placed inside a folder with the same name as the component.
+
+This folder is only there to keep the component's files organized. It is not part of the component's name.
+
+For example:
+
+```files
+components
+└── todo_list
+    ├── todo_list.py
+    └── todo_list.html
+```
+
+The component is still simply called `todo-list`.
+
+You therefore render it as:
+
+```html
+<pb-todo-list />
+```
+
+You do not need to include the folder name when rendering the component.
+
+This organization is intentionally abstract. PyBlade uses the folder to keep the component's files together, while the component itself is identified by its name.
+
+### Flat components
+
+If you prefer not to create a separate folder for every Live Component, you can use the `--flat` option:
+
+```bash
+pyblade make:livecomponent TodoList --flat
+```
+
+The generated files will then be placed directly inside the components directory:
+
+```files
+components
+├── todo_list.py
+├── todo_list.html
+└── ...
+```
+
+You can also configure this behavior in your `pyblade.toml` file, so you don't have to specify `--flat` every time.
+
+This is simply an organizational choice. It does not change how you render the component.
+
+## Inline components
+
+If a component is small enough, you can keep its template directly inside the Python class instead of creating a separate HTML file.
+
+These are called **inline components**.
+
+For example:
+
+```python title="components/todo_list/todo_list.py"
+from pyblade import LiveComponent
+
+
+class TodoList(LiveComponent):
+
+    def render(self):
+        return self.render_inline("""
+            <div>
+                {# Your content goes here #}
+            </div>
+        """)
+```
+
+You can generate an inline component using the `--inline` option:
+
+```bash
+pyblade make:livecomponent TodoList --inline
+```
+
+An inline component still requires its Python class. Only the separate template file is omitted.
+
+## Omitting the `render` method
+
+If your component follows PyBlade's conventional naming structure, you can omit the `render` method entirely.
+
+PyBlade Live will automatically use the template associated with the component:
+
+```python title="components/todo_list/todo_list.py"
+from pyblade import LiveComponent
+
+class TodoList(LiveComponent):
+    ...
+```
+
+With the conventional structure:
+
+```files
+components
+└── todo_list
+    ├── todo_list.py
+    └── todo_list.html
+```
+
+PyBlade automatically knows that `todo_list.html` belongs to the `TodoList` component.
+
+If you use a different template name or location, you can customize the template resolution. For a fixed template, override the `template_name` property with the template path:
+
+```python
+class TodoList(LiveComponent):
+    template_name = "path.to.template"
+```
+
+For more advanced or dynamic template resolution, you can instead override the `get_template_name()` method.
+
+This lets you keep simple components concise while still giving you full control over which template a component renders.
+
+## Rendering Live Components
+
+Live Components use the **same syntax as regular PyBlade components**.
+
+The preferred way to render the `TodoList` component is with a component tag:
+
+```html
+<pb-todo-list />
+```
+
+You can also use the `@component` directive:
+
+```html
+@component("todo-list")
+```
+
+Both forms refer to the same component.
+
+The tag syntax is generally easier to read when your component is part of the HTML structure, while the `@component` directive can be useful when you need to render a component dynamically or use it in a template expression.
+
+<Callout type="info" title={"The same syntax is used for regular and Live Components"}>
+
+You don't need a special syntax to tell PyBlade that a component is live.
+
+For example, both a regular component and a Live Component can be rendered using:
+
+```html
+<pb-card />
+```
+
+PyBlade determines which type of component to render when it searches for the component.
+
+</Callout>
+
+### How PyBlade finds a component
+
+Because regular and Live Components use the same syntax, you may wonder how PyBlade knows which one to render.
+
+When PyBlade encounters a component such as:
+
+```html
+<pb-card />
+```
+
+it searches for a **Live Component first**.
+
+In this case, PyBlade looks for the Python class that defines the `card` Live Component. If it finds it, PyBlade renders the Live Component.
+
+If no Live Component is found, PyBlade then searches for a regular PyBlade component named `card`.
+
+If neither a Live Component nor a regular component can be found, PyBlade raises an exception indicating that the component could not be resolved.
+
+The process can be summarized as:
+
+```text
+<pb-card />
+     │
+     ▼
+Look for a Live Component
+     │
+     ├── Found ──► Render Live Component
+     │
+     └── Not found
+             │
+             ▼
+      Look for regular component
+             │
+             ├── Found ──► Render regular component
+             │
+             └── Not found ──► Raise an exception
+```
+
+This behavior allows you to use the same component syntax throughout your templates without having to remember whether a component is regular or live.
+
+### Component names
+
+Component tags use the component's **kebab-case name**:
+
+```html
+<pb-todo-list />
+```
+
+For a Python class named:
+
+```python
+class TodoList(LiveComponent):
+    ...
+```
+
+the corresponding component name is `todo-list`.
+
+You can also use the `@component` directive with the same name:
+
+```html
+@component("todo-list")
+```
+
+Do not use the Python class name directly in the component tag:
+
+```html
+<pb-TodoList />
+```
+
+Component names should use **kebab-case** or the supported **snake_case** form.
+
+## Passing data to components
+
+Live Components can receive initial data from the template when they are rendered.
+
+You can pass a value using a regular attribute:
+
+```html
+<pb-todo-list title="My Tasks" />
+```
+
+If you need to pass a Python value or variable, use a bound attribute by prefixing the attribute name with `:`:
+
+```html
+<pb-todo-list :title="initial_title" />
+```
+
+The same concept applies when using the `@component` directive:
+
+```html
+@component("todo-list", props={"title": initial_title})
+```
+
+<Callout type="info" title={"Already familiar?"}>
+
+If you have already read the **Passing data to components** section for regular PyBlade components, the syntax here works in the same way.
+
+The difference is what the Live Component does with the received data.
+
+</Callout>
+
+### Receiving data in the component
+
+Data passed to a Live Component is received through its `mount()` method.
+
+For example:
+
+```python title="components/todo_list/todo_list.py"
+from pyblade import LiveComponent
+
+
+class TodoList(LiveComponent):
+
+    def mount(self, title: str):
+        self.title = title
+
+    def render(self):
+        return self.render_template(context={})
+```
+
+When the component is rendered as:
+
+```html
+<pb-todo-list title="My Tasks" />
+```
+
+PyBlade calls `mount()` during the component's initial creation and passes `"My Tasks"` as the `title` argument.
+
+You can think of `mount()` as the place where you prepare a Live Component when it is first created. It is similar in purpose to a Python class constructor, although it follows the Live Component lifecycle rather than replacing `__init__()`.
+
+We will explore `mount()` and the other lifecycle hooks in the [Lifecycle hooks](/docs/live/lifecycle-hooks) section.
+
+### Automatically assigning component properties
+
+For simple cases, you can omit `mount()` entirely.
+
+If you explicitly declare a typed property whose name matches a value passed to the component, PyBlade Live can assign the value automatically:
+
+```python title="components/todo_list/todo_list.py"
+from pyblade import LiveComponent
+
+
+class TodoList(LiveComponent):
+
+    title: str
+
+    def render(self):
+        return self.render_template(context={})
+```
+
+You can then render the component as:
+
+```html
+<pb-todo-list title="My Tasks" />
+```
+
+PyBlade will automatically assign the value to the `title` property.
+
+This is equivalent to assigning the property yourself inside `mount()` for this simple case.
+
+<Callout type="warn" title={"Initial values are not automatically reactive"}>
+
+Values passed to a Live Component when it is created are used to initialize the component.
+
+If the value outside the component changes later, the component's property will not automatically change with it.
+
+This behavior is intentional. If you need a property to respond to changes from outside the component, PyBlade Live provides mechanisms for explicitly opting into that behavior.
+
+We will cover this in the relevant section later in the documentation.
+
+</Callout>
+
+## Rendering components in loops
+
+When rendering elements inside a loop in a Live Component template, PyBlade needs a way to distinguish one item from another when the list changes.
+
+For this reason, elements rendered by a loop should have a **unique `key`**.
+
+For example:
+
+```html
+<div>
+
+    @for (task in tasks)
+
+        <div key="{{ task.id }}">
+            {# ... #}
+        </div>
+
+    @endfor
+
+</div>
+```
+
+The `key` should uniquely identify each item. Using the item's database ID is often a good choice.
+
+The same principle applies when rendering Live Components inside a loop.
+
+You can pass the key directly to a component tag:
+
+```html
+<div>
+
+    @for (task in tasks)
+
+        <pb-task-item :task="task" :key="task.id" />
+
+    @endfor
+
+</div>
+```
+
+When using the `@component` directive, the key can be provided as a separate argument:
+
+```html
+<div>
+
+    @for (task in tasks)
+
+        @component(
+            "task-item",
+            props={"task": task},
+            key=task.id
+        )
+
+    @endfor
+
+</div>
+```
+
+<Callout type="info" title={"Why do I need a key?"}>
+
+When a list changes, PyBlade Live needs to know which rendered element corresponds to which item.
+
+A unique `key` gives each item an identity, allowing PyBlade to correctly match the existing elements with the new ones.
+
+You will see this become especially important when building lists that can be added to, removed from, filtered, or reordered.
+
+</Callout>
+
+## Including custom JavaScript
+
+<Callout type="error" title={"404: Not found"}>
+
+Coming soon!
+
+</Callout>
+
+## Full-page components
+
+<Callout type="info" title={"Not available yet"}>
+
+This feature is not yet available. This section documents the planned API for informational purposes only.
+
+</Callout>
+
+A full-page component allows a Live Component to be assigned directly to a route instead of being rendered inside another PyBlade template.
+
+This can be useful when an entire page naturally belongs to a single Live Component.
+
+For example, a future API could allow you to assign a component to a Django route using `as_view()`:
+
+```python
+from django.urls import path
+
+from live import TodoList
+
+
+urlpatterns = [
+    path("tasks/", TodoList.as_view()),
+]
+```
+
+When the user visits `/tasks/`, the `TodoList` component would be rendered as the page itself.
+
+### Accessing route parameters
+
+Full-page components can also receive parameters from the URL.
+
+For example:
+
+```python
+urlpatterns = [
+    path("tasks/<int:id>/", TaskDetail.as_view()),
+]
+```
+
+The `id` parameter could then be received by the component's `mount()` method:
+
+```python
+from pyblade import LiveComponent
+
+from app.models import Task
+
+
+class TaskDetail(LiveComponent):
+
+    def mount(self, id: int):
+        self.task = Task.objects.get(id=id)
+
+    def render(self):
+        return self.render_template("task-detail")
+```
+
+If the user visits `/tasks/1/`, the value `1` would be passed to the component as the `id` parameter.

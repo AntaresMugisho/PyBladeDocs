@@ -8,10 +8,10 @@ PyBlade Live provides a simple `pb-click` directive for calling component method
 For example, given the `InvoiceDetail` component below:
 
 ```python
-from pyblade import live
+from pyblade import LiveComponent
 from app.models import Invoice
 
-class ShowInvoice(live.Component):
+class ShowInvoice(LiveComponent):
     invoice: Invoice
 
     def download(self):
@@ -48,10 +48,10 @@ PyBlade Live makes it easy to handle form submissions via the `pb-submit` direct
 Here's a basic example of using `pb-submit` to handle a "PostCreate" form submission:
 
 ```python
-from pyblade import live
+from pyblade import LiveComponent
 from app.models import Post
 
-class PostCreate(live.Component)
+class PostCreate(LiveComponent)
     title: str = ""
     content: str = ""
 
@@ -94,10 +94,10 @@ PyBlade Live makes it easy to bind a component property's value with form inputs
 Here is a simple example of using `pb-model` to bind the `title` and `content` properties with form inputs in a `PostCreate` component:
 
 ```python
-from pyblade import live
+from pyblade import LiveComponent
 from app.models import Post
 
-class PostCreate(live.Component)
+class PostCreate(LiveComponent)
     title: str = ""
     content: str = ""
 
@@ -796,9 +796,9 @@ Showing or hiding content in PyBlade Live is as simple as using one of PyBlade's
 For example, below is a `PostDetail` component with the ability to toggle viewing comments on and off:
 
 ```python
-from pyblade import live
+from pyblade import LiveComponent
 
-class PostDetail(live.Component):
+class PostDetail(LiveComponent):
 
     show_comments = False
     ...
@@ -985,9 +985,9 @@ Using polling inside PyBlade Live is as simple as adding `pb-poll` to an element
 Below is an example of a `SubscriberCount` component that shows a user's subscriber count:
 
 ```python
-from pyblade import live, auth
+from pyblade import LiveComponent, auth
 
-class SubscriberCount(live.Component):
+class SubscriberCount(LiveComponent):
 
     def render(self):
         user = auth()
@@ -1146,10 +1146,10 @@ The `pb-show` directive is different than using `@if` in PyBlade in that it togg
 Here's a practical example of using `pb-show` to toggle a "Create Post" modal:
 
 ```python
-from pyblade import live
+from pyblade import LiveComponent
 from app.models import Post
 
-class PostCreate(live.Component):
+class PostCreate(LiveComponent):
 
     show_modal: bool = False
     content: str = ''
@@ -1206,9 +1206,9 @@ To demonstrate the most basic functionality of `pb-stream`, below is a simple Co
 
 ```python
 import time
-from pyblade import live
+from pyblade import LiveComponent
 
-class CountDown(live.Component):
+class CountDown(LiveComponent):
 
     start: int = 3
 
@@ -1267,11 +1267,11 @@ Below is an example of using `pb-stream` to accomplish a ChatGPT-like interface:
 
 ```python
 import openai # You need to install this (pip install openai)
-from pyblade import live
+from pyblade import LiveComponent
 
 openai.api_key = "your-api-key" # Replace with your actual OpenAI API Key
 
-class ChatBot(live.Component):
+class ChatBot(LiveComponent):
 
     prompt: str = ""
     question: str = ""
@@ -1367,10 +1367,10 @@ Append/replace can also be specified at the target element level by appending or
 Here's an example of using `pb-text` to optimistically show updates to a PyBlade Live property without waiting for a network roundtrip.
 
 ```python
-from pyblade import live
+from pyblade import LiveComponent
 from app.models import Post
 
-class PostDetail(live.Component):
+class PostDetail(LiveComponent):
     
     post: Post
     likes: int

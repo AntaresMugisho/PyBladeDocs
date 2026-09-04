@@ -13,9 +13,9 @@ To dispatch an event from a PyBlade Live component, you can call the `emit()` me
 Below is an example of dispatching a `post-created` event from a `PostCreate` component:
 
 ```python
-from pyblade import live
+from pyblade import LiveComponent
 
-class PostCreate(live.Component):
+class PostCreate(LiveComponent):
 
     def save(self):
         ...
@@ -41,9 +41,9 @@ To listen for an event in a PyBlade Live component, add the `@on` decorator abov
 
 
 ```python
-from pyblade import live
+from pyblade import LiveComponent
 
-class Dashboard(live.Component):
+class Dashboard(LiveComponent):
 
 	@on('post-created') # [!code highlight]
     def update_post_list(self, title: str):
@@ -61,11 +61,11 @@ Occasionally, you may want to dynamically generate event listener names at run-t
 For example, if you wanted to scope an event listener to a specific Database model, you could append the model's ID to the event name when dispatching like so:
 
 ```python
-from pyblade import live
+from pyblade import LiveComponent
 from app.models import Post
 
 
-class PostUpdate(live.Component):
+class PostUpdate(LiveComponent):
     post: Post
 
     def update(self, id: int):
@@ -76,10 +76,10 @@ class PostUpdate(live.Component):
 And then listen for that specific model:
 
 ```python
-from pyblade import live
+from pyblade import LiveComponent
 from app.models import Post
 
-class PostDetail(live.Component):
+class PostDetail(LiveComponent):
 
     post: Post
 
@@ -124,9 +124,9 @@ If you want to use events for communicating directly between two components on t
 Below is an example of the `PostCreate` component dispatching the `post-created` event directly to the `Dashboard` component, skipping any other components listening for that specific event:
 
 ```python
-from pyblade import live
+from pyblade import LiveComponent
 
-class postCreate(live.Component):
+class postCreate(LiveComponent):
 
     def save(self):
 		self.emit("post-created").to("Dashboard") # [!code highlight]
@@ -138,9 +138,9 @@ class postCreate(live.Component):
 Using the `emit().self()` modifier, you can restrict an event to only being intercepted by the component it was triggered from:
 
 ```python
-from pyblade import live
+from pyblade import LiveComponent
 
-class postCreate(live.Component):
+class postCreate(LiveComponent):
 
     def save(self):
 		self.emit("post-created").self() # [!code highlight]
@@ -223,7 +223,7 @@ You can now access those event parameters from both your PyBlade Live class and 
 Here's an example of receiving the `refresh_posts` parameter within a PyBlade Live class:
 
 ```python
-from pyblade import live
+from pyblade import LiveComponent
 # ...
 
     @on("post-created")

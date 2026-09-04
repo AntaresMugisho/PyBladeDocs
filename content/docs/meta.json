@@ -11,10 +11,10 @@
     "displaying-data",
     "pyblade-directives",
     "components",
-    "layouts",
+    "template-inheritence",
     
     "---LIVE COMPONENTS---",
-    "...live",
+    "...live-components",
 
     "---PYBLADE CLI---",
     "...cli",

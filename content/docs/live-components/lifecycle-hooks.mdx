@@ -23,10 +23,10 @@ In a typical Python class, a constructor (`__init__()`) initializes an object’
 Here's an example of how to use the `mount()` method to initialize `name` and `email` in an `UpdateProfile` component:
 
 ```python
-from pyblade import live
+from pyblade import LiveComponent
 from pyblade.live import auth
 
-class UpdateProfile(live.Component):
+class UpdateProfile(LiveComponent):
 
     def mount(self):
         user = auth()
@@ -37,10 +37,10 @@ class UpdateProfile(live.Component):
 The `mount()` method can also receive parameters when the component is initialized:
 
 ```python
-from pyblade import live
+from pyblade import LiveComponent
 from app.models import Post
 
-class PostUpdate(live.Component):
+class PostUpdate(LiveComponent):
 
     def mount(self, post: Post):
         self.title = post.title
@@ -63,10 +63,10 @@ For this purpose, PyBlade Live provides the `boot()` method where you can write 
 The `boot()` method can be useful for things like initializing private properties, which are not persisted between requests. Below is an example of initializing a private property as a Post model:
 
 ```python
-from pyblade import live
+from pyblade import LiveComponent
 from app.models import Post
 
-class PostDetail(live.Component):
+class PostDetail(LiveComponent):
     _post_id = 1  # Private property that users cannot access or change
 
     def boot(self):
@@ -99,9 +99,9 @@ It's worth noting that for this particular example, in an actual application, yo
 
 
 ```python
-from pyblade import live
+from pyblade import LiveComponent
 
-class PostDetail(live.Component):
+class PostDetail(LiveComponent):
     post_id = 1
     
     def updating(self, property: str, value):
@@ -122,9 +122,9 @@ Below is an example of using `updated()` to ensure a property's value stays cons
 
 
 ```python
-from pyblade import live
+from pyblade import LiveComponent
 
-class UserCreate(live.Component):
+class UserCreate(LiveComponent):
     username = ""
     email = ""
     
@@ -144,9 +144,9 @@ Now, anytime the `username` property is updated client-side, PyBlade Live will e
 Because you are often targeting a specific property when using update hooks, PyBlade Live allows you to specify the property name directly as part of the method name. Here's the same example from above but rewritten utilizing this technique:
 
 ```python
-from pyblade import live
+from pyblade import LiveComponent
 
-class UserCreate(live.Component):
+class UserCreate(LiveComponent):
     username = ""
     email = ""
     
@@ -169,9 +169,9 @@ We often use the terms "serialize" and "deserialize" to refer to this process th
 Let's look at an example that uses both `mount()`, `serialize()`, and `deserialize()` all together to support using a custom [data transfer object (DTO)](https://en.wikipedia.org/wiki/Data_transfer_object) instead of a Django model to store the Post data in the component:
 
 ```python
-from pyblade import live
+from pyblade import LiveComponent
 
-class PostDetail(live.Component):
+class PostDetail(LiveComponent):
     post = None
     
     def mount(self, title, content):
@@ -204,10 +204,10 @@ The above example mainly demonstrates the abilities and nature of the `serialize
 If you want to hook into the process of rendering a component's PyBlade template, you can use the `rendering()` and `rendered()` hooks:
 
 ```python
-from pyblade import live
+from pyblade import LiveComponent
 from app.models import Post
 
-class PostList(live.Component):
+class PostList(LiveComponent):
     def render(self):
         return self.view("show-posts", {
             "posts": Post.objects.all()
@@ -235,10 +235,10 @@ These hooks allow you to modify data before rendering and process the final outp
 Sometimes, it can be helpful to intercept and catch errors, such as customizing error messages or ignoring specific types of exceptions. The `exception()` hook allows you to do just that. You can check the error type and use the `stop_propagation()` method to prevent further execution.
 
 ```python
-from pyblade import live
+from pyblade import LiveComponent
 from app.models import Post
 
-class PostDetail(live.Component):
+class PostDetail(LiveComponent):
 
     def mount(self):
         self.post = Post.objects.get(id=1)
