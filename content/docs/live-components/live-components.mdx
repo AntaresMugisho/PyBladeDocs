@@ -32,10 +32,15 @@ PyBlade CLI provides a command to generate both files for you:
 pyblade make:livecomponent TodoList
 ```
 
-You can also use kebab-case names:
+You can also use *kebab-case* names:
 
 ```bash
 pyblade make:livecomponent todo-list
+```
+Or even *snake_case*:
+
+```bash
+pyblade make:livecomponent todo_list
 ```
 
 By default, PyBlade creates the component inside its own folder:
@@ -51,7 +56,6 @@ The Python file contains the Live Component class:
 
 ```python title="components/todo_list/todo_list.py"
 from pyblade import LiveComponent
-
 
 class TodoList(LiveComponent):
 
@@ -134,7 +138,6 @@ For example:
 ```python title="components/todo_list/todo_list.py"
 from pyblade import LiveComponent
 
-
 class TodoList(LiveComponent):
 
     def render(self):
@@ -186,6 +189,14 @@ class TodoList(LiveComponent):
 
 For more advanced or dynamic template resolution, you can instead override the `get_template_name()` method.
 
+```python
+class TodoList(LiveComponent):
+
+    def get_template_name(self):
+        return "path.to.template"
+```
+
+
 This lets you keep simple components concise while still giving you full control over which template a component renders.
 
 ## Rendering Live Components
@@ -211,15 +222,7 @@ The tag syntax is generally easier to read when your component is part of the HT
 <Callout type="info" title={"The same syntax is used for regular and Live Components"}>
 
 You don't need a special syntax to tell PyBlade that a component is live.
-
-For example, both a regular component and a Live Component can be rendered using:
-
-```html
-<pb-card />
-```
-
 PyBlade determines which type of component to render when it searches for the component.
-
 </Callout>
 
 ### How PyBlade finds a component
@@ -238,7 +241,7 @@ In this case, PyBlade looks for the Python class that defines the `card` Live Co
 
 If no Live Component is found, PyBlade then searches for a regular PyBlade component named `card`.
 
-If neither a Live Component nor a regular component can be found, PyBlade raises an exception indicating that the component could not be resolved.
+If neither a Live Component nor a regular component can be found, PyBlade raises the `ComponentNotFound` exception indicating that the component could not be resolved.
 
 The process can be summarized as:
 
@@ -261,6 +264,18 @@ Look for a Live Component
 ```
 
 This behavior allows you to use the same component syntax throughout your templates without having to remember whether a component is regular or live.
+
+
+<Callout type="info" title="Component names must be unique within a component directory.">
+
+You cannot have two regular components with the same name, two Live Components with the same name, or a regular component and a Live Component with the same name in the same directory.
+
+PyBlade also enforces this rule when generating components. If the generated file names would conflict with an existing component, the command returns an error instead of overwriting the existing files.
+
+Components with the same name can only coexist when they are placed in separate component directories.
+
+</Callout>
+
 
 ### Component names
 
@@ -303,21 +318,24 @@ You can pass a value using a regular attribute:
 <pb-todo-list title="My Tasks" />
 ```
 
-If you need to pass a Python value or variable, use a bound attribute by prefixing the attribute name with `:`:
+If you need to pass a Python value or variable, use a bound attribute by prefixing the attribute name with `:` like this:
 
 ```html
 <pb-todo-list :title="initial_title" />
 ```
 
-The same concept applies when using the `@component` directive:
+When using the `@component` directive, you can pass a dictionary containing the data as the second argument:
 
 ```html
-@component("todo-list", props={"title": initial_title})
+@component("todo-list", {"title": initial_title})
 ```
 
-<Callout type="info" title={"Already familiar?"}>
+The values in the dictionary are passed to the Live Component in the same way as values passed through a component tag.
 
-If you have already read the **Passing data to components** section for regular PyBlade components, the syntax here works in the same way.
+
+<Callout type="info" title="Already familiar?">
+
+If you have already read the [Passing data to components](/docs/components#passing-data-to-components) section for regular PyBlade components, the syntax here works in the same way.
 
 The difference is what the Live Component does with the received data.
 
@@ -327,7 +345,10 @@ The difference is what the Live Component does with the received data.
 
 Data passed to a Live Component is received through its `mount()` method.
 
+The `mount()` method is the Live Component equivalent of Python's `__init__()` method. It is used to receive and/or initialize the data passed to the component when it is created.
+
 For example:
+
 
 ```python title="components/todo_list/todo_list.py"
 from pyblade import LiveComponent
@@ -352,7 +373,7 @@ PyBlade calls `mount()` during the component's initial creation and passes `"My 
 
 You can think of `mount()` as the place where you prepare a Live Component when it is first created. It is similar in purpose to a Python class constructor, although it follows the Live Component lifecycle rather than replacing `__init__()`.
 
-We will explore `mount()` and the other lifecycle hooks in the [Lifecycle hooks](/docs/live/lifecycle-hooks) section.
+We will explore `mount()` and the other lifecycle hooks in the [Lifecycle hooks](lifecycle-hooks) section.
 
 ### Automatically assigning component properties
 
@@ -382,17 +403,6 @@ PyBlade will automatically assign the value to the `title` property.
 
 This is equivalent to assigning the property yourself inside `mount()` for this simple case.
 
-<Callout type="warn" title={"Initial values are not automatically reactive"}>
-
-Values passed to a Live Component when it is created are used to initialize the component.
-
-If the value outside the component changes later, the component's property will not automatically change with it.
-
-This behavior is intentional. If you need a property to respond to changes from outside the component, PyBlade Live provides mechanisms for explicitly opting into that behavior.
-
-We will cover this in the relevant section later in the documentation.
-
-</Callout>
 
 ## Rendering components in loops
 
@@ -402,17 +412,13 @@ For this reason, elements rendered by a loop should have a **unique `key`**.
 
 For example:
 
-```html
+```html title="components/todo_list/todo_list.html"
 <div>
-
     @for (task in tasks)
-
         <div key="{{ task.id }}">
             {# ... #}
         </div>
-
     @endfor
-
 </div>
 ```
 
@@ -422,33 +428,25 @@ The same principle applies when rendering Live Components inside a loop.
 
 You can pass the key directly to a component tag:
 
-```html
+```html title="templates/todo.html"
 <div>
-
     @for (task in tasks)
-
         <pb-task-item :task="task" :key="task.id" />
-
     @endfor
-
 </div>
 ```
 
 When using the `@component` directive, the key can be provided as a separate argument:
 
-```html
+```html title="templates/todo.html"
 <div>
-
     @for (task in tasks)
-
         @component(
             "task-item",
-            props={"task": task},
+            {"task": task},
             key=task.id
         )
-
     @endfor
-
 </div>
 ```
 
@@ -462,40 +460,158 @@ You will see this become especially important when building lists that can be ad
 
 </Callout>
 
-## Including custom JavaScript
+{/* ## Including custom JavaScript
 
 <Callout type="error" title={"404: Not found"}>
 
 Coming soon!
 
-</Callout>
-
+</Callout> */}
 ## Full-page components
-
-<Callout type="info" title={"Not available yet"}>
-
-This feature is not yet available. This section documents the planned API for informational purposes only.
-
-</Callout>
 
 A full-page component allows a Live Component to be assigned directly to a route instead of being rendered inside another PyBlade template.
 
-This can be useful when an entire page naturally belongs to a single Live Component.
+This is particularly useful when an entire page naturally belongs to a single Live Component, such as a dashboard, task list, profile page, or form.
 
-For example, a future API could allow you to assign a component to a Django route using `as_view()`:
+Full-page components also work especially well with PyBlade's SPA-style navigation using `pb:navigate`, allowing users to move between full-page components without a complete browser page reload.
 
-```python
-from django.urls import path
+### Defining a full-page component
 
-from live import TodoList
+Full-page components can be assigned directly to a route using `as_view()`.
 
+<Tabs groupId="framework" items={["django", "flask"]}>
+    <Tab>
+        ```python title="urls.py"
+        from django.urls import path
 
-urlpatterns = [
-    path("tasks/", TodoList.as_view()),
-]
+        from components.todo_list import TodoList
+
+        urlpatterns = [
+            path("tasks/", TodoList.as_view()),
+        ]
+        ```
+    </Tab>
+
+    <Tab>
+        ```python title="app.py"
+        from flask import Flask
+
+        from components.todo_list import TodoList
+
+        app = Flask(__name__)
+
+        app.add_url_rule(
+            "/tasks/",
+            view_func=TodoList.as_view(),
+        )
+        ```
+    </Tab>
+</Tabs>
+
+When the user visits `/tasks/`, the `TodoList` component is rendered as the page itself rather than being placed inside another PyBlade template.
+
+### The application layout
+
+Full-page components rendered through routes use your application's layout by default.
+
+PyBlade looks for an application layout at:
+
+```text
+templates/
+└── layouts/
+    └── app.html
 ```
 
-When the user visits `/tasks/`, the `TodoList` component would be rendered as the page itself.
+If this file does not exist, you can generate it with:
+
+```bash
+pyblade make:template layouts.app
+```
+
+Your application layout should contain a `@yield("content")` directive where the full-page component's content will be rendered:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ title }}</title>
+</head>
+
+<body>
+    <header>
+        <!-- Application navigation -->
+    </header>
+
+    <main>
+        @yield("content")
+    </main>
+
+    @pbscripts
+</body>
+</html>
+```
+
+The layout is responsible for the common structure of your application, while the full-page component provides the content for the current page.
+
+You can customize the default application layout in your `pyblade.toml` file. This is useful when your application has a different layout structure, for example:
+
+```toml
+[components]
+layout = "layouts.dashboard"
+```
+
+With this configuration, full-page components will use `templates/layouts/dashboard.html` instead of `templates/layouts/app.html`.
+
+### Component-specific layouts
+
+Sometimes a particular full-page component needs a different layout from the application's default layout. For example, a dashboard may use a different navigation structure from a public-facing page.
+
+You can specify a layout directly on the component by overriding its layout configuration:
+
+```python
+from pyblade import LiveComponent
+
+
+class Dashboard(LiveComponent):
+    layout = "layouts.dashboard"
+```
+
+The `Dashboard` component will then use `templates/layouts/dashboard.html` instead of the default application layout.
+
+This allows you to keep a single default layout for most pages while giving individual full-page components the flexibility to use a different layout when necessary.
+
+### Navigating between full-page components
+
+Full-page components are especially useful when combined with the `pb:navigate` attribute.
+
+For example, your application layout might contain:
+
+```html
+<nav>
+    <a href="/tasks/" pb:navigate>Tasks</a>
+    <a href="/profile/" pb:navigate>Profile</a>
+    <a href="/settings/" pb:navigate>Settings</a>
+</nav>
+
+@pbscripts
+```
+
+When a user clicks one of these links, PyBlade intercepts the navigation and loads the destination page without performing a full browser reload.
+
+Behind the scenes, PyBlade requests the destination URL, processes the response, and updates the appropriate part of the current page while keeping the application layout in place. A progress bar is displayed during the navigation to provide visual feedback.
+
+The browser URL and history are also updated, so the navigation behaves like normal browser navigation. Users can still use the Back and Forward buttons as expected.
+
+### Page metadata
+
+SPA-style navigation does not prevent each page from having its own metadata.
+
+When navigating to a new page with `pb:navigate`, PyBlade also updates the document metadata provided by the destination page, including the page title, description, and other relevant `<meta>` elements.
+
+This means you can have navigation that feels like an SPA while still maintaining page-specific metadata and server-rendered URLs, making full-page components suitable for SEO-friendly applications.
 
 ### Accessing route parameters
 
@@ -503,17 +619,35 @@ Full-page components can also receive parameters from the URL.
 
 For example:
 
-```python
-urlpatterns = [
-    path("tasks/<int:id>/", TaskDetail.as_view()),
-]
-```
+<Tabs groupId="framework" items={["django", "flask"]}>
 
-The `id` parameter could then be received by the component's `mount()` method:
+    <Tab>
 
-```python
+    ```python title="urls.py"
+    urlpatterns = [
+        path("tasks/<int:id>/", TaskDetail.as_view()),
+    ]
+    ```
+
+    </Tab>
+
+    <Tab value="flask" label="Flask">
+
+    ```python name="routes.py"
+    app.add_url_rule(
+        "/tasks/<int:id>/",
+        view_func=TaskDetail.as_view(),
+    )
+    ```
+
+    </Tab>
+
+</Tabs>
+
+The `id` parameter can then be received by the component's `mount()` method:
+
+```python title="components/task_detail/task_detail.py"
 from pyblade import LiveComponent
-
 from app.models import Task
 
 
@@ -523,7 +657,9 @@ class TaskDetail(LiveComponent):
         self.task = Task.objects.get(id=id)
 
     def render(self):
-        return self.render_template("task-detail")
+        return self.render_template()
 ```
 
-If the user visits `/tasks/1/`, the value `1` would be passed to the component as the `id` parameter.
+If the user visits `/tasks/1/`, the value `1` is passed to the component as the `id` parameter.
+
+This makes full-page components convenient for pages that depend on route parameters, such as `/tasks/<id>/`, `/users/<id>/`, or `/products/<slug>/`.
